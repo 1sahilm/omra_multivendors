@@ -11,9 +11,7 @@ const multer = require("multer");
 const fs = require("fs");
 
 router.get("/userActivity", async (req, res) => {
-  const { _id, password, email } = req.user;
-
-  const isActive= req.params.isActive
+  
 
 
   try {
