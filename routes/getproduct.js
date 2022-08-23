@@ -10,24 +10,24 @@ const sharp = require("sharp");
 const multer = require("multer");
 const fs = require("fs");
 
-// router.get("/userActivity", async (req, res) => {
+router.get("/userActivity", async (req, res) => {
   
 
 
-//   try {
-//     const user = await UserModel.find();
-//     //Fields
+  try {
+    const user = await UserModel.find();
+    //Fields
 
-//     res.json({
-//       success: "Sucessfully",
-//       user,
-//     });
-//   } catch (err) {
-//     res.json({
-//       message: err?.message,
-//     });
-//   }
-// });
+    res.json({
+      success: "Sucessfully",
+      user,
+    });
+  } catch (err) {
+    res.json({
+      message: err?.message,
+    });
+  }
+});
 
 router.get("/get_products", async (req, res) => {
   // const { user } = req.user;
