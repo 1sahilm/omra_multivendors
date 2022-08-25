@@ -325,7 +325,7 @@ router.post(
             Vendor_Id: userData.GST_No,
             vendors_name: userData.Merchant_Name,
             mobile_no: userData.mobile_no,
-            isActive: JSON.parse(userData.isActive),
+            isActive: userData.isActive,
             TypesOf_Bussiness: userData.TypesOf_Bussiness,
             SubTypeOf_bussiness: userData.SubTypeOf_bussiness,
             Merchant_Address: userData.Merchant_Address,
