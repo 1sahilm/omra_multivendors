@@ -1,16 +1,9 @@
 const express = require("express");
-const { default: mongoose } = require("mongoose");
+
 const router = express.Router();
-const UserModel = require("../model/model");
 
-const Category = require("../model/products/category");
 const Banner = require("../model/products/banner");
-const verifyJwt = require("../Middleware/jwtMiddleware");
 
-const path = require("path");
-const sharp = require("sharp");
-const multer = require("multer");
-const fs = require("fs");
 const upload = require("../config/multer");
 
 //=====================================================
@@ -50,20 +43,29 @@ router.post(
         try {
           const item = {
             banner_name: req.body.banner_name,
-            product : req.body.product,
-           
+            product: req.body.product,
 
-            banner_image1: req.files.banner_image1?.length > 0
-              ?`${process.env.BASE_URL}/banner-image/${req.files.banner_image1[0].filename}`: undefined,
+            banner_image1:
+              req.files.banner_image1?.length > 0
+                ? `${process.env.BASE_URL}/banner-image/${req.files.banner_image1[0].filename}`
+                : undefined,
 
-            banner_image2: req.files.banner_image2?.length > 0
-              ?`${process.env.BASE_URL}/banner-image/${req.files.banner_image2[0].filename}`: undefined,
-            banner_image3: req.files.banner_image3?.length > 0
-              ?`${process.env.BASE_URL}/banner-image/${req.files.banner_image3[0].filename}`: undefined,
-            banner_image4: req.files.banner_image4?.length > 0
-              ?`${process.env.BASE_URL}/banner-image/${req.files.banner_image4[0].filename}`: undefined,
-            banner_image5: req.files.banner_image5?.length > 0
-              ?`${process.env.BASE_URL}/banner-image/${req.files.banner_image5[0].filename}`: undefined,
+            banner_image2:
+              req.files.banner_image2?.length > 0
+                ? `${process.env.BASE_URL}/banner-image/${req.files.banner_image2[0].filename}`
+                : undefined,
+            banner_image3:
+              req.files.banner_image3?.length > 0
+                ? `${process.env.BASE_URL}/banner-image/${req.files.banner_image3[0].filename}`
+                : undefined,
+            banner_image4:
+              req.files.banner_image4?.length > 0
+                ? `${process.env.BASE_URL}/banner-image/${req.files.banner_image4[0].filename}`
+                : undefined,
+            banner_image5:
+              req.files.banner_image5?.length > 0
+                ? `${process.env.BASE_URL}/banner-image/${req.files.banner_image5[0].filename}`
+                : undefined,
             type: type,
           };
           const banner = await new Banner(item);
@@ -73,8 +75,7 @@ router.post(
           res.status(500).send({ message: err?.message });
         }
       }
-    } 
-    
+    }
   }
 );
 
@@ -99,19 +100,29 @@ router.patch(
         { _id },
         {
           banner_name: req.body.banner_name,
-          product : req.body.product,
+          product: req.body.product,
 
-          banner_image1: req.files.banner_image1?.length > 0
-              ?`${process.env.BASE_URL}/banner-image/${req.files.banner_image1[0].filename}`: undefined,
+          banner_image1:
+            req.files.banner_image1?.length > 0
+              ? `${process.env.BASE_URL}/banner-image/${req.files.banner_image1[0].filename}`
+              : undefined,
 
-            banner_image2: req.files.banner_image2?.length > 0
-              ?`${process.env.BASE_URL}/banner-image/${req.files.banner_image2[0].filename}`: undefined,
-            banner_image3: req.files.banner_image3?.length > 0
-              ?`${process.env.BASE_URL}/banner-image/${req.files.banner_image3[0].filename}`: undefined,
-            banner_image4: req.files.banner_image4?.length > 0
-              ?`${process.env.BASE_URL}/banner-image/${req.files.banner_image4[0].filename}`: undefined,
-            banner_image5: req.files.banner_image5?.length > 0
-              ?`${process.env.BASE_URL}/banner-image/${req.files.banner_image5[0].filename}`: undefined,
+          banner_image2:
+            req.files.banner_image2?.length > 0
+              ? `${process.env.BASE_URL}/banner-image/${req.files.banner_image2[0].filename}`
+              : undefined,
+          banner_image3:
+            req.files.banner_image3?.length > 0
+              ? `${process.env.BASE_URL}/banner-image/${req.files.banner_image3[0].filename}`
+              : undefined,
+          banner_image4:
+            req.files.banner_image4?.length > 0
+              ? `${process.env.BASE_URL}/banner-image/${req.files.banner_image4[0].filename}`
+              : undefined,
+          banner_image5:
+            req.files.banner_image5?.length > 0
+              ? `${process.env.BASE_URL}/banner-image/${req.files.banner_image5[0].filename}`
+              : undefined,
           type: type,
         },
         {

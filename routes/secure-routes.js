@@ -6,11 +6,11 @@ const UserModel = require("../model/model");
 const Product = require("../model/products/product");
 const ProductProfile = require("../model/products/product_profile");
 const path = require("path");
-const sharp = require("sharp");
+// const sharp = require("sharp");
 const multer = require("multer");
-const fs = require("fs");
-const { sendEmail } = require("../lib/mailer");
-const { request } = require("http");
+// const fs = require("fs");
+// const { sendEmail } = require("../lib/mailer");
+// const { request } = require("http");
 
 //=====================================================
 
@@ -74,8 +74,6 @@ router.get("/test", (req, res, next) => {
 router.patch("/deactivate/:_id", async (req, res) => {
   const { _id } = req.params;
   const update_product = req.body;
-  console.log(req.body.category);
-  console.log({ "Hello babababababababababa": _id });
 
   try {
     if (!mongoose.Types.ObjectId.isValid(_id))
@@ -123,7 +121,6 @@ router.patch("/deactivat1111111/:_id", async (req, res) => {
 
 router.patch("/details", async (req, res) => {
   const { _id } = req.user;
-  console.log("deatails", _id);
 
   try {
     const user = await UserModel.findOneAndUpdate(
@@ -328,7 +325,7 @@ router.post(
             Vendor_Id: userData.GST_No,
             vendors_name: userData.Merchant_Name,
             mobile_no: userData.mobile_no,
-            isActive: Json.parse(userData.isActive),
+            isActive: JSON.parse(userData.isActive),
             TypesOf_Bussiness: userData.TypesOf_Bussiness,
             SubTypeOf_bussiness: userData.SubTypeOf_bussiness,
             Merchant_Address: userData.Merchant_Address,

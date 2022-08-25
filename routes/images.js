@@ -1,19 +1,17 @@
-import fs from 'fs';
+import fs from "fs";
 
-const express = require('express')
+const express = require("express");
 
-const uploads = require("../config/cloudinary")
+const uploads = require("../config/cloudinary");
 
-const upload = require("../config/multer")
+const upload = require("../config/multer");
 
-const router = express()
+const router = express();
 
-
-
-router.use(upload.array('image'));
+router.use(upload.array("image"));
 
 router.post(async (req, res) => {
-  const uploader = async (path) => await uploads(path, 'Images');
+  const uploader = async (path) => await uploads(path, "Images");
   const urls = [];
   const files = req.files;
 
@@ -27,6 +25,4 @@ router.post(async (req, res) => {
   res.status(200).json(urls);
 });
 
-module.exports=router
-
-
+module.exports = router;

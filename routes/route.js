@@ -1,9 +1,9 @@
 const express = require("express");
-const passport = require("passport");
+// const passport = require("passport");
 const jwt = require("jsonwebtoken");
 
 const router = express.Router();
-const ProductModel = require("../model/sellerProduct/product");
+// const ProductModel = require("../model/sellerProduct/product");
 const res = require("express/lib/response");
 const UserModel = require("../model/model");
 const bcrypt = require("bcrypt");
@@ -79,14 +79,12 @@ router.post(
           };
           const token = jwt.sign({ user: payload }, "TOP_SECRET");
 
-          res
-            .status(201)
-            .json({
-              success: true,
-              data: "created successfully",
-              user: user,
-              token: token,
-            });
+          res.status(201).json({
+            success: true,
+            data: "created successfully",
+            user: user,
+            token: token,
+          });
         } catch (err) {
           console.log({ error: err.message });
         }
@@ -181,10 +179,9 @@ router.post("/login", async (req, res) => {
     const token = jwt.sign({ user: body }, "TOP_SECRET");
 
     res.status(200).json({
-      user:body,
-      token
-    })
-    
+      user: body,
+      token,
+    });
   } catch (error) {
     res.status(500).send(error);
   }
@@ -198,14 +195,12 @@ router.get(
       res.clearCookie("jwt");
       const user = await req.user.save();
 
-      res
-        .status(201)
-        .json({
-          success: true,
-          data: "logout successfully",
-          user: user,
-          token: user,
-        });
+      res.status(201).json({
+        success: true,
+        data: "logout successfully",
+        user: user,
+        token: user,
+      });
     } catch (err) {
       console.log({ error: err.message });
     }

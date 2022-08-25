@@ -1,17 +1,17 @@
 const express = require("express");
-const { default: mongoose } = require("mongoose");
+// const { default: mongoose } = require("mongoose");
 const router = express.Router();
-const UserModel = require("../model/model");
+// const UserModel = require("../model/model");
 
 const Category = require("../model/products/category");
 
 const path = require("path");
-const sharp = require("sharp");
+// const sharp = require("sharp");
 const multer = require("multer");
-const fs = require("fs");
+// const fs = require("fs");
 const SubCategory = require("../model/products/subcategory");
-const Product = require("../model/products/product");
-const uploadSubCategoryImage = require("../config/multer");
+// const Product = require("../model/products/product");
+// const uploadSubCategoryImage = require("../config/multer");
 const CustomerQueryByProduct = require("../model/products/CustomerQuery");
 
 //=====================================================

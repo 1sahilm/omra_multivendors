@@ -1,96 +1,77 @@
+const express = require("express");
 
+const bodyParser = require("body-parser");
+const cors = require("cors");
 
-const express = require('express');
-const mongoose = require('mongoose');
-const passport = require('passport');
-const bodyParser = require('body-parser');
-const cors  = require("cors")
-const multer = require("multer");
-
-
-
-const UserModel = require('./model/model');
-const database =require("./config/database")
-require("dotenv").config()
+const database = require("./config/database");
+require("dotenv").config();
 const PORT = process.env.PORT || 5000;
 
+database();
 
-database()
-
-require('./auth/auth');
-
-
-
+require("./auth/auth");
 
 // const routes = require('./routes/routes');
-const secureRoute = require('./routes/secure-routes');
-const upload = require('./routes/upload');
-const category = require('./routes/category');
-const buyer = require('./routes/buyer')
-const { verifyJwt } = require('./Middleware/jwtMiddleware');
-const getProduct =require('./routes/getproduct');
+const secureRoute = require("./routes/secure-routes");
+const upload = require("./routes/upload");
+const category = require("./routes/category");
+const buyer = require("./routes/buyer");
+const { verifyJwt } = require("./Middleware/jwtMiddleware");
+const getProduct = require("./routes/getproduct");
 // const images = require('./routes/images')
-const bannerImage = require("./routes/banner_images")
-
+const bannerImage = require("./routes/banner_images");
 
 const app = express();
 
 // app.use(express.json());
-app.use(bodyParser.json()) // for parsing application/json
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.urlencoded({ extended: true }));
 // images=================
 
+app.set("view engine", "ejs");
 
+app.use(
+  cors({
+    credentials: true,
+    origin: "*",
+  })
+);
 
-app.set('view engine', 'ejs')
-
-app.use(cors({
-  credentials:true,
-  origin: '*'
-}));
-
-
-app.use("/product-image",express.static("public/images"))
-app.use("/category-image",express.static("public/images"))
-app.use("/banner-image",express.static("public/banner"))
-
-
-
+app.use("/product-image", express.static("public/images"));
+app.use("/category-image", express.static("public/images"));
+app.use("/banner-image", express.static("public/banner"));
 
 // app.use(cors({
 //   origin:"http://localhost:3000",
 //   method:['GET','POST']
 // }))
 
-app.get("/", (req,res)=> {
+app.get("/", (req, res) => {
   // res.render('index.ejs', {})
-  res.json({"message": "Welcome to India bazar. --------------------."})
-  
-})
-
-
+  res.json({ message: "Welcome to India bazar. --------------------." });
+});
 
 // app.use('/product',upload);
-const routes = require('./routes/route');
+const routes = require("./routes/route");
 
 // app.use('/images', images);
-app.use('/upload', upload);
-app.use('/api', routes);
-app.use('/api',buyer)
-app.use("/api/category",category)
-app.use("/api",bannerImage)
+app.use("/upload", upload);
+app.use("/api", routes);
+app.use("/api", buyer);
+app.use("/api/category", category);
+app.use("/api", bannerImage);
 
 // Plug in the JWT strategy as a middleware so only verified users can access this route.
-app.use('/api/user', verifyJwt, secureRoute);
+app.use("/api/user", verifyJwt, secureRoute);
 
-app.use('/api',getProduct)
+app.use("/api", getProduct);
 
 // Handle errors.
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.json({ error: err });
 });
 
 app.listen(PORT, () => {
-  console.log('Server started.')
+  console.log("Server started.");
 });
