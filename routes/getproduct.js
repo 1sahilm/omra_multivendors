@@ -11,9 +11,6 @@ const multer = require("multer");
 const fs = require("fs");
 
 router.get("/userActivity", async (req, res) => {
-  
-
-
   try {
     const user = await UserModel.find();
     //Fields

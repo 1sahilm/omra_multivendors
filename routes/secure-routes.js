@@ -75,7 +75,7 @@ router.patch("/deactivate/:_id", async (req, res) => {
   const { _id } = req.params;
   const update_product = req.body;
   console.log(req.body.category);
-  console.log({"Hello babababababababababa":_id});
+  console.log({ "Hello babababababababababa": _id });
 
   try {
     if (!mongoose.Types.ObjectId.isValid(_id))
@@ -83,7 +83,6 @@ router.patch("/deactivate/:_id", async (req, res) => {
 
     const product = await UserModel.findOne({ _id });
     product.isActive = req.body.isActive;
-
 
     await product.save();
     console.log(product);
@@ -94,40 +93,37 @@ router.patch("/deactivate/:_id", async (req, res) => {
 });
 //=======================
 
-router.patch("/deactivat1111111/:_id", async (req,res)=>{
-  const {_id} = req.params;
-  console.log("userIddddddd",_id)
-  console.log("hello babba ksie ho")
-  try{
-   const User = await UserModel.updateOne(
-    {
-      _id:_id
-    },
-    {
-      isActive:req.body.isActive
-    },
-    {
-      new:true,
-      upsert:true
-    })
+router.patch("/deactivat1111111/:_id", async (req, res) => {
+  const { _id } = req.params;
+  console.log("userIddddddd", _id);
+  console.log("hello babba ksie ho");
+  try {
+    const User = await UserModel.updateOne(
+      {
+        _id: _id,
+      },
+      {
+        isActive: req.body.isActive,
+      },
+      {
+        new: true,
+        upsert: true,
+      }
+    );
     res.json({
       message: "User Updated Sucessfully",
       User,
     });
-
-
-  }catch(error){
+  } catch (error) {
     res.json({
-      message:error?.message
-    })
-
+      message: error?.message,
+    });
   }
-})
+});
 
 router.patch("/details", async (req, res) => {
   const { _id } = req.user;
-  console.log("deatails",_id)
- 
+  console.log("deatails", _id);
 
   try {
     const user = await UserModel.findOneAndUpdate(
@@ -163,7 +159,6 @@ router.patch("/details", async (req, res) => {
 
 router.get("/details", async (req, res) => {
   const { _id } = req.user;
- 
 
   try {
     const user = await UserModel.findOne({ _id: _id });
@@ -184,7 +179,6 @@ router.get("/details", async (req, res) => {
 router.get("/userDetails", async (req, res) => {
   const { _id, password, email } = req.user;
 
-
   try {
     const user = await UserModel.find({});
     //Fields
@@ -202,11 +196,10 @@ router.get("/userDetails", async (req, res) => {
 router.get("/userActivity", async (req, res) => {
   const { _id, password, email } = req.user;
 
-  const isActive= req.params.isActive
-
+  const isActive = req.params.isActive;
 
   try {
-    const user = await UserModel.find({},{isActive:1});
+    const user = await UserModel.find({}, { isActive: 1 });
     //Fields
 
     res.json({
@@ -222,7 +215,6 @@ router.get("/userActivity", async (req, res) => {
 
 router.patch("/companyprofile", async (req, res) => {
   const { _id } = req.user;
-  
 
   try {
     const user = await UserModel.findOneAndUpdate(
@@ -255,7 +247,6 @@ router.patch("/companyprofile", async (req, res) => {
 
 router.get("/companyprofile", async (req, res) => {
   const { _id } = req.user;
- 
 
   try {
     const user = await UserModel.findOne({ _id });
@@ -285,10 +276,26 @@ router.post(
   async (req, res) => {
     // const { user } = req.user;
     const { _id } = req.user;
-    const {product_name,manufacturer_name,manufacturer_phone_no,manufacturer_address,brand,videos,
-      category,sub_category,price ,product_Specification,additionalSpecification,product_description,
-      capacity,product_code,delivery_time,model_no,type,made_in} = req.body
-   
+    const {
+      product_name,
+      manufacturer_name,
+      manufacturer_phone_no,
+      manufacturer_address,
+      brand,
+      videos,
+      category,
+      sub_category,
+      price,
+      product_Specification,
+      additionalSpecification,
+      product_description,
+      capacity,
+      product_code,
+      delivery_time,
+      model_no,
+      type,
+      made_in,
+    } = req.body;
 
     const userData = await UserModel.findOne(
       { _id: _id },
@@ -298,25 +305,30 @@ router.post(
         TypesOf_Bussiness: 1,
         SubTypeOf_bussiness: 1,
         Merchant_Address: 1,
-        mobile_no:1,
-        isActive:1
-        
+        mobile_no: 1,
+        isActive: 1,
       }
     );
-    if(!product_name || !category){
-      res.json({success:false,data:"product name and category is compulsory"})
-    } else{
-      const autocomplete= await Product.findOne({product_name:product_name,category:category})
-      if(autocomplete){
-        res.json({success:false,data:"This Product already created"})
+    if (!product_name || !category) {
+      res.json({
+        success: false,
+        data: "product name and category is compulsory",
+      });
+    } else {
+      const autocomplete = await Product.findOne({
+        product_name: product_name,
+        category: category,
+      });
+      if (autocomplete) {
+        res.json({ success: false, data: "This Product already created" });
       } else {
         try {
           const product = await new Product({
             auther_Id: _id,
             Vendor_Id: userData.GST_No,
             vendors_name: userData.Merchant_Name,
-            mobile_no:userData.mobile_no,
-            isActive:Json.parse(userData.isActive),
+            mobile_no: userData.mobile_no,
+            isActive: Json.parse(userData.isActive),
             TypesOf_Bussiness: userData.TypesOf_Bussiness,
             SubTypeOf_bussiness: userData.SubTypeOf_bussiness,
             Merchant_Address: userData.Merchant_Address,
@@ -325,7 +337,7 @@ router.post(
             manufacturer_phone_no: manufacturer_phone_no,
             manufacturer_address: manufacturer_address,
             brand: brand,
-    
+
             product_image1:
               req.files.product_image1?.length > 0
                 ? `${process.env.BASE_URL}/product-image/${req.files.product_image1[0].filename}`
@@ -346,7 +358,7 @@ router.post(
               req.files.product_image5?.length > 0
                 ? `${process.env.BASE_URL}/product-image/${req.files.product_image5[0].filename}`
                 : undefined,
-    
+
             // product_image2: req.files.product_image2[0].filename,
             videos: videos,
             category: category,
@@ -356,24 +368,21 @@ router.post(
             additionalSpecification: JSON.parse(additionalSpecification),
             product_description: product_description,
             capacity: capacity,
-            product_code:product_code,
-            delivery_time:delivery_time,
+            product_code: product_code,
+            delivery_time: delivery_time,
 
             model_no: model_no,
             made_in: made_in,
             type: type,
           });
-    
+
           await product.save();
           res.status(200).send(product);
         } catch (err) {
           res.status(500).send({ message: err?.message });
         }
-
       }
     }
-
-    
   }
 );
 
@@ -390,10 +399,26 @@ router.patch(
   ]),
   async (req, res) => {
     const { _id } = req.params;
-    const {product_name,manufacturer_name,manufacturer_phone_no,manufacturer_address,brand,videos,
-      category,sub_category,price ,product_Specification,additionalSpecification,product_description,
-      capacity,product_code,delivery_time,model_no,type,made_in} = req.body
-    
+    const {
+      product_name,
+      manufacturer_name,
+      manufacturer_phone_no,
+      manufacturer_address,
+      brand,
+      videos,
+      category,
+      sub_category,
+      price,
+      product_Specification,
+      additionalSpecification,
+      product_description,
+      capacity,
+      product_code,
+      delivery_time,
+      model_no,
+      type,
+      made_in,
+    } = req.body;
 
     try {
       const user = await Product.updateOne(
@@ -435,9 +460,9 @@ router.patch(
           additionalSpecification: JSON.parse(additionalSpecification),
           product_description: product_description,
           capacity: capacity,
-          product_code:product_code,
-          delivery_time:delivery_time,
-          made_in:made_in,
+          product_code: product_code,
+          delivery_time: delivery_time,
+          made_in: made_in,
 
           model_no: model_no,
           type: type,
@@ -468,10 +493,10 @@ router.get("/get_products", async (req, res) => {
   //   { GST_No: 1, Merchant_Name: 1 ,TypesOf_Bussiness: 1}
   // );
   try {
-    const product1 = await Product.find().sort({'createdAt':-1});
-    const userData= await UserModel.find({},{_id:1,isActive:1})
-    const product = {...product1, ...userData}
-    console.log("babagdtbftfshgf",product)
+    const product1 = await Product.find().sort({ createdAt: -1 });
+    const userData = await UserModel.find({}, { _id: 1, isActive: 1 });
+    const product = { ...product1, ...userData };
+    console.log("babagdtbftfshgf", product);
 
     res.status(200).json(product1);
   } catch (error) {
@@ -514,24 +539,23 @@ router.patch("/approved_product/:_id", async (req, res) => {
   }
 });
 
-router.get("/getApprovedCount",async(req,res)=>{
+router.get("/getApprovedCount", async (req, res) => {
   try {
-    const product = await Product.find({isApproved:true}).count();
-    console.log({"helloo babab":product})
+    const product = await Product.find({ isApproved: true }).count();
+    console.log({ "helloo babab": product });
 
     res.status(200).json(product);
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
-
-})
+});
 
 //===================================  declined
 
 router.patch("/declined_product/:_id", async (req, res) => {
   const { _id } = req.params;
   const update_product = req.body;
-  console.log("declinesd yeseees",req.body);
+  console.log("declinesd yeseees", req.body);
   console.log(_id);
 
   try {
@@ -550,16 +574,15 @@ router.patch("/declined_product/:_id", async (req, res) => {
   }
 });
 
-router.get("/getDeclinedProductCount",async(req,res)=>{
+router.get("/getDeclinedProductCount", async (req, res) => {
   try {
-    const product = await Product.find({isDeclined:true}).count();
+    const product = await Product.find({ isDeclined: true }).count();
 
     res.status(200).json(product);
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
-
-})
+});
 
 /// product profile
 
