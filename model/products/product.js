@@ -14,27 +14,27 @@ const ProductSchema = new Schema(
       ref: "User",
     },
     vendors_name: { type: String, required: true },
-    TypesOf_Bussiness:{ type: String, required: true },
+    TypesOf_Bussiness: { type: String, required: true },
 
     // true all above
-    SubTypeOf_bussiness:{ type: String, required: true },
-    Merchant_Address:{ type: String, required: true },
+    SubTypeOf_bussiness: { type: String, required: true },
+    Merchant_Address: { type: String, required: true },
     product_name: { type: String, required: false },
-    manufacturer_name:{
-      type:String,
-      required:false
+    manufacturer_name: {
+      type: String,
+      required: false,
     },
-    manufacturer_phone_no:{
-      type:String,
-      required:false
+    manufacturer_phone_no: {
+      type: String,
+      required: false,
     },
-    manufacturer_address:{
-      type:String,
-      required:false
+    manufacturer_address: {
+      type: String,
+      required: false,
     },
-    brand:{
-      type:String,
-      required:false
+    brand: {
+      type: String,
+      required: false,
     },
     product_image: {
       type: Array,
@@ -43,10 +43,12 @@ const ProductSchema = new Schema(
     category: {
       type: String,
       required: false,
+      trime: true,
     },
     sub_category: {
       type: String,
       required: false,
+      trim: true,
     },
 
     product_image1: {
@@ -85,58 +87,53 @@ const ProductSchema = new Schema(
     },
     additionalSpecification: {
       type: Array,
-      required: false
-
+      required: false,
     },
     product_description: {
-        type: String,
-        required: false,
-      },
-      capacity:{
-        type:String,
-        required:false
-      },
-      model_no:{
-        type:String,
-        required:false
-      },
-      product_code:{
-        type:String,
-        required:false
-
-      },
-      delivery_time:{
-        type:String,
-        required:false
-      },
-      made_in:{
-        type:String,
-        required:false
-      }
-      ,
-
+      type: String,
+      required: false,
+    },
+    capacity: {
+      type: String,
+      required: false,
+    },
+    model_no: {
+      type: String,
+      required: false,
+    },
+    product_code: {
+      type: String,
+      required: false,
+    },
+    delivery_time: {
+      type: String,
+      required: false,
+    },
+    made_in: {
+      type: String,
+      required: false,
+    },
     type: {
       type: String,
       required: false,
     },
-    isApproved:{
-        type:Boolean,
-        default:false,
+    isApproved: {
+      type: Boolean,
+      default: false,
     },
-    message:{ type:String,
-      required:false},
-    status:{
-      type:String,
-      required:false
+    message: { type: String, required: false },
+    status: {
+      type: String,
+      required: false,
     },
-    isDeclined:{
-      type:Boolean,
-      default:false,
-  },
-  isActive: {
-    type: mongoose.Schema.Types.String,
-    ref: "User",
-  },
+    isDeclined: {
+      type: Boolean,
+      default: false,
+    },
+    isActive: {
+      type: mongoose.Schema.Types.Boolean,
+      ref: "User",
+    },
   },
   {
     timestamps: true,

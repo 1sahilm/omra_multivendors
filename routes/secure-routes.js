@@ -71,6 +71,7 @@ router.get("/test", (req, res, next) => {
 });
 
 //===================deactivate users==================
+//===================deactivate users==================
 router.patch("/deactivate/:_id", async (req, res) => {
   const { _id } = req.params;
   const update_product = req.body;
@@ -79,12 +80,16 @@ router.patch("/deactivate/:_id", async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(_id))
       return res.status(404).send("No post Available");
 
-    const product = await UserModel.findOne({ _id });
-    product.isActive = req.body.isActive;
+    const user = await UserModel.findOne({ _id });
+    user.isActive = req.body.isActive;
+    const data = await Product.updateMany(
+      { auther_Id: _id },
+      { $set: { isActive: req.body.isActive } }
+    );
 
-    await product.save();
-    console.log(product);
-    res.status(200).send(product);
+    await user.save();
+    console.log({ user: user, product: data });
+    res.status(200).send({ user: user, product: data });
   } catch (err) {
     res.status(500).send({ message: err?.message });
   }
@@ -325,7 +330,7 @@ router.post(
             Vendor_Id: userData.GST_No,
             vendors_name: userData.Merchant_Name,
             mobile_no: userData.mobile_no,
-            isActive: userData.isActive,
+            isActive: JSON.parse(userData.isActive),
             TypesOf_Bussiness: userData.TypesOf_Bussiness,
             SubTypeOf_bussiness: userData.SubTypeOf_bussiness,
             Merchant_Address: userData.Merchant_Address,
