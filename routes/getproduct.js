@@ -33,7 +33,27 @@ router.get("/get_products", async (req, res) => {
   //   { GST_No: 1, Merchant_Name: 1 ,TypesOf_Bussiness: 1}
   // );
   try {
-    const product = await Product.find().sort({ createdAt: 1 });
+    const product = await Product.find().sort({ createdAt: -1 });
+
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
+
+///
+router.get("/get_publish_product", async (req, res) => {
+  // const { user } = req.user;
+  // const userData = await UserModel.findOne(
+  //   { _id: user._id },
+  //   { GST_No: 1, Merchant_Name: 1 ,TypesOf_Bussiness: 1}
+  // );
+  try {
+    const product = await Product.find({
+      isApproved: true,
+      isActive: true,
+      isDeclined: false,
+    }).sort({ createdAt: -1 });
 
     res.status(200).json(product);
   } catch (error) {
@@ -50,7 +70,10 @@ router.get("/getByCategory", async (req, res) => {
   // );
 
   try {
-    const product = await Product.find({ category });
+    const product = await Product.find(
+      { category }
+      // { isActive: true, isApproved: true, isDeclined: false }
+    );
 
     res.status(200).json(product);
   } catch (error) {
@@ -94,9 +117,11 @@ router.get("/search/:key", async (req, res) => {
   try {
     const data = await Product.find({
       $or: [
-        { vendors_name: { $regex: req.params.key, $options: "$i" } },
-        { product_name: { $regex: req.params.key, $options: "$i" } },
-        { Merchant_Address: { $regex: req.params.key, $options: "$i" } },
+        // { vendors_name: { $regex: req.params.key, $options: "$i" } },
+        // { product_name: { $regex: req.params.key, $options: "$i" } },
+        // { Merchant_Address: { $regex: req.params.key, $options: "$i" } },
+        { model_no: { $regex: req.params.key, $options: "$i" } },
+        { brand: { $regex: req.params.key, $options: "$i" } },
         { category: { $regex: req.params.key, $options: "$i" } },
       ],
     });
