@@ -184,23 +184,24 @@ router.get("/userDetails", async (req, res) => {
     const { _id, password, email } = req.user;
 
     try {
-        const user = await UserModel.find({}, { password: 0 }).lean();
-        //Fields
+        await UserModel.find({}, { password: 0 })
+            .lean()
+            .then(async (data) => {
+                const newdata = await Promise.all(
+                    data.map(async (user) => ({
+                        ...user,
+                        leadCount:
+                            (await CustomerQueryByProduct.countDocuments({
+                                merchant_Id: user._id,
+                            })) || 0,
+                    }))
+                );
 
-        //GET LEADS COUNT
-        user.forEach(async (v) => {
-            v.leadCount =
-                (await CustomerQueryByProduct.countDocuments({
-                    merchant_Id: v._id,
-                })) || 0;
-        });
-
-        Promise.all(user).then((data) => {
-            res.json({
-                success: "Sucessfully",
-                user: data,
+                res.json({
+                    success: "Sucessfully",
+                    user: newdata,
+                });
             });
-        });
     } catch (err) {
         res.json({
             message: err?.message,
