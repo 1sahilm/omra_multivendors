@@ -110,6 +110,7 @@ router.get("/getbuyerQuery", async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 });
+
 router.get("/getbuyerQueryCount", async (req, res) => {
   const { query } = req;
 

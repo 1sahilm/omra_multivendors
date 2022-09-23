@@ -247,6 +247,25 @@ router.get("/get_subcategory", async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 });
+
+router.get("/get_subcategory-lazy", async (req, res) => {
+  let {page=1,limit=50}=req.query;
+
+  page = parseInt(page);
+  limit = parseInt(limit);
+
+  try {
+    const product = await SubCategory.find().limit(limit*1).skip((page-1)*limit).exec();
+    const count = await SubCategory.countDocuments();
+
+    const totalPages = Math.ceil(count / limit);
+
+    res.status(200).json({product, totalPages , nextPage: page < totalPages ? page + 1 : null });
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+
+});
 //=======================get SubCat By Category================
 router.get("/get_subcategoryByCat", async (req, res) => {
   category_name = req.query.category_name;
