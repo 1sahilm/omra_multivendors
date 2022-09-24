@@ -9,6 +9,8 @@ const path = require("path");
 const sharp = require("sharp");
 const multer = require("multer");
 const fs = require("fs");
+const Category = require("../model/products/category");
+const SubCategoy = require("../model/products/subcategory");
 
 router.get("/userActivity", async (req, res) => {
   try {
@@ -41,6 +43,15 @@ router.get("/get_products", async (req, res) => {
   }
 });
 
+router.get("/getcompanyDescription", async (req, res) => {
+  try {
+    const cdetails = await UserModel.find({}, { description: 1 });
+    res.status(200).json(cdetails);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
+
 ///
 router.get("/get_publish_product", async (req, res) => {
   // const { user } = req.user;
@@ -54,6 +65,24 @@ router.get("/get_publish_product", async (req, res) => {
       isActive: true,
       isDeclined: false,
     }).sort({ createdAt: -1 });
+
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
+/// for published
+router.get("/publishproductApi", async (req, res) => {
+  // const category = req.query.category;
+  const { page = 1, limit = 10, toDate, fromDate } = query;
+  try {
+    const product = await Product.find({
+      isActive: true,
+      isApproved: true,
+      isDeclined: false,
+    })
+      .limit(limit)
+      .skip((page - 1) * limit);
 
     res.status(200).json(product);
   } catch (error) {
@@ -115,17 +144,23 @@ router.get("/search=", async (req, res) => {
 
 router.get("/search/:key", async (req, res) => {
   try {
-    const data = await Product.find({
+    const data1 = await Product.find({
       $or: [
         // { vendors_name: { $regex: req.params.key, $options: "$i" } },
         // { product_name: { $regex: req.params.key, $options: "$i" } },
         // { Merchant_Address: { $regex: req.params.key, $options: "$i" } },
         { model_no: { $regex: req.params.key, $options: "$i" } },
         { brand: { $regex: req.params.key, $options: "$i" } },
+        { subcategory: { $regex: req.params.key, $options: "$i" } },
         { category: { $regex: req.params.key, $options: "$i" } },
       ],
-    });
-    res.json(data);
+    }).limit(10);
+
+    const data2 = await SubCategoy.find({
+      $or: [{ category_name: { $regex: req.params.key, $options: "$i" } }],
+    }).limit(5);
+    // const data = [...data2, ...data1];
+    res.json({ data1, data2 });
   } catch (error) {
     res.json(404);
   }

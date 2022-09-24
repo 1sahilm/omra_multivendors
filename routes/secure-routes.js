@@ -181,13 +181,26 @@ router.get("/details", async (req, res) => {
 router.get("/userDetails", async (req, res) => {
   const { _id, password, email } = req.user;
 
+  let { page = 1, limit = 5, toDate, fromDate } = req.query;
+  page = Number(page);
+  limit = Number(limit);
+
   try {
-    const user = await UserModel.find({});
+    const user = await UserModel.find({})
+      .limit(limit)
+      .skip((page - 1) * limit)
+      .sort({ createdAt: -1 });
     //Fields
+    const totalDocuments = await UserModel.countDocuments({});
+
+    const pages = totalDocuments / limit;
 
     res.json({
-      success: "Sucessfully",
+      success: true,
       user,
+      totalPages: pages,
+      currentPage: page,
+      nextPage: page < pages ? page + 1 : null,
     });
   } catch (err) {
     res.json({
@@ -307,6 +320,8 @@ router.post(
         TypesOf_Bussiness: 1,
         SubTypeOf_bussiness: 1,
         Merchant_Address: 1,
+        description: 1,
+
         mobile_no: 1,
         isActive: 1,
       }
@@ -334,6 +349,7 @@ router.post(
             TypesOf_Bussiness: userData.TypesOf_Bussiness,
             SubTypeOf_bussiness: userData.SubTypeOf_bussiness,
             Merchant_Address: userData.Merchant_Address,
+            company_description: userData.description,
             product_name: product_name,
             manufacturer_name: manufacturer_name,
             manufacturer_phone_no: manufacturer_phone_no,

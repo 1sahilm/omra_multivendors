@@ -210,6 +210,33 @@ router.get(
     // });
   }
 );
+router.patch("/forgotpassword", async (req, res) => {
+  const { description, phoneNumber, merchantId } = req.body;
+  const { email } = req.query;
+
+  const merchant = await UserModel.findOne({ email: email });
+
+  if (!merchant) {
+    return res
+      .status(404)
+      .json({ message: "merchant not found", success: false });
+  }
+
+  try {
+    const user = await UserModel.updateOne(
+      { _id },
+      {
+        password: req.body.password,
+      },
+      {
+        new: true,
+        upsert: true,
+      }
+    );
+  } catch (error) {
+    console.log({ error: error.message });
+  }
+});
 
 router.post("/send-mail", async (req, res) => {
   const { description, phoneNumber, email, merchantId } = req.body;

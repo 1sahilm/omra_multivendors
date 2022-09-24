@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const UserModel = require("../model");
 
 const Schema = mongoose.Schema;
 
@@ -15,6 +16,12 @@ const ProductSchema = new Schema(
     },
     vendors_name: { type: String, required: true },
     TypesOf_Bussiness: { type: String, required: true },
+    company_description: {
+      type: mongoose.Schema.Types.String,
+      // required: false,
+      // default: UserModel.description,
+      ref: "User",
+    },
 
     // true all above
     SubTypeOf_bussiness: { type: String, required: true },
@@ -43,7 +50,7 @@ const ProductSchema = new Schema(
     category: {
       type: String,
       required: false,
-      trime: true,
+      trim: true,
     },
     sub_category: {
       type: String,
