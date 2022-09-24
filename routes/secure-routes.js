@@ -335,6 +335,7 @@ router.post(
                 product_name: product_name,
                 category: category,
             });
+
             if (autocomplete) {
                 res.json({
                     success: false,
