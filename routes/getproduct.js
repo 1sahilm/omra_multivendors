@@ -100,7 +100,7 @@ router.get("/getByCategory", async (req, res) => {
 
   try {
     const product = await Product.find(
-      { category }
+      { category, isApproved: true }
       // { isActive: true, isApproved: true, isDeclined: false }
     );
 
