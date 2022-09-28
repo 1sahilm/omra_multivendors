@@ -164,7 +164,7 @@ router.get("/details", async (req, res) => {
   const { _id } = req.user;
 
   try {
-    const user = await UserModel.findOne({ _id: _id });
+    const user = await UserModel.findOne({ _id: _id }, { password: 0 });
     // const user = await UserModel.find({ role: "Admin" });
     //Fields
 
@@ -181,6 +181,9 @@ router.get("/details", async (req, res) => {
 
 router.get("/userDetails", async (req, res) => {
   const { _id, password, email } = req.user;
+  let { page = 1, limit = 5, toDate, fromDate } = req.query;
+  page = Number(page);
+  limit = Number(limit);
 
   try {
     await UserModel.find({}, { password: 0 })
@@ -201,6 +204,87 @@ router.get("/userDetails", async (req, res) => {
           user: newdata,
         });
       });
+  } catch (err) {
+    res.json({
+      message: err?.message,
+    });
+  }
+});
+router.get("/userDetailsPaginate", async (req, res) => {
+  const { _id, password, email } = req.user;
+  let { page = 1, limit = 9, toDate, fromDate } = req.query;
+  page = Number(page);
+  limit = Number(limit);
+
+  try {
+    const user = await UserModel.find({}, { password: 0 })
+      .limit(limit)
+      .skip((page - 1) * limit)
+      .sort({ createdAt: -1 })
+      .lean()
+      .then(async (data) => {
+        const newdata = await Promise.all(
+          data.map(async (user) => ({
+            ...user,
+            leadCount:
+              (await CustomerQueryByProduct.countDocuments({
+                merchant_Id: user._id,
+              })) || 0,
+          }))
+        );
+        const totalDocuments = await UserModel.countDocuments({});
+
+        const pages = Math.ceil(totalDocuments / limit);
+
+        res.json({
+          success: true,
+          user: newdata,
+
+          totalPages: pages,
+          currentPage: page,
+          nextPage: page < pages ? page + 1 : null,
+        });
+      });
+
+    //Fields
+
+    // res.json({
+    //   success: true,
+    //   user: newdata,
+
+    //   totalPages: pages,
+    //   currentPage: page,
+    //   nextPage: page < pages ? page + 1 : null,
+    // });
+  } catch (err) {
+    res.json({
+      message: err?.message,
+    });
+  }
+});
+
+router.get("/userDetailsData", async (req, res) => {
+  let { page = 1, limit = 5, toDate, fromDate } = req.query;
+  page = Number(page);
+  limit = Number(limit);
+
+  try {
+    const user = await UserModel.find({})
+      .limit(limit)
+      .skip((page - 1) * limit)
+      .sort({ createdAt: -1 });
+    //Fields
+    const totalDocuments = await UserModel.countDocuments({});
+
+    const pages = Math.ceil(totalDocuments / limit);
+
+    res.json({
+      success: true,
+      user,
+      totalPages: pages,
+      currentPage: page,
+      nextPage: page < pages ? page + 1 : null,
+    });
   } catch (err) {
     res.json({
       message: err?.message,
@@ -628,5 +712,4 @@ router.post("/company_profile", async (req, res) => {
     res.status(500).send({ message: err?.message });
   }
 });
-
 module.exports = router;

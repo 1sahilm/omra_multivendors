@@ -43,6 +43,27 @@ router.get("/get_products", async (req, res) => {
   }
 });
 
+// api for list of approval product
+router.get("/get_productforApproval", async (req, res) => {
+  try {
+    const product = await Product.find({
+      isApproved: false,
+      // isActive: true,
+      isDeclined: false,
+    }).sort({ createdAt: -1 });
+
+    countDocs = await Product.countDocuments({
+      isApproved: false,
+      // isActive: true,
+      isDeclined: false,
+    });
+
+    res.status(200).json({ success: true, data: product, count: countDocs });
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
+
 router.get("/getcompanyDescription", async (req, res) => {
   try {
     const cdetails = await UserModel.find({}, { description: 1 });
@@ -74,7 +95,7 @@ router.get("/get_publish_product", async (req, res) => {
 /// for published
 router.get("/publishproductApi", async (req, res) => {
   // const category = req.query.category;
-  const { page = 1, limit = 10, toDate, fromDate } = query;
+  const { page = 1, limit = 10, toDate, fromDate } = req.query;
   try {
     const product = await Product.find({
       isActive: true,
@@ -82,27 +103,44 @@ router.get("/publishproductApi", async (req, res) => {
       isDeclined: false,
     })
       .limit(limit)
-      .skip((page - 1) * limit);
+      .skip((page - 1) * limit)
+      .sort({ createdAt: -1 });
+    const totalDocuments = await Product.countDocuments({
+      isActive: true,
+      isApproved: true,
+      isDeclined: false,
+    });
 
-    res.status(200).json(product);
+    const pages = Math.ceil(totalDocuments / limit);
+
+    res.status(200).json({
+      success: true,
+      data: product,
+      totalPages: pages,
+      currentPage: page,
+      nextPage: page < pages ? page + 1 : null,
+    });
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
 });
 
 router.get("/getByCategory", async (req, res) => {
+  let filter = {};
   const category = req.query.category;
-  // const { user } = req.user;
-  // const userData = await UserModel.findOne(
-  //   { _id: user._id },
-  //   { GST_No: 1, Merchant_Name: 1 ,TypesOf_Bussiness: 1}
-  // );
+  if (req.query.categories) {
+    filter = { category: req.query.categories.split(",") };
+  }
 
   try {
     const product = await Product.find(
-      { category, isApproved: true }
+      { category, isActive: true, isApproved: true, isDeclined: false }
       // { isActive: true, isApproved: true, isDeclined: false }
-    );
+      // filter
+    )
+      .populate("category")
+      .sort({ createdAt: -1 });
+    // .filter({ isActive: true, isApproved: true, isDeclined: false });
 
     res.status(200).json(product);
   } catch (error) {
