@@ -36,7 +36,6 @@ router.post(
     { name: "category_image2", maxCount: 1 },
   ]),
   async (req, res) => {
-    console.log({ test: req.body.category_name });
     const { category_name } = req.body;
 
     if (!category_name) {
@@ -173,8 +172,6 @@ router.post(
     { name: "category_image2", maxCount: 1 },
   ]),
   async (req, res) => {
-    console.log({ imagesss: req.body.sub_category_image });
-
     try {
       const category = await new SubCategory({
         category_Id: req.body.category_Id,
@@ -234,11 +231,6 @@ router.patch(
 //Fields
 
 router.get("/get_subcategory", async (req, res) => {
-  // const { user } = req.user;
-  // const userData = await UserModel.findOne(
-  //   { _id: user._id },
-  //   { GST_No: 1, Merchant_Name: 1 ,TypesOf_Bussiness: 1}
-  // );
   try {
     const product = await SubCategory.find();
 
@@ -249,22 +241,28 @@ router.get("/get_subcategory", async (req, res) => {
 });
 
 router.get("/get_subcategory-lazy", async (req, res) => {
-  let {page=1,limit=50}=req.query;
+  let { page = 1, limit = 50 } = req.query;
 
   page = parseInt(page);
   limit = parseInt(limit);
 
   try {
-    const product = await SubCategory.find().limit(limit*1).skip((page-1)*limit).exec();
+    const product = await SubCategory.find()
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .exec();
     const count = await SubCategory.countDocuments();
 
     const totalPages = Math.ceil(count / limit);
 
-    res.status(200).json({product, totalPages , nextPage: page < totalPages ? page + 1 : null });
+    res.status(200).json({
+      product,
+      totalPages,
+      nextPage: page < totalPages ? page + 1 : null,
+    });
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
-
 });
 //=======================get SubCat By Category================
 router.get("/get_subcategoryByCat", async (req, res) => {
@@ -272,7 +270,7 @@ router.get("/get_subcategoryByCat", async (req, res) => {
 
   try {
     const product = await SubCategory.find({ category_name: category_name });
-    console.log("hgghcxgds", product);
+
     res.status(200).json(product);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -284,13 +282,10 @@ router.post(
   "/connect_to_buy",
 
   async (req, res) => {
-    console.log({ imagesss: req.body.sub_category_image });
-
     try {
       const product = await new CustomerQueryByProduct({
         product_Id: req.body.product_Id,
-        // product_name: req.body.product_name,
-        // product_merchant:req.body.product_merchant,
+
         customer_mob: req.body.customer_mob,
       });
       await product.save();

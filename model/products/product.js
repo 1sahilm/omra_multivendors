@@ -26,7 +26,11 @@ const ProductSchema = new Schema(
     // true all above
     SubTypeOf_bussiness: { type: String, required: true },
     Merchant_Address: { type: String, required: true },
-    product_name: { type: String, required: false },
+    product_name: {
+      type: String,
+      required: false,
+      //  index: true
+    },
     manufacturer_name: {
       type: String,
       required: false,
@@ -42,6 +46,7 @@ const ProductSchema = new Schema(
     brand: {
       type: String,
       required: false,
+      index: true,
     },
     product_image: {
       type: Array,
@@ -51,11 +56,13 @@ const ProductSchema = new Schema(
       type: String,
       required: false,
       trim: true,
+      // index: true,
     },
     sub_category: {
       type: String,
       required: false,
       trim: true,
+      // index: true,
     },
 
     product_image1: {
@@ -120,6 +127,10 @@ const ProductSchema = new Schema(
       type: String,
       required: false,
     },
+    source: {
+      type: String,
+      required: false,
+    },
     type: {
       type: String,
       required: false,
@@ -146,6 +157,13 @@ const ProductSchema = new Schema(
     timestamps: true,
   }
 );
+
+ProductSchema.index({
+  product_name: "text",
+  category: "text",
+  sub_category: "text",
+  brand: "text",
+});
 
 const Product = mongoose.model("Product", ProductSchema);
 

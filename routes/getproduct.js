@@ -134,7 +134,12 @@ router.get("/getByCategory", async (req, res) => {
 
   try {
     const product = await Product.find(
-      { category, isActive: true, isApproved: true, isDeclined: false }
+      {
+        category: { $in: category },
+        isActive: true,
+        isApproved: true,
+        isDeclined: false,
+      }
       // { isActive: true, isApproved: true, isDeclined: false }
       // filter
     )
@@ -181,24 +186,71 @@ router.get("/search=", async (req, res) => {
 });
 
 router.get("/search/:key", async (req, res) => {
+  console.log(req.params.key);
+  var regx = new RegExp(req.params.key);
   try {
-    const data1 = await Product.find({
+    const data = await Product.find({
+      // $text: {
+      //   $search: req.params.key.toString(),
+      // },
       $or: [
-        // { vendors_name: { $regex: req.params.key, $options: "$i" } },
-        // { product_name: { $regex: req.params.key, $options: "$i" } },
-        // { Merchant_Address: { $regex: req.params.key, $options: "$i" } },
-        { model_no: { $regex: req.params.key, $options: "$i" } },
-        { brand: { $regex: req.params.key, $options: "$i" } },
-        { subcategory: { $regex: req.params.key, $options: "$i" } },
-        { category: { $regex: req.params.key, $options: "$i" } },
+        {
+          product_name: {
+            $regex: req.params.key,
+            $options: "$i",
+          },
+        },
+        {
+          model_no: {
+            $regex: req.params.key,
+            $options: "$i",
+          },
+        },
+        {
+          brand: {
+            $regex: req.params.key,
+            $options: "$i",
+          },
+        },
+        {
+          subcategory: {
+            $regex: req.params.key,
+            $options: "$i",
+          },
+        },
+        {
+          category: {
+            $regex: req.params.key,
+            $options: "$i",
+          },
+        },
       ],
-    }).limit(10);
+    });
+    // .limit(10);
 
     const data2 = await SubCategoy.find({
       $or: [{ category_name: { $regex: req.params.key, $options: "$i" } }],
     }).limit(5);
     // const data = [...data2, ...data1];
-    res.json({ data1, data2 });
+    // res.json({ data1, data2 });
+    res.send(data);
+  } catch (error) {
+    res.json(404);
+  }
+});
+
+// ===================================testing==================
+router.get("/homepageSearch/:key", async (req, res) => {
+  try {
+    const data = await Product.find({
+      $or: [
+        { category: { $regex: req.params.key, $options: "$i" } },
+        { sub_category: { $regex: req.params.key, $options: "$i" } },
+        { brand: { $regex: req.params.key, $options: "$i" } },
+        { product_name: { $regex: req.params.key, $options: "$i" } },
+      ],
+    }).limit(10);
+    res.json(data);
   } catch (error) {
     res.json(404);
   }

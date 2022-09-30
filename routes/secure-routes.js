@@ -89,7 +89,7 @@ router.patch("/deactivate/:_id", async (req, res) => {
     );
 
     await user.save();
-    console.log({ user: user, product: data });
+
     res.status(200).send({ user: user, product: data });
   } catch (err) {
     res.status(500).send({ message: err?.message });
@@ -99,8 +99,7 @@ router.patch("/deactivate/:_id", async (req, res) => {
 
 router.patch("/deactivat1111111/:_id", async (req, res) => {
   const { _id } = req.params;
-  console.log("userIddddddd", _id);
-  console.log("hello babba ksie ho");
+
   try {
     const User = await UserModel.updateOne(
       {
@@ -212,7 +211,7 @@ router.get("/userDetails", async (req, res) => {
 });
 router.get("/userDetailsPaginate", async (req, res) => {
   const { _id, password, email } = req.user;
-  let { page = 1, limit = 9, toDate, fromDate } = req.query;
+  let { page = 1, limit = 5, toDate, fromDate } = req.query;
   page = Number(page);
   limit = Number(limit);
 
@@ -392,6 +391,7 @@ router.post(
       product_code,
       delivery_time,
       model_no,
+      source,
       type,
       made_in,
     } = req.body;
@@ -476,6 +476,7 @@ router.post(
 
             model_no: model_no,
             made_in: made_in,
+            source: source,
             type: type,
           });
 
@@ -521,6 +522,7 @@ router.patch(
       model_no,
       type,
       made_in,
+      source,
     } = req.body;
 
     try {
@@ -566,6 +568,7 @@ router.patch(
           product_code: product_code,
           delivery_time: delivery_time,
           made_in: made_in,
+          source: source,
 
           model_no: model_no,
           type: type,
@@ -599,7 +602,6 @@ router.get("/get_products", async (req, res) => {
     const product1 = await Product.find().sort({ createdAt: -1 });
     const userData = await UserModel.find({}, { _id: 1, isActive: 1 });
     const product = { ...product1, ...userData };
-    console.log("babagdtbftfshgf", product);
 
     res.status(200).json(product1);
   } catch (error) {
@@ -619,13 +621,36 @@ router.get("/get_product/:id", async (req, res) => {
   }
 });
 
+/// ===================== Notification Api   ===============================
+router.get("/notification", async (req, res) => {
+  try {
+    const userData = await UserModel.find({}, { password: 0 })
+      .lean()
+      .then(async (data) => {
+        const newdata = await Promise.all(
+          data.map(async (user) => {
+            console.log(user?._id);
+            let test = await Product.find(
+              { auther_Id: user?._id }
+              // { isApproved: 1, isDeclined: 1 }
+            );
+            data = { isApproved: test?.isApproved };
+            // res.json({ success: true, data: test });
+          })
+        );
+        // res.json({ success: true, data: newdata });
+      });
+  } catch (error) {
+    // message:error?.message
+    console.log({ message: " something wrong" });
+  }
+});
+
 // update product====================================Update product for Approved==
 
 router.patch("/approved_product/:_id", async (req, res) => {
   const { _id } = req.params;
   const update_product = req.body;
-  console.log(req.body.category);
-  console.log(_id);
 
   try {
     if (!mongoose.Types.ObjectId.isValid(_id))
@@ -635,7 +660,7 @@ router.patch("/approved_product/:_id", async (req, res) => {
     product.isApproved = req.body.isApproved;
 
     await product.save();
-    console.log(product);
+
     res.status(200).send(product);
   } catch (err) {
     res.status(500).send({ message: err?.message });
@@ -645,7 +670,6 @@ router.patch("/approved_product/:_id", async (req, res) => {
 router.get("/getApprovedCount", async (req, res) => {
   try {
     const product = await Product.find({ isApproved: true }).count();
-    console.log({ "helloo babab": product });
 
     res.status(200).json(product);
   } catch (error) {
@@ -658,8 +682,6 @@ router.get("/getApprovedCount", async (req, res) => {
 router.patch("/declined_product/:_id", async (req, res) => {
   const { _id } = req.params;
   const update_product = req.body;
-  console.log("declinesd yeseees", req.body);
-  console.log(_id);
 
   try {
     if (!mongoose.Types.ObjectId.isValid(_id))
