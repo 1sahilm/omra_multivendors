@@ -127,27 +127,41 @@ router.get("/publishproductApi", async (req, res) => {
 
 router.get("/getByCategory", async (req, res) => {
   let filter = {};
+
   const category = req.query.category;
-  if (req.query.categories) {
-    filter = { category: req.query.categories.split(",") };
-  }
+  console.log("categoryyyy", category.split(","));
+  // if (req.query.categories) {
+  //   filter = { category: [req.query.categories] };
+  // }
 
   try {
     const product = await Product.find(
       {
-        category: { $in: category },
+        category: { $in: category.split(",") },
+
         isActive: true,
         isApproved: true,
         isDeclined: false,
       }
       // { isActive: true, isApproved: true, isDeclined: false }
       // filter
-    )
-      .populate("category")
-      .sort({ createdAt: -1 });
+    ).sort({ createdAt: -1 });
     // .filter({ isActive: true, isApproved: true, isDeclined: false });
-
+    console.log({ category: { $in: category.split(",") } }),
+      console.log({ test: category });
     res.status(200).json(product);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
+
+//============ get Brand list ==========
+router.get("/brand", async (req, res) => {
+  try {
+    const brand = await Product.find({}).select({ brand: 1, _id: 0 });
+    // .distinct("brand");
+    const test = new Set(brand);
+    res.status(200).json({ data: brand });
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
@@ -243,6 +257,10 @@ router.get("/search/:key", async (req, res) => {
 router.get("/homepageSearch/:key", async (req, res) => {
   try {
     const data = await Product.find({
+      // $text: {
+      //   $search: req.params.key.toString(),
+      // },
+
       $or: [
         { category: { $regex: req.params.key, $options: "$i" } },
         { sub_category: { $regex: req.params.key, $options: "$i" } },

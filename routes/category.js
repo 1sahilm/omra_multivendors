@@ -118,17 +118,24 @@ router.delete("/delete_category/:_id", (req, res) => {
 
 router.get("/get_category", async (req, res) => {
   try {
-    const product = await Category.find();
+    const product = await Category.find({});
 
-    res.status(200).json(product);
+    res.status(200).json(await product);
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
 });
 
 router.get("/get_home_cat", async (req, res) => {
+  let { page = 1, limit = 10 } = req.query;
+
+  page = parseInt(page);
+  limit = parseInt(limit);
   try {
-    const product = await Category.find().limit(10);
+    const product = await Category.find({})
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .exec();
 
     res.status(200).json(product);
   } catch (error) {
