@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 
 const ProductSchema = new Schema(
   {
-    Vendor_Id: { type: String, required: true },
+    Vendor_Id: { type: mongoose.Schema.Types.String, ref: "User" },
     auther_Id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -14,8 +14,8 @@ const ProductSchema = new Schema(
       type: mongoose.Schema.Types.String,
       ref: "User",
     },
-    vendors_name: { type: String, required: true },
-    TypesOf_Bussiness: { type: String, required: true },
+    vendors_name: { type: mongoose.Schema.Types.String, ref: "User" },
+    TypesOf_Bussiness: { type: mongoose.Schema.Types.String, ref: "User" },
     company_description: {
       type: mongoose.Schema.Types.String,
       // required: false,
@@ -24,8 +24,8 @@ const ProductSchema = new Schema(
     },
 
     // true all above
-    SubTypeOf_bussiness: { type: String, required: true },
-    Merchant_Address: { type: String, required: true },
+    SubTypeOf_bussiness: { type: mongoose.Schema.Types.String, ref: "User" },
+    Merchant_Address: { type: mongoose.Schema.Types.String, ref: "User" },
     product_name: {
       type: String,
       required: false,
@@ -124,6 +124,10 @@ const ProductSchema = new Schema(
       required: false,
     },
     made_in: {
+      type: String,
+      required: false,
+    },
+    source_type: {
       type: String,
       required: false,
     },

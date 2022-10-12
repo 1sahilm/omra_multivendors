@@ -376,6 +376,7 @@ router.post(
     const { _id } = req.user;
     const {
       product_name,
+
       manufacturer_name,
       manufacturer_phone_no,
       manufacturer_address,
@@ -392,6 +393,7 @@ router.post(
       delivery_time,
       model_no,
       source,
+      source_type,
       type,
       made_in,
     } = req.body;
@@ -476,7 +478,9 @@ router.post(
 
             model_no: model_no,
             made_in: made_in,
+            source_type: source_type,
             source: source,
+
             type: type,
           });
 
@@ -523,6 +527,7 @@ router.patch(
       type,
       made_in,
       source,
+      source_type,
     } = req.body;
 
     try {
@@ -569,6 +574,7 @@ router.patch(
           delivery_time: delivery_time,
           made_in: made_in,
           source: source,
+          source_type: source_type,
 
           model_no: model_no,
           type: type,

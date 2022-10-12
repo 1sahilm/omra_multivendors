@@ -129,7 +129,8 @@ router.get("/getByCategory", async (req, res) => {
   let filter = {};
 
   const category = req.query.category;
-  console.log("categoryyyy", category.split(","));
+  // const sub_category = req.query.sub_category;
+  // console.log("categoryyyy", category.split(","));
   // if (req.query.categories) {
   //   filter = { category: [req.query.categories] };
   // }
@@ -138,6 +139,7 @@ router.get("/getByCategory", async (req, res) => {
     const product = await Product.find(
       {
         category: { $in: category.split(",") },
+        // sub_category: { $in: sub_category },
 
         isActive: true,
         isApproved: true,
@@ -147,8 +149,8 @@ router.get("/getByCategory", async (req, res) => {
       // filter
     ).sort({ createdAt: -1 });
     // .filter({ isActive: true, isApproved: true, isDeclined: false });
-    console.log({ category: { $in: category.split(",") } }),
-      console.log({ test: category });
+    // console.log({ category: { $in: category.split(",") } }),
+    console.log({ test: category });
     res.status(200).json(product);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -248,6 +250,47 @@ router.get("/search/:key", async (req, res) => {
     // const data = [...data2, ...data1];
     // res.json({ data1, data2 });
     res.send(data);
+  } catch (error) {
+    res.json(404);
+  }
+});
+
+//// ==================== Search api for  half/full text search=============
+router.get("/product-search/:key", async (req, res) => {
+  var search = req.body.search;
+  var category = req.body.category;
+  var sub_category = req.body.sub_category;
+  var brand = req.body.brand;
+  let regex = new RegExp(req.params.searchQuery, "i");
+  let q = req.query.q;
+  // const filterd = await Model.find({ $and: [ { $or: [{title: regex },{description: regex}] }, {category: value.category}, {city:value.city} ] })
+  try {
+    const data = await Product.find(
+      {
+        category: { $regex: new RegExp(q) },
+      },
+      { _id: 0 }
+      // (data, error) => {
+      //   res.json(data);
+      // }
+    ).limit(10);
+    res.json(data);
+  } catch (error) {
+    res.json(404);
+  }
+});
+// ======================= search2 api -============
+router.get("/autoCompleteSearch/:key", async (req, res) => {
+  try {
+    const data = await Product.find(
+      {
+        $text: {
+          $search: ".*" + req.params.key.toString() + ".*",
+        },
+      },
+      { brand: 1, category: 1, sub_category: 1, product_name: 1 }
+    ).limit(10);
+    res.json(data);
   } catch (error) {
     res.json(404);
   }
