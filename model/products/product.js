@@ -165,8 +165,8 @@ const ProductSchema = new Schema(
 ProductSchema.index({
   product_name: "text",
   category: "text",
-  sub_category: "text",
   brand: "text",
+  sub_category: "text",
 });
 
 const Product = mongoose.model("Product", ProductSchema);

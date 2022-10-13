@@ -287,8 +287,8 @@ router.get("/autoCompleteSearch/:key", async (req, res) => {
         $text: {
           $search: ".*" + req.params.key.toString() + ".*",
         },
-      },
-      { brand: 1, category: 1, sub_category: 1, product_name: 1 }
+      }
+      // { brand: 1, category: 1, sub_category: 1, product_name: 1 }
     ).limit(10);
     res.json(data);
   } catch (error) {
@@ -310,6 +310,8 @@ router.get("/homepageSearch/:key", async (req, res) => {
         { brand: { $regex: req.params.key, $options: "$i" } },
         { product_name: { $regex: req.params.key, $options: "$i" } },
       ],
+      isActive: true,
+      isApproved: true,
     }).limit(10);
     res.json(data);
   } catch (error) {
