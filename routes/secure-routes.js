@@ -291,6 +291,27 @@ router.get("/userDetailsData", async (req, res) => {
   }
 });
 
+router.get("/get_user", async (req, res) => {
+  const _id = req.user;
+
+  try {
+    const user = await UserModel.find(
+      { _id: _id },
+      {
+        email: 1,
+        company_Name: 1,
+        mobile_no: 1,
+        Merchant_Name: 1,
+        Year_of_establishment: 1,
+      }
+    );
+
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
+
 router.get("/userActivity", async (req, res) => {
   const { _id, password, email } = req.user;
 
@@ -382,6 +403,7 @@ router.post(
       manufacturer_address,
       brand,
       videos,
+      video_url,
       category,
       sub_category,
       price,
@@ -390,6 +412,7 @@ router.post(
       product_description,
       capacity,
       product_code,
+      quantity,
       delivery_time,
       model_no,
       source,
@@ -466,6 +489,7 @@ router.post(
 
             // product_image2: req.files.product_image2[0].filename,
             videos: videos,
+            video_url: video_url,
             category: category,
             sub_category: sub_category,
             price: price,
@@ -474,6 +498,7 @@ router.post(
             product_description: product_description,
             capacity: capacity,
             product_code: product_code,
+            quantity: quantity,
             delivery_time: delivery_time,
 
             model_no: model_no,
@@ -514,6 +539,7 @@ router.patch(
       manufacturer_address,
       brand,
       videos,
+      video_url,
       category,
       sub_category,
       price,
@@ -522,6 +548,7 @@ router.patch(
       product_description,
       capacity,
       product_code,
+      quantity,
       delivery_time,
       model_no,
       type,
@@ -566,10 +593,12 @@ router.patch(
           category: category,
           sub_category: sub_category,
           price: price,
+          video_url: video_url,
           product_Specification: product_Specification,
           additionalSpecification: JSON.parse(additionalSpecification),
           product_description: product_description,
           capacity: capacity,
+          quantity: quantity,
           product_code: product_code,
           delivery_time: delivery_time,
           made_in: made_in,

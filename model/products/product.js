@@ -90,6 +90,10 @@ const ProductSchema = new Schema(
     //   type: String,
     //   required: false,
     // },
+    video_url: {
+      type: String,
+      required: false,
+    },
     price: {
       type: String,
       required: false,
@@ -116,6 +120,10 @@ const ProductSchema = new Schema(
       required: false,
     },
     product_code: {
+      type: String,
+      required: false,
+    },
+    quantity: {
       type: String,
       required: false,
     },

@@ -125,6 +125,29 @@ router.get("/publishproductApi", async (req, res) => {
   }
 });
 
+router.get("/get_user", async (req, res) => {
+  const _id = req.query._id;
+  console.log("idddd", req.query);
+  console.log("hello bababa");
+
+  try {
+    const user = await UserModel.find(
+      { _id: _id },
+      {
+        email: 1,
+        company_Name: 1,
+        mobile_no: 1,
+        Merchant_Name: 1,
+        Year_of_establishment: 1,
+      }
+    );
+
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
+
 router.get("/getByCategory", async (req, res) => {
   let filter = {};
 
