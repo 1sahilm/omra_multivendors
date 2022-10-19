@@ -85,7 +85,12 @@ router.get("/get_publish_product", async (req, res) => {
       isApproved: true,
       isActive: true,
       isDeclined: false,
-    }).sort({ createdAt: -1 });
+    }).sort({ updatedAt: -1 });
+    const totalDocuments = await Product.countDocuments({
+      isActive: true,
+      isApproved: true,
+      isDeclined: false,
+    });
 
     res.status(200).json(product);
   } catch (error) {

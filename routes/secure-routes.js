@@ -211,7 +211,7 @@ router.get("/userDetails", async (req, res) => {
 });
 router.get("/userDetailsPaginate", async (req, res) => {
   const { _id, password, email } = req.user;
-  let { page = 1, limit = 5, toDate, fromDate } = req.query;
+  let { page = 1, limit = 12, toDate, fromDate } = req.query;
   page = Number(page);
   limit = Number(limit);
 
@@ -295,7 +295,7 @@ router.get("/get_user", async (req, res) => {
   const _id = req.user;
 
   try {
-    const user = await UserModel.find(
+    const user = await UserModel.findOne(
       { _id: _id },
       {
         email: 1,

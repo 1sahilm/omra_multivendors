@@ -20,6 +20,7 @@ const { verifyJwt } = require("./Middleware/jwtMiddleware");
 const getProduct = require("./routes/getproduct");
 // const images = require('./routes/images')
 const bannerImage = require("./routes/banner_images");
+const blogs = require("./routes/blogs");
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use(
 
 app.use("/product-image", express.static("public/images"));
 app.use("/category-image", express.static("public/images"));
+app.use("/blog-image", express.static("public/blog"));
 app.use("/banner-image", express.static("public/banner"));
 
 // app.use(cors({
@@ -63,6 +65,7 @@ app.use("/api", bannerImage);
 
 // Plug in the JWT strategy as a middleware so only verified users can access this route.
 app.use("/api/user", verifyJwt, secureRoute);
+app.use("/api/user/blog", verifyJwt, blogs);
 
 app.use("/api", getProduct);
 
