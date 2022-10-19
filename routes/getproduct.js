@@ -75,11 +75,6 @@ router.get("/getcompanyDescription", async (req, res) => {
 
 ///
 router.get("/get_publish_product", async (req, res) => {
-  // const { user } = req.user;
-  // const userData = await UserModel.findOne(
-  //   { _id: user._id },
-  //   { GST_No: 1, Merchant_Name: 1 ,TypesOf_Bussiness: 1}
-  // );
   try {
     const product = await Product.find({
       isApproved: true,
