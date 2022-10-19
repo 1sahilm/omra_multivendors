@@ -11,7 +11,7 @@ database();
 
 require("./auth/auth");
 
-// const routes = require('./routes/routes');
+// const routes  = require('./routes/routes');
 const secureRoute = require("./routes/secure-routes");
 const upload = require("./routes/upload");
 const category = require("./routes/category");
