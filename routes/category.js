@@ -80,7 +80,7 @@ router.patch(
         {
           category_name: req.body.category_name,
           category_image:
-            req.files.category_image.length > 0
+            req.files.category_image?.length > 0
               ? `${process.env.BASE_URL}/category-image/${req.files.category_image[0].filename}`
               : undefined,
         },
