@@ -35,7 +35,7 @@ router.get("/get_products", async (req, res) => {
   //   { GST_No: 1, Merchant_Name: 1 ,TypesOf_Bussiness: 1}
   // );
   try {
-    const product = await Product.find().sort({ createdAt: -1 });
+    const product = await Product.find({}).sort({ createdAt: -1 });
 
     res.status(200).json(product);
   } catch (error) {

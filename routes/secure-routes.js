@@ -510,9 +510,13 @@ router.post(
           });
 
           await product.save();
-          res.status(200).send(product);
+          // res.status(200).send(product);
+          res.status(200).json({
+            message: "product has been uploaded Sucessfully",
+            product,
+          });
         } catch (err) {
-          res.status(500).send({ message: err?.message });
+          res.status(500).json({ message: err?.message });
         }
       }
     }
@@ -643,6 +647,25 @@ router.get("/get_products", async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 });
+router.get("/getproductForApproval", async (req, res) => {
+  // const { user } = req.user;
+  // const userData = await UserModel.findOne(
+  //   { _id: user._id },
+  //   { GST_No: 1, Merchant_Name: 1 ,TypesOf_Bussiness: 1}
+  // );
+  try {
+    const product1 = await Product.find({
+      isApproved: false,
+      isDeclined: false,
+    }).sort({ createdAt: -1 });
+    const userData = await UserModel.find({}, { _id: 1, isActive: 1 });
+    const product = { ...product1, ...userData };
+
+    res.status(200).json(product1);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
 ///
 router.get("/get_product/:id", async (req, res) => {
   const { id } = req.params;
@@ -743,7 +766,70 @@ router.get("/getDeclinedProductCount", async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 });
+// ===============Approved Product Search=========================
+// ===================================testing==================
+router.get("/ApprovedSearch/:key", async (req, res) => {
+  try {
+    const data = await Product.find({
+      // $text: {
+      //   $search: req.params.key.toString(),
+      // },
 
+      $or: [
+        { category: { $regex: req.params.key, $options: "$i" } },
+        { sub_category: { $regex: req.params.key, $options: "$i" } },
+        { brand: { $regex: req.params.key, $options: "$i" } },
+        { product_name: { $regex: req.params.key, $options: "$i" } },
+        { vendors_name: { $regex: req.params.key, $options: "$i" } },
+      ],
+      isActive: true,
+      isApproved: true,
+    });
+    res.json(data);
+  } catch (error) {
+    res.json(404);
+  }
+});
+//========================
+router.get("/ApprovedFilterByDate/:key", async (req, res) => {
+  // let today = new date().getTime();
+  console.log("hello", new Date(req.params.key), new Date());
+
+  try {
+    const data = await Product.find({
+      isActive: true,
+      isApproved: true,
+      updatedAt: { $lte: new Date(), $gte: new Date(req.params.key) },
+    });
+    res.json(data);
+  } catch (error) {
+    res.json(404);
+  }
+});
+// ===================================waiting for Approval api(unApproved and unDecline)==================
+router.get("/waitingApprovalSearch/:key", async (req, res) => {
+  try {
+    const data = await Product.find({
+      // $text: {
+      //   $search: req.params.key.toString(),
+      // },
+
+      $or: [
+        { category: { $regex: req.params.key, $options: "$i" } },
+        { sub_category: { $regex: req.params.key, $options: "$i" } },
+        { brand: { $regex: req.params.key, $options: "$i" } },
+        { product_name: { $regex: req.params.key, $options: "$i" } },
+        { vendors_name: { $regex: req.params.key, $options: "$i" } },
+      ],
+      isActive: true,
+      isApproved: false,
+      isDeclined: false,
+    });
+    res.json(data);
+  } catch (error) {
+    res.json(404);
+  }
+});
 /// product profile
 
 router.post("/company_profile", async (req, res) => {
