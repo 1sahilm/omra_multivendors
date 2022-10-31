@@ -154,40 +154,53 @@ router.get("/get_postionCat", async (req, res) => {
 
 ///  SubCategory Product==========================SubCategory Product============
 
-// router.post("/add_subcategory" ,upload.single("sub_category_image"),async(req,res)=>{
-//   try {
-//     const subcategory=await new SubCategory({
-//       category_Id: req.body.category_Id,
-//       category_name: req.body.category_name,
-//       sub_category_name: req.body.sub_category_name,
-//       sub_category_image: req.files.sub_category_image.filename >0 ? `${process.env.BASE_URL}/category-image/${req.files.sub_category_image.filename}`:undefined,
-
-//     })
-//    await subcategory.save()
-//     res.status(200).send( await subcategory)
-
-//   } catch (error) {
-//     res.json(error.message)
-
+// router.post(
+//   "/add_subcategory",
+//   upload.single("sub_category_image"),
+//   async (req, res) => {
+//     try {
+//       const subcategory = await new SubCategory({
+//         category_Id: req.body.category_Id,
+//         category_name: req.body.category_name,
+//         sub_category_name: req.body.sub_category_name,
+//         sub_category_image:
+//           req.files.sub_category_image.filename > 0
+//             ? `${process.env.BASE_URL}/category-image/${req.files.sub_category_image.filename}`
+//             : undefined,
+//       });
+//       await subcategory.save();
+//       res.status(200).send(await subcategory);
+//     } catch (error) {
+//       res.json(error.message);
+//     }
 //   }
-// })
+// );
 
 router.post(
-  "/add_subcategory",
+  "/add-subcategory",
   upload.fields([
     { name: "sub_category_image", maxCount: 1 },
     { name: "category_image2", maxCount: 1 },
   ]),
   async (req, res) => {
+    const {
+      category_Id,
+      category_name,
+      sub_category_name,
+      sub_category_image,
+    } = req.body;
     try {
       const category = await new SubCategory({
-        category_Id: req.body.category_Id,
-        category_name: req.body.category_name,
-        sub_category_name: req.body.sub_category_name,
-        sub_category_image: `${process.env.BASE_URL}/category-image/${req.files.sub_category_image[0].filename}`,
+        category_Id: category_Id,
+        category_name: category_name,
+        sub_category_name: sub_category_name,
+        sub_category_image:
+          req.files.sub_category_image.length > 0
+            ? `${process.env.BASE_URL}/category-image/${req.files.sub_category_image[0].filename}`
+            : undefined,
       });
       await category.save();
-      res.status(200).send(category);
+      res.status(200).json({ message: "uploaded", category });
     } catch (err) {
       res.status(500).send({ message: err?.message });
     }
@@ -205,13 +218,14 @@ router.patch(
   ),
   async (req, res) => {
     const { _id } = req.params;
+    console;
 
     try {
       const user = await SubCategory.updateOne(
         { _id },
         {
-          sub_category_name: req.body.category_name,
-          category_image:
+          sub_category_name: req.body.sub_category_name,
+          sub_category_image:
             req.files.sub_category_image.length > 0
               ? `${process.env.BASE_URL}/category-image/${req.files.sub_category_image[0].filename}`
               : undefined,
@@ -223,7 +237,7 @@ router.patch(
       );
       //Fields
 
-      res.json({
+      res.status(201).json({
         message: "Subcategory Updated Sucessfully",
         user,
       });
