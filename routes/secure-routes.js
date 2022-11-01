@@ -442,6 +442,7 @@ router.post(
       const autocomplete = await Product.findOne({
         product_name: product_name,
         category: category,
+        auther_Id: _id,
       });
 
       if (autocomplete) {
