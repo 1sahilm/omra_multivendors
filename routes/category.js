@@ -195,9 +195,9 @@ router.post(
         category_name: category_name,
         sub_category_name: sub_category_name,
         sub_category_image:
-          req.files.sub_category_image.length > 0
-            ? `${process.env.BASE_URL}/category-image/${req.files.sub_category_image[0].filename}`
-            : undefined,
+          // req.files.sub_category_image.length > 0
+          `${process.env.BASE_URL}/category-image/${req.files.sub_category_image[0].filename}`,
+        // : undefined,
       });
       await category.save();
       res.status(200).json({ message: "uploaded", category });
@@ -226,7 +226,7 @@ router.patch(
         {
           sub_category_name: req.body.sub_category_name,
           sub_category_image:
-            req.files.sub_category_image.length > 0
+            req.files.sub_category_image?.length > 0
               ? `${process.env.BASE_URL}/category-image/${req.files.sub_category_image[0].filename}`
               : undefined,
         },
@@ -238,6 +238,7 @@ router.patch(
       //Fields
 
       res.status(201).json({
+        success: true,
         message: "Subcategory Updated Sucessfully",
         user,
       });
