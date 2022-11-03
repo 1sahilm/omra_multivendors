@@ -420,6 +420,7 @@ router.post(
       type,
       made_in,
     } = req.body;
+    const { product_image1 } = req.files;
 
     const userData = await UserModel.findOne(
       { _id: _id },
@@ -436,12 +437,13 @@ router.post(
     if (!product_name || !category) {
       res.json({
         success: false,
-        data: "product name and category is compulsory",
+        message: "product name and category  is compulsory",
       });
     } else {
       const autocomplete = await Product.findOne({
         product_name: product_name,
         category: category,
+        sub_category: sub_category,
 
         auther_Id: _id,
       });
@@ -449,7 +451,7 @@ router.post(
       if (autocomplete) {
         res.json({
           success: false,
-          data: "This Product already created",
+          message: "This Product already created",
         });
       } else {
         try {
@@ -514,7 +516,9 @@ router.post(
           await product.save();
           // res.status(200).send(product);
           res.status(200).json({
+            success: true,
             message: "product has been uploaded Sucessfully",
+
             product,
           });
         } catch (err) {
@@ -832,6 +836,27 @@ router.get("/waitingApprovalSearch/:key", async (req, res) => {
     res.json(404);
   }
 });
+//=================================================
+router.get("/waitingproductFilterByDate/:key", async (req, res) => {
+  // let today = new date().getTime();
+  console.log("hello", new Date(req.params.key), new Date());
+
+  try {
+    const data = await Product.find({
+      isActive: true,
+      isApproved: false,
+      isDeclined: false,
+      updatedAt: {
+        $gte: new Date(req.params.key),
+        $lte: new Date(),
+      },
+    });
+    res.json(data);
+  } catch (error) {
+    res.json(404);
+  }
+});
+//=========================================================
 /// product profile
 
 router.post("/company_profile", async (req, res) => {
