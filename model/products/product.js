@@ -143,6 +143,33 @@ const ProductSchema = new Schema(
       type: String,
       required: false,
     },
+    image_source_pdf: {
+      type: String,
+      required: false,
+    },
+    image_source_image: {
+      type: String,
+      required: false,
+    },
+    image_source_url: {
+      type: String,
+      required: false,
+    },
+    image_source_other: {
+      type: String,
+      required: false,
+    },
+    // image_source:[
+    //   source_type:{type:String, required:false},
+    //     image:{type:Array,required:false}
+    // ],
+    // image_source: [
+    //   { source_type: { type: String, required: false } },
+    //   { image: { type: Array, required: false } },
+    //   { pdf: { type: Array, required: false } },
+    //   { url: { type: String, required: false } },
+    //   { other: { type: String, required: false } },
+    // ],
     type: {
       type: String,
       required: false,

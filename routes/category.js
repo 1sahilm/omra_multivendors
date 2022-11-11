@@ -92,7 +92,7 @@ router.patch(
       //Fields
 
       res.json({
-        message: "User Updated Sucessfully",
+        message: "Category Updated Sucessfully",
         user,
       });
     } catch (err) {
@@ -102,6 +102,47 @@ router.patch(
     }
   }
 );
+
+//=========Hide/UnHide Category===>
+router.patch(
+  "/hide-category/:_id",
+  upload.fields(
+    [
+      { name: "category_image", maxCount: 1 },
+      { name: "category_image2", maxCount: 1 },
+    ]
+    // upload.fields('banner_image1',5
+  ),
+  async (req, res) => {
+    const { _id } = req.params;
+
+    try {
+      const user = await Category.updateOne(
+        { _id },
+        {
+          isHide: req.body.isHide,
+        },
+
+        {
+          new: true,
+          upsert: true,
+        }
+      );
+      //Fields
+
+      res.json({
+        message: "Category is Updated Sucessfully",
+        user,
+      });
+    } catch (err) {
+      res.json({
+        message: err?.message,
+      });
+    }
+  }
+);
+
+///=====================
 
 router.delete("/delete_category/:_id", (req, res) => {
   const { _id } = req.params;
@@ -119,6 +160,17 @@ router.delete("/delete_category/:_id", (req, res) => {
 router.get("/get_category", async (req, res) => {
   try {
     const product = await Category.find({});
+
+    res.status(200).json(await product);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
+
+// for use of uploading Product
+router.get("/product_category", async (req, res) => {
+  try {
+    const product = await Category.find({ isHide: false });
 
     res.status(200).json(await product);
   } catch (error) {
@@ -189,20 +241,34 @@ router.post(
       sub_category_name,
       sub_category_image,
     } = req.body;
-    try {
-      const category = await new SubCategory({
-        category_Id: category_Id,
-        category_name: category_name,
+    if (!sub_category_name) {
+      res.json({ message: "Sub Category name must be Enter" });
+    } else {
+      const isSubCategoryName = await SubCategory.find({
         sub_category_name: sub_category_name,
-        sub_category_image:
-          // req.files.sub_category_image.length > 0
-          `${process.env.BASE_URL}/category-image/${req.files.sub_category_image[0].filename}`,
-        // : undefined,
       });
-      await category.save();
-      res.status(200).json({ message: "uploaded", category });
-    } catch (err) {
-      res.status(500).send({ message: err?.message });
+      if (isSubCategoryName) {
+        res.json({
+          success: false,
+          message: "This Name is Already Entered please Try with new",
+        });
+      } else {
+        try {
+          const category = await new SubCategory({
+            category_Id: category_Id,
+            category_name: category_name,
+            sub_category_name: sub_category_name,
+            sub_category_image:
+              // req.files.sub_category_image.length > 0
+              `${process.env.BASE_URL}/category-image/${req.files.sub_category_image[0].filename}`,
+            // : undefined,
+          });
+          await category.save();
+          res.status(200).json({ message: "uploaded", category });
+        } catch (err) {
+          res.status(500).send({ message: err?.message });
+        }
+      }
     }
   }
 );
@@ -250,11 +316,59 @@ router.patch(
   }
 );
 
+//=========Hide/UnHide SubCategoryCategory===>
+router.patch(
+  "/hide-subcategory/:_id",
+  upload.fields(
+    [
+      { name: "category_image", maxCount: 1 },
+      { name: "category_image2", maxCount: 1 },
+    ]
+    // upload.fields('banner_image1',5
+  ),
+  async (req, res) => {
+    const { _id } = req.params;
+
+    try {
+      const user = await SubCategory.updateOne(
+        { _id },
+        {
+          isHide: req.body.isHide,
+        },
+
+        {
+          new: true,
+          upsert: true,
+        }
+      );
+      //Fields
+
+      res.json({
+        message: "SubCategory is Updated Sucessfully",
+        user,
+      });
+    } catch (err) {
+      res.json({
+        message: err?.message,
+      });
+    }
+  }
+);
+
 //Fields
 
 router.get("/get_subcategory", async (req, res) => {
   try {
     const product = await SubCategory.find();
+
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
+router.get("/get_subcategory-for-upload", async (req, res) => {
+  try {
+    const product = await SubCategory.find({ isHide: false });
 
     res.status(200).json(product);
   } catch (error) {
@@ -296,6 +410,23 @@ router.get("/get_subcategoryByCat", async (req, res) => {
     res.status(200).json(product);
   } catch (error) {
     res.status(404).json({ message: error.message });
+  }
+});
+
+//===============================Category Search ==========================
+router.get("/searchCategory/:key", async (req, res) => {
+  try {
+    const data = await Category.find({
+      $or: [
+        { category_name: { $regex: req.params.key, $options: "$i" } },
+        // { GST_No: { $regex: req.params.key, $options: "$i" } },
+        // { Merchant_Address: { $regex: req.params.key, $options: "$i" } },
+        // { company_Name: { $regex: req.params.key, $options: "$i" } },
+      ],
+    });
+    res.json(data);
+  } catch (error) {
+    res.json(404);
   }
 });
 //====================

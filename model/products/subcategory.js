@@ -22,6 +22,7 @@ const SubCategorySchema = new schema(
       type: Array,
       require: false,
     },
+    isHide: { type: Boolean, default: false },
   },
   {
     timestamps: true,
