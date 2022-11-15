@@ -77,6 +77,30 @@ app.use(function (err, req, res, next) {
   res.json({ error: err });
 });
 
+
+//////////////////////==========================
+
+
+app.post("/api/test-mail",(req,res)=>{
+  console.log("test1")
+
+  try{
+  const mail = sendEmail({
+    merchantEmail:"kmryvamit78@gmail.com",
+    description:"this is test ",
+    phoneNumber:"8210374580",
+    email:"eklavyasingh12065@gmail.com"
+  })
+
+  res.status(200).json(mail)
+}catch(error){
+  // res.send(error)
+  console.log("tset2")
+}
+
+})
+
+//=================================
 app.listen(PORT, () => {
   console.log("Server started.");
 });

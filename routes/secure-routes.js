@@ -85,7 +85,7 @@ router.get("/test", (req, res, next) => {
 
 //===================deactivate users==================
 //===================deactivate users==================
-router.patch("/deactivate/:_id", async(req, res) => {
+router.patch("/deactivate/:_id", async (req, res) => {
     const { _id } = req.params;
     const update_product = req.body;
 
@@ -101,12 +101,12 @@ router.patch("/deactivate/:_id", async(req, res) => {
 
         res.status(200).send({ user: user, product: data });
     } catch (err) {
-        res.status(500).send({ message: err ? err.message : "" });
+        res.status(500).send({ message: err?.message });
     }
 });
 //=======================
 
-router.patch("/deactivat1111111/:_id", async(req, res) => {
+router.patch("/deactivat1111111/:_id", async (req, res) => {
     const { _id } = req.params;
 
     try {
@@ -124,12 +124,12 @@ router.patch("/deactivat1111111/:_id", async(req, res) => {
         });
     } catch (error) {
         res.json({
-            message: err ? err.message : ""
+            message: error?.message,
         });
     }
 });
 
-router.patch("/details", async(req, res) => {
+router.patch("/details", async (req, res) => {
     const { _id } = req.user;
 
     try {
@@ -155,12 +155,12 @@ router.patch("/details", async(req, res) => {
         });
     } catch (err) {
         res.json({
-            message: err ? err.message : ""
+            message: err.message,
         });
     }
 });
 
-router.get("/details", async(req, res) => {
+router.get("/details", async (req, res) => {
     const { _id } = req.user;
 
     try {
@@ -174,12 +174,12 @@ router.get("/details", async(req, res) => {
         });
     } catch (err) {
         res.json({
-            message: err ? err.message : ""
+            message: err?.message,
         });
     }
 });
 
-router.get("/userDetails", async(req, res) => {
+router.get("/userDetails", async (req, res) => {
     const { _id, password, email } = req.user;
     let { page = 1, limit = 5, toDate, fromDate } = req.query;
     page = Number(page);
@@ -188,9 +188,9 @@ router.get("/userDetails", async(req, res) => {
     try {
         await UserModel.find({}, { password: 0 })
             .lean()
-            .then(async(data) => {
+            .then(async (data) => {
                 const newdata = await Promise.all(
-                    data.map(async(user) => ({
+                    data.map(async (user) => ({
                         ...user,
                         leadCount:
                             (await CustomerQueryByProduct.countDocuments({
@@ -206,11 +206,11 @@ router.get("/userDetails", async(req, res) => {
             });
     } catch (err) {
         res.json({
-            message: err ? err.message : ""
+            message: err?.message,
         });
     }
 });
-router.get("/userDetailsPaginate", async(req, res) => {
+router.get("/userDetailsPaginate", async (req, res) => {
     const { _id, password, email } = req.user;
     let { page = 1, limit = 12, toDate, fromDate } = req.query;
     page = Number(page);
@@ -222,9 +222,9 @@ router.get("/userDetailsPaginate", async(req, res) => {
             .skip((page - 1) * limit)
             .sort({ createdAt: -1 })
             .lean()
-            .then(async(data) => {
+            .then(async (data) => {
                 const newdata = await Promise.all(
-                    data.map(async(user) => ({
+                    data.map(async (user) => ({
                         ...user,
                         leadCount:
                             (await CustomerQueryByProduct.countDocuments({
@@ -258,12 +258,12 @@ router.get("/userDetailsPaginate", async(req, res) => {
         // });
     } catch (err) {
         res.json({
-            message: err ? err.message : ""
+            message: err?.message,
         });
     }
 });
 
-router.get("/userDetailsData", async(req, res) => {
+router.get("/userDetailsData", async (req, res) => {
     let { page = 1, limit = 5, toDate, fromDate } = req.query;
     page = Number(page);
     limit = Number(limit);
@@ -287,12 +287,12 @@ router.get("/userDetailsData", async(req, res) => {
         });
     } catch (err) {
         res.json({
-            message: err ? err.message : ""
+            message: err?.message,
         });
     }
 });
 
-router.get("/get_user", async(req, res) => {
+router.get("/get_user", async (req, res) => {
     const _id = req.user;
 
     try {
@@ -310,7 +310,7 @@ router.get("/get_user", async(req, res) => {
     }
 });
 
-router.get("/userActivity", async(req, res) => {
+router.get("/userActivity", async (req, res) => {
     const { _id, password, email } = req.user;
 
     const isActive = req.params.isActive;
@@ -325,12 +325,12 @@ router.get("/userActivity", async(req, res) => {
         });
     } catch (err) {
         res.json({
-            message: err ? err.message : ""
+            message: err?.message,
         });
     }
 });
 
-router.patch("/companyprofile", async(req, res) => {
+router.patch("/companyprofile", async (req, res) => {
     const { _id } = req.user;
 
     try {
@@ -353,12 +353,12 @@ router.patch("/companyprofile", async(req, res) => {
         });
     } catch (err) {
         res.json({
-            message: err ? err.message : ""
+            message: err?.message,
         });
     }
 });
 
-router.get("/companyprofile", async(req, res) => {
+router.get("/companyprofile", async (req, res) => {
     const { _id } = req.user;
 
     try {
@@ -371,7 +371,7 @@ router.get("/companyprofile", async(req, res) => {
         });
     } catch (err) {
         res.json({
-            message: err ? err.message : ""
+            message: err?.message,
         });
     }
 });
@@ -386,7 +386,7 @@ router.post(
         { name: "product_image4" },
         { name: "product_image5" },
     ]),
-    async(req, res) => {
+    async (req, res) => {
         // const { user } = req.user;
         const { _id } = req.user;
         const {
@@ -469,17 +469,19 @@ router.post(
                         manufacturer_address: manufacturer_address,
                         brand: brand,
 
-                        product_image1: req.files.product_image1 ? .length > 0 ? `${process.env.BASE_URL}/product-image/${req.files.product_image1[0].filename}` : undefined,
-                        product_image2: req.files.product_image2 ? .length > 0 ?
+                        product_image1: req.files.product_image1?.length > 0 ?
+                            `${process.env.BASE_URL}/product-image/${req.files.product_image1[0].filename}` :
+                            undefined,
+                        product_image2: req.files.product_image2?.length > 0 ?
                             `${process.env.BASE_URL}/product-image/${req.files.product_image2[0].filename}` :
                             undefined,
-                        product_image3: req.files.product_image3 ? .length > 0 ?
+                        product_image3: req.files.product_image3?.length > 0 ?
                             `${process.env.BASE_URL}/product-image/${req.files.product_image3[0].filename}` :
                             undefined,
-                        product_image4: req.files.product_image4 ? .length > 0 ?
+                        product_image4: req.files.product_image4?.length > 0 ?
                             `${process.env.BASE_URL}/product-image/${req.files.product_image4[0].filename}` :
                             undefined,
-                        product_image5: req.files.product_image5 ? .length > 0 ?
+                        product_image5: req.files.product_image5?.length > 0 ?
                             `${process.env.BASE_URL}/product-image/${req.files.product_image5[0].filename}` :
                             undefined,
 
@@ -502,10 +504,10 @@ router.post(
                         source_type: source_type,
                         source: source,
                         image_source: image_source[({ url: url }, { other: other })],
-                        image_source_pdf: req.files.image_source_pdf ? .length > 0 ?
+                        image_source_pdf: req.files.image_source_pdf?.length > 0 ?
                             `${process.env.BASE_URL}/product-image/${req.files.image_source_pdf[0].filename}` :
                             undefined,
-                        image_source_image: req.files.image_source_image ? .length > 0 ?
+                        image_source_image: req.files.image_source_image?.length > 0 ?
                             `${process.env.BASE_URL}/product-image/${req.files.image_source_image[0].filename}` :
                             undefined,
                         image_source_url: image_source_url,
@@ -522,7 +524,7 @@ router.post(
                         product,
                     });
                 } catch (err) {
-                    res.status(500).json({ message: err ? .message });
+                    res.status(500).json({ message: err?.message });
                 }
             }
         }
@@ -540,7 +542,7 @@ router.patch(
         { name: "product_image4" },
         { name: "product_image5" },
     ]),
-    async(req, res) => {
+    async (req, res) => {
         const { _id } = req.params;
         const {
             product_name,
@@ -575,19 +577,19 @@ router.patch(
                 manufacturer_address: manufacturer_address,
                 brand: brand,
 
-                product_image1: req.files.product_image1 ? .length > 0 ?
+                product_image1: req.files.product_image1?.length > 0 ?
                     `${process.env.BASE_URL}/product-image/${req.files.product_image1[0].filename}` :
                     undefined,
-                product_image2: req.files.product_image2 ? .length > 0 ?
+                product_image2: req.files.product_image2?.length > 0 ?
                     `${process.env.BASE_URL}/product-image/${req.files.product_image2[0].filename}` :
                     undefined,
-                product_image3: req.files.product_image3 ? .length > 0 ?
+                product_image3: req.files.product_image3?.length > 0 ?
                     `${process.env.BASE_URL}/product-image/${req.files.product_image3[0].filename}` :
                     undefined,
-                product_image4: req.files.product_image4 ? .length > 0 ?
+                product_image4: req.files.product_image4?.length > 0 ?
                     `${process.env.BASE_URL}/product-image/${req.files.product_image4[0].filename}` :
                     undefined,
-                product_image5: req.files.product_image5 ? .length > 0 ?
+                product_image5: req.files.product_image5?.length > 0 ?
                     `${process.env.BASE_URL}/product-image/${req.files.product_image5[0].filename}` :
                     undefined,
 
@@ -622,13 +624,13 @@ router.patch(
             });
         } catch (err) {
             res.json({
-                message: err ? .message,
+                message: err?.message,
             });
         }
     }
 );
 
-router.get("/get_products", async(req, res) => {
+router.get("/get_products", async (req, res) => {
     // const { user } = req.user;
     // const userData = await UserModel.findOne(
     //   { _id: user._id },
@@ -637,14 +639,14 @@ router.get("/get_products", async(req, res) => {
     try {
         const product1 = await Product.find().sort({ createdAt: -1 });
         const userData = await UserModel.find({}, { _id: 1, isActive: 1 });
-        const product = {...product1, ...userData };
+        const product = { ...product1, ...userData };
 
         res.status(200).json(product1);
     } catch (error) {
         res.status(404).json({ message: error.message });
     }
 });
-router.get("/getproductForApproval", async(req, res) => {
+router.get("/getproductForApproval", async (req, res) => {
     // const { user } = req.user;
     // const userData = await UserModel.findOne(
     //   { _id: user._id },
@@ -656,7 +658,7 @@ router.get("/getproductForApproval", async(req, res) => {
             isDeclined: false,
         }).sort({ createdAt: -1 });
         const userData = await UserModel.find({}, { _id: 1, isActive: 1 });
-        const product = {...product1, ...userData };
+        const product = { ...product1, ...userData };
 
         res.status(200).json(product1);
     } catch (error) {
@@ -664,7 +666,7 @@ router.get("/getproductForApproval", async(req, res) => {
     }
 });
 ///
-router.get("/get_product/:id", async(req, res) => {
+router.get("/get_product/:id", async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -677,18 +679,18 @@ router.get("/get_product/:id", async(req, res) => {
 });
 
 /// ===================== Notification Api   ===============================
-router.get("/notification", async(req, res) => {
+router.get("/notification", async (req, res) => {
     try {
         const userData = await UserModel.find({}, { password: 0 })
             .lean()
-            .then(async(data) => {
+            .then(async (data) => {
                 const newdata = await Promise.all(
-                    data.map(async(user) => {
-                        console.log(user ? ._id);
-                        let test = await Product.find({ auther_Id: user ? ._id }
+                    data.map(async (user) => {
+                        console.log(user?._id);
+                        let test = await Product.find({ auther_Id: user?._id }
                             // { isApproved: 1, isDeclined: 1 }
                         );
-                        data = { isApproved: test ? .isApproved };
+                        data = { isApproved: test?.isApproved };
                         // res.json({ success: true, data: test });
                     })
                 );
@@ -702,7 +704,7 @@ router.get("/notification", async(req, res) => {
 
 // update product====================================Update product for Approved==
 
-router.patch("/approved_product/:_id", async(req, res) => {
+router.patch("/approved_product/:_id", async (req, res) => {
     const { _id } = req.params;
     const update_product = req.body;
 
@@ -717,11 +719,11 @@ router.patch("/approved_product/:_id", async(req, res) => {
 
         res.status(200).send(product);
     } catch (err) {
-        res.status(500).send({ message: err ? .message });
+        res.status(500).send({ message: err?.message });
     }
 });
 
-router.get("/getApprovedCount", async(req, res) => {
+router.get("/getApprovedCount", async (req, res) => {
     try {
         const product = await Product.find({ isApproved: true }).count();
 
@@ -733,7 +735,7 @@ router.get("/getApprovedCount", async(req, res) => {
 
 //===================================  declined
 
-router.patch("/declined_product/:_id", async(req, res) => {
+router.patch("/declined_product/:_id", async (req, res) => {
     const { _id } = req.params;
     const update_product = req.body;
 
@@ -749,11 +751,11 @@ router.patch("/declined_product/:_id", async(req, res) => {
         await product.save();
         res.status(200).send(product);
     } catch (err) {
-        res.status(500).send({ message: err ? .message });
+        res.status(500).send({ message: err?.message });
     }
 });
 
-router.get("/getDeclinedProductCount", async(req, res) => {
+router.get("/getDeclinedProductCount", async (req, res) => {
     try {
         const product = await Product.find({ isDeclined: true }).count();
 
@@ -764,7 +766,7 @@ router.get("/getDeclinedProductCount", async(req, res) => {
 });
 // ===============Approved Product Search=========================
 // ===================================testing==================
-router.get("/ApprovedSearch/:key", async(req, res) => {
+router.get("/ApprovedSearch/:key", async (req, res) => {
     try {
         const data = await Product.find({
             // $text: {
@@ -787,7 +789,7 @@ router.get("/ApprovedSearch/:key", async(req, res) => {
     }
 });
 //========================
-router.get("/ApprovedFilterByDate/:key", async(req, res) => {
+router.get("/ApprovedFilterByDate/:key", async (req, res) => {
     // let today = new date().getTime();
     console.log("hello", new Date(req.params.key), new Date());
 
@@ -803,7 +805,7 @@ router.get("/ApprovedFilterByDate/:key", async(req, res) => {
     }
 });
 // ===================================waiting for Approval api(unApproved and unDecline)==================
-router.get("/waitingApprovalSearch/:key", async(req, res) => {
+router.get("/waitingApprovalSearch/:key", async (req, res) => {
     try {
         const data = await Product.find({
             // $text: {
@@ -827,7 +829,7 @@ router.get("/waitingApprovalSearch/:key", async(req, res) => {
     }
 });
 //=================================================
-router.get("/waitingproductFilterByDate/:key", async(req, res) => {
+router.get("/waitingproductFilterByDate/:key", async (req, res) => {
     // let today = new date().getTime();
     console.log("hello", new Date(req.params.key), new Date());
 
@@ -849,7 +851,7 @@ router.get("/waitingproductFilterByDate/:key", async(req, res) => {
 //=========================================================
 /// product profile
 
-router.post("/company_profile", async(req, res) => {
+router.post("/company_profile", async (req, res) => {
     const { user } = req;
 
     const userData = await ProductProfile.findOne({ _id: user.id }, { GST_No: 1, Merchant_Name: 1 });
@@ -860,13 +862,12 @@ router.post("/company_profile", async(req, res) => {
             vendors_name: userData.Merchant_Name,
             product_name: req.body.product_name,
             description: req.body.description,
-
             type: req.body.type,
         });
         await product.save();
         res.status(200).send(product);
     } catch (err) {
-        res.status(500).send({ message: err ? .message });
+        res.status(500).json({ message: err?.message });
     }
 });
 module.exports = router;
