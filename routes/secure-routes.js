@@ -9,6 +9,7 @@ const path = require("path");
 // const sharp = require("sharp");
 const multer = require("multer");
 const CustomerQueryByProduct = require("../model/products/CustomerQuery");
+const Category = require("../model/products/category");
 // const fs = require("fs");
 // const { sendEmail } = require("../lib/mailer");
 // const { request } = require("http");
@@ -423,6 +424,7 @@ router.post(
         const { product_image1 } = req.files;
         const source_image = await Product.find({});
         console.log("Source Image", source_image);
+        
 
         const userData = await UserModel.findOne({ _id: _id }, {
             GST_No: 1,
