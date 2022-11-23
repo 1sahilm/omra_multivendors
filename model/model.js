@@ -36,6 +36,10 @@ const UserSchema = new Schema({
         type: String,
         required: false,
     },
+    Merchant_City:{
+        type:String,
+        required:false,
+    },
     Merchant_ServiceArea_Pincodes: {
         type: Array,
         required: false,

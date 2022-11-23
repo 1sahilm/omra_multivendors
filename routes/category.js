@@ -144,10 +144,13 @@ router.patch(
 
 ///=====================
 
-router.delete("/delete_category/:_id", (req, res) => {
+router.delete("/delete_category/:_id", async (req, res) => {
   const { _id } = req.params;
+  console.log("hellotest",_id)
   try {
-    const category = Category.findOneAndDelete({ _id });
+    const category =await Category.findOneAndDelete({ _id:_id });
+    console.log("categoryyy",category)
+    // category.delete()
     res.json({
       message: "category deleted Sucessfully",
       category,
@@ -366,6 +369,27 @@ router.get("/get_subcategory", async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 });
+
+
+//=================== delete SubCategory=============
+
+router.delete("/delete_subcategory/:_id", async (req, res) => {
+  const { _id } = req.params;
+  console.log("hellotest",_id)
+  try {
+    const category =await SubCategory.findOneAndDelete({ _id:_id });
+    console.log("categoryyy",category)
+    // category.delete()
+    res.json({
+      message: "category deleted Sucessfully",
+      category,
+    });
+  } catch (error) {
+    res.json({ message: error?.message, success: false });
+  }
+});
+
+//========================end Here =========
 router.get("/get_subcategory-for-upload", async (req, res) => {
   try {
     const product = await SubCategory.find({ isHide: false });

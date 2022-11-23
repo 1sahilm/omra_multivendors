@@ -5,8 +5,11 @@ const Schema = mongoose.Schema;
 const BannerSchema = new Schema(
   {
     product_id: { type: String, required: false },
+    product_name:{type:String, required:false},
     merchant_id: { type: String, required: false },
+    merchant_name:{type:String,required:false},
     category_id: { type: String, required: false },
+    category_name:{type:String, required:false},
     banner_name: { type: String, required: false },
     banner_image: { type: Array, required: false },
     type: { type: String, required: false },

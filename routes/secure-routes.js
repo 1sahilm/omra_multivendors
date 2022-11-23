@@ -137,6 +137,7 @@ router.patch("/details", async (req, res) => {
         const user = await UserModel.findOneAndUpdate({ _id: _id }, {
             Merchant_Name: req.body.Merchant_Name,
             Merchant_Address: req.body.Merchant_Address,
+            Merchant_City:req.body.Merchant_City,
             TypesOf_Bussiness: req.body.TypesOf_Bussiness,
             SubTypeOf_bussiness: req.body.SubTypeOf_bussiness,
             Merchant_Designation: req.body.Merchant_Designation,

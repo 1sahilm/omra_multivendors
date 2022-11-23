@@ -22,6 +22,9 @@ const getProduct = require("./routes/getproduct");
 const bannerImage = require("./routes/banner_images");
 const blogs = require("./routes/blogs");
 const banner = require("./routes/banner");
+const service = require("./routes/secure/subscription/service");
+const package = require("./routes/secure/subscription/package");
+const subscribe = require("./routes/secure/subscription/subscribe")
 
 const app = express();
 
@@ -68,6 +71,10 @@ app.use("/api", bannerImage);
 app.use("/api/user", verifyJwt, secureRoute);
 app.use("/api/user/blog", verifyJwt, blogs);
 app.use("/api/banner", verifyJwt, banner);
+app.use("/api/pricing",service)
+app.use("/api/pricing/package",package)
+app.use("/api/pricing",subscribe)
+
 
 app.use("/api", getProduct);
 

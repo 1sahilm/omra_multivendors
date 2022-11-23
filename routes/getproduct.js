@@ -136,8 +136,10 @@ router.get("/get_user", async (req, res) => {
       {
         email: 1,
         company_Name: 1,
+        description:1,
         mobile_no: 1,
         Merchant_Name: 1,
+        GST_No:1,
         Year_of_establishment: 1,
       }
     );
