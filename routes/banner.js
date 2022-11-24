@@ -97,7 +97,7 @@ router.get("/get_teaser_banner", async(req, res) => {
         res.status(404).json({ message: error.message });
     }
 });
-//  =================ShowCase1 is used to advertize by category===================================
+//  =================ShowCase1 is used to advertize by category=======================================
 router.post(
     "/showcase1",
     upload.fields([{ name: "banner_image" }]),
