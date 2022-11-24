@@ -25,6 +25,7 @@ const banner = require("./routes/banner");
 const service = require("./routes/secure/subscription/service");
 const package = require("./routes/secure/subscription/package");
 const subscribe = require("./routes/secure/subscription/subscribe")
+const sendMail = require("./lib/mailer")
 
 const app = express();
 
@@ -88,24 +89,26 @@ app.use(function (err, req, res, next) {
 //////////////////////==========================
 
 
-// app.post("/api/test-mail",(req,res)=>{
-//   console.log("test1")
+app.post("/api/test-mail",(req,res)=>{
+  console.log("test1")
 
-//   try{
-//   const mail = sendEmail({
-//     merchantEmail:"kmryvamit78@gmail.com",
-//     description:"this is test ",
-//     phoneNumber:"8210374580",
-//     email:"eklavyasingh12065@gmail.com"
-//   })
+  try{
+  const mail = sendMail({
+    // merchantEmail:"eklavyasingh12065@gmail.com",
+    merchantEmail:"kmryvamit78@gmail.com",
+    description:"this is test",
+    phoneNumber:"8210374580",
+    email:"eklavyasingh12065@gmail.com"
+    // email:"kmryvamit78@gmail.com"
+  })
 
-//   res.status(200).json(mail)
-// }catch(error){
-//   // res.send(error)
-//   console.log("tset2")
-// }
+  res.status(200).json(mail)
+}catch(error){
+  res.send(error?.message)
+  
+}
 
-// })
+})
 
 //=================================
 app.listen(PORT, () => {

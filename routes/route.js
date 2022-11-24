@@ -7,6 +7,7 @@ const router = express.Router();
 const res = require("express/lib/response");
 const UserModel = require("../model/model");
 const bcrypt = require("bcrypt");
+const sendEmail = require("../lib/mailer");
 // const { sendEmail } = require("../lib/mailer");
 require("dotenv").config();
 
@@ -238,27 +239,32 @@ router.patch("/forgotpassword", async (req, res) => {
   }
 });
 
-// router.post("/send-mail", async (req, res) => {
-//   const { description, phoneNumber, email, merchantId } = req.body;
+router.post("/send-mail", async (req, res) => {
+  const { description, phoneNumber, email,merchantId } = req.body;
+  console.log("merchant Id",merchantId)
+  // const {id} = req.query.merchantId
+  // console.log("iddddd",id)
 
-//   const merchant = await UserModel.findOne({ _id: merchantId });
+  const merchant = await UserModel.findOne({ _id: merchantId });
+  console.log("userdata",merchant)
 
-//   if (!merchant) {
-//     return res
-//       .status(404)
-//       .json({ message: "merchant not found", success: false });
-//   }
+  if (!merchant) {
+    return res
+      .status(404)
+      .json({ message: "merchant not found", success: false });
+  }
 
-//   try {
-//     await sendEmail({
-//       merchantEmail: merchant.email,
-//       email,
-//       phoneNumber,
-//       description,
-//     });
-//     res.status(200).json({ message: "email sent successfully", success: true });
-//   } catch (error) {
-//     res.status(500).json({ message: error?.message, success: false });
-//   }
-// });
+  try {
+    await sendEmail({
+      merchantEmail: merchant.email,
+      merchantId:merchantId,
+      email,
+      phoneNumber,
+      description,
+    });
+    res.status(200).json({ message: "email sent successfully", success: true });
+  } catch (error) {
+    res.status(500).json({ message: error?.message, success: false });
+  }
+});
 module.exports = router;

@@ -11,6 +11,7 @@ const multer = require("multer");
 const SubCategory = require("../model/products/subcategory");
 
 const CustomerQueryByProduct = require("../model/products/CustomerQuery");
+const sendEmail = require("../lib/mailer");
 
 //=====================================================
 
@@ -39,13 +40,13 @@ router.post(
     const { category_name } = req.body;
 
     if (!category_name) {
-      res.json({ success: false, data: "Category is mandatory" });
+      res.json({ success: false, message: "Category is mandatory" });
     } else {
       const isCategory = await Category.findOne({
         category_name: category_name,
       });
       if (isCategory) {
-        res.json({ success: false, data: "Already created try with new" });
+        res.json({ success: false, message: `${category_name} has Already created try with new` });
       } else {
         try {
           const category = await new Category({
@@ -53,7 +54,7 @@ router.post(
             category_image: `${process.env.BASE_URL}/category-image/${req.files.category_image[0].filename}`,
           });
           await category.save();
-          res.status(200).send(category);
+          res.status(200).json({success:true,data:category,message:`${category_name} has been Successfully created`});
         } catch (err) {
           res.status(500).send({ message: err?.message });
         }
@@ -73,33 +74,51 @@ router.patch(
   ),
   async (req, res) => {
     const { _id } = req.params;
+    const {category_name}=req.body
 
-    try {
-      const user = await Category.updateOne(
-        { _id },
-        {
-          category_name: req.body.category_name,
-          category_image:
-            req.files.category_image?.length > 0
-              ? `${process.env.BASE_URL}/category-image/${req.files.category_image[0].filename}`
-              : undefined,
-        },
-        {
-          new: true,
-          upsert: true,
+    if(!category_name){
+      res.json({success:false,message:`Category name is required`})
+
+    } else{
+      const isCategory =await Category.findOne({category_name:category_name})
+      if(isCategory){
+        res.json({success:false,message:`${category_name} has Already created try with new `})
+
+      }
+      else{
+        try {
+          const user = await Category.updateOne(
+            { _id },
+            {
+              category_name: req.body.category_name,
+              category_image:
+                req.files.category_image?.length > 0
+                  ? `${process.env.BASE_URL}/category-image/${req.files.category_image[0].filename}`
+                  : undefined,
+            },
+            {
+              new: true,
+              upsert: true,
+            }
+          );
+          //Fields
+    
+          res.json({
+            success:true,
+            message: `${category_name} has been Successfully Created `,
+            data:user
+          });
+        } catch (err) {
+          res.json({
+            message: err?.message,
+          });
         }
-      );
-      //Fields
 
-      res.json({
-        message: "Category Updated Sucessfully",
-        user,
-      });
-    } catch (err) {
-      res.json({
-        message: err?.message,
-      });
+      }
     }
+
+
+    
   }
 );
 
@@ -115,12 +134,13 @@ router.patch(
   ),
   async (req, res) => {
     const { _id } = req.params;
+    const {isHide} = req.body
 
     try {
       const user = await Category.updateOne(
         { _id },
         {
-          isHide: req.body.isHide,
+          isHide: isHide,
         },
 
         {
@@ -131,8 +151,9 @@ router.patch(
       //Fields
 
       res.json({
-        message: "Category is Updated Sucessfully",
-        user,
+        success:true,
+        message: `Category is ${isHide} Sucessfully`,
+        data:user,
       });
     } catch (err) {
       res.json({
@@ -152,8 +173,9 @@ router.delete("/delete_category/:_id", async (req, res) => {
     console.log("categoryyy",category)
     // category.delete()
     res.json({
-      message: "category deleted Sucessfully",
-      category,
+      success:true,
+      message: `${category?.category_name} category deleted Sucessfully`,
+      data:category,
     });
   } catch (error) {
     res.json({ message: error?.message, success: false });
@@ -247,13 +269,16 @@ router.post(
     if (!sub_category_name) {
       res.json({ message: "Sub Category name must be Enter" });
     } else {
-      const isSubCategoryName = await SubCategory.find({
-        sub_category_name: sub_category_name,
+      const isSubCategoryName = await SubCategory.findOne({
+        sub_category_name: sub_category_name, category_name: category_name,
       });
+      console.log("hellotest",isSubCategoryName)
+      
+     
       if (isSubCategoryName) {
         res.json({
           success: false,
-          message: "This Name is Already Entered please Try with new",
+          message: `${sub_category_name} is Already Created in ${category_name} please Try with new`,
         });
       } else {
         try {
@@ -267,7 +292,7 @@ router.post(
             // : undefined,
           });
           await category.save();
-          res.status(200).json({ message: "uploaded", category });
+          res.status(200).json({success:true, message: `${sub_category_name} has been Successfully Created in ${category_name}`, data:category });
         } catch (err) {
           res.status(500).send({ message: err?.message });
         }
@@ -287,35 +312,53 @@ router.patch(
   ),
   async (req, res) => {
     const { _id } = req.params;
-    console;
 
-    try {
-      const user = await SubCategory.updateOne(
-        { _id },
-        {
-          sub_category_name: req.body.sub_category_name,
-          sub_category_image:
-            req.files.sub_category_image?.length > 0
-              ? `${process.env.BASE_URL}/category-image/${req.files.sub_category_image[0].filename}`
-              : undefined,
-        },
-        {
-          new: true,
-          upsert: true,
+    const {sub_category_name} = req.body
+
+    if(!sub_category_name){
+      res.json({success:false,message:"SubCategory Name is required"})
+    }else{
+      const catName =await SubCategory.findOne({_id:_id,sub_category_name:sub_category_name})
+       console.log("sucatNam",catName)
+      if(catName){
+        res.json({success:false,message:`${sub_category_name} is Already Created in ${catName?.category_name} `})
+      }
+      else{
+        try {
+          const user = await SubCategory.updateOne(
+            { _id },
+            {
+              sub_category_name: sub_category_name,
+              sub_category_image:
+                req.files.sub_category_image?.length > 0
+                  ? `${process.env.BASE_URL}/category-image/${req.files.sub_category_image[0].filename}`
+                  : undefined,
+            },
+            {
+              new: true,
+              upsert: true,
+            }
+          );
+          //Fields
+    
+          res.status(201).json({
+            success: true,
+            message: `${sub_category_name} is  Updated Sucessfully`,
+            data:user,
+          });
+        } catch (err) {
+          res.json({
+            message: err?.message,
+          });
         }
-      );
-      //Fields
 
-      res.status(201).json({
-        success: true,
-        message: "Subcategory Updated Sucessfully",
-        user,
-      });
-    } catch (err) {
-      res.json({
-        message: err?.message,
-      });
+      }
     }
+    
+   
+
+
+   
   }
 );
 
@@ -331,12 +374,13 @@ router.patch(
   ),
   async (req, res) => {
     const { _id } = req.params;
+    const {isHide}=req.body;
 
     try {
       const user = await SubCategory.updateOne(
         { _id },
         {
-          isHide: req.body.isHide,
+          isHide: isHide,
         },
 
         {
@@ -347,8 +391,9 @@ router.patch(
       //Fields
 
       res.json({
+        success:true,
         message: "SubCategory is Updated Sucessfully",
-        user,
+        data:user,
       });
     } catch (err) {
       res.json({
@@ -466,6 +511,9 @@ router.post(
         customer_mob: req.body.customer_mob,
       });
       await product.save();
+    // sendEmail({
+        
+    //   })  
       res.status(200).send(product);
     } catch (err) {
       res.status(500).send({ message: err?.message });
