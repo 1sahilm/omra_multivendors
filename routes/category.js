@@ -79,13 +79,14 @@ router.patch(
     if(!category_name){
       res.json({success:false,message:`Category name is required`})
 
-    } else{
-      const isCategory =await Category.findOne({category_name:category_name})
-      if(isCategory){
-        res.json({success:false,message:`${category_name} has Already created try with new `})
+    } 
+    // else{
+    //   const isCategory =await Category.findOne({category_name:category_name})
+    //   if(isCategory?.length>1){
+    //     res.json({success:false,message:`${category_name} has Already created try with new `})
 
-      }
-      else{
+    //   }
+    //   else{
         try {
           const user = await Category.updateOne(
             { _id },
@@ -115,11 +116,11 @@ router.patch(
         }
 
       }
-    }
+    // }
 
 
     
-  }
+  // }
 );
 
 //=========Hide/UnHide Category===>
@@ -315,15 +316,15 @@ router.patch(
 
     const {sub_category_name} = req.body
 
-    if(!sub_category_name){
-      res.json({success:false,message:"SubCategory Name is required"})
-    }else{
-      const catName =await SubCategory.findOne({_id:_id,sub_category_name:sub_category_name})
-       console.log("sucatNam",catName)
-      if(catName){
-        res.json({success:false,message:`${sub_category_name} is Already Created in ${catName?.category_name} `})
-      }
-      else{
+    // if(!sub_category_name){
+    //   res.json({success:false,message:"SubCategory Name is required"})
+    // }else{
+    //   const catName =await SubCategory.findOne({_id:_id,sub_category_name:sub_category_name,sub_category_image:sub_category_image})
+    //    console.log("sucatNam",catName)
+    //   if(catName){
+    //     res.json({success:false,message:`${sub_category_name} is Already Created in ${catName?.category_name} `})
+    //   }
+    //   else{
         try {
           const user = await SubCategory.updateOne(
             { _id },
@@ -353,13 +354,13 @@ router.patch(
         }
 
       }
-    }
+    // }
     
    
 
 
    
-  }
+  // }
 );
 
 //=========Hide/UnHide SubCategoryCategory===>
