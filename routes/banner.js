@@ -150,7 +150,7 @@ router.patch(
                     `${process.env.BASE_URL}/banner-image/${req.files.banner_image[0].filename}` :
                     undefined,
 
-                type: type,
+                // type: type,
             }, {
                 new: true,
                 upsert: true,

@@ -214,7 +214,7 @@ router.get("/userDetails", async (req, res) => {
 });
 router.get("/userDetailsPaginate", async (req, res) => {
     const { _id, password, email } = req.user;
-    let { page = 1, limit = 12, toDate, fromDate } = req.query;
+    let { page = 1, limit = 50, toDate, fromDate } = req.query;
     page = Number(page);
     limit = Number(limit);
 
@@ -794,6 +794,7 @@ router.get("/ApprovedSearch/:key", async (req, res) => {
 //========================
 router.get("/ApprovedFilterByDate/:key", async (req, res) => {
     // let today = new date().getTime();
+    console.log("helloooo",req.params.key)
     console.log("hello", new Date(req.params.key), new Date());
 
     try {
@@ -807,6 +808,29 @@ router.get("/ApprovedFilterByDate/:key", async (req, res) => {
         res.json(404);
     }
 });
+
+//========================
+router.get("/WaitingFilterByDate/:key", async (req, res) => {
+    // let today = new date().getTime();
+    console.log("helloooo",req.params.key)
+    console.log("hello", new Date(req.params.key), new Date());
+
+    try {
+        const data = await Product.find({
+            isActive: true,
+            isApproved: false,
+            isDeclined:false,
+            updatedAt: { $lte: new Date(), $gte: new Date(req.params.key) },
+        });
+        res.json(data);
+    } catch (error) {
+        res.json(404);
+    }
+});
+
+
+
+
 // ===================================waiting for Approval api(unApproved and unDecline)==================
 router.get("/waitingApprovalSearch/:key", async (req, res) => {
     try {
