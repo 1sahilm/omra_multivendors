@@ -95,7 +95,7 @@ router.patch(
         const { _id } = req.params;
 
         try {
-            const service = await Services.updateOne(
+            const service = await Packages.updateOne(
                 { _id },
                 {
                     name: req.body.name,
@@ -119,8 +119,8 @@ router.patch(
             res.json({
                 success:true,
                 message: `
-                // ${service?.name}
-                 Service  has Updated Sucessfully`,
+                 ${service?.name}
+                 Package  has Updated Sucessfully`,
                 data:user,
             });
         } catch (err) {
@@ -139,9 +139,10 @@ router.delete("/delete_package/:_id", async (req, res) => {
     const { _id } = req.params;
 
     try {
-        const service = await Services.findOneAndDelete({ _id: _id });
+        const service = await Packages.findOneAndDelete({ _id: _id });
 
         res.json({
+            success:true,
             message: `${service?.name} has deleted Sucessfully`,
             service,
         });

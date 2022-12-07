@@ -39,12 +39,12 @@ router.post(
     async (req, res) => {
         // const {_id}= req.user
         // console.log("ggg",req.user)
-        const test= await UserModel.find({role: 'Admin'},{password:0,Merchant_Designation:0,SubTypeOf_bussiness:0,TypesOf_Bussiness:0,description:0,PAN_No:0,
-        Year_of_establishment:0})
-        const datatArray= [];
-        const user= test.filter((item)=>datatArray.push({id:item._id}))
+        // const test= await UserModel.find({role: 'Admin'},{password:0,Merchant_Designation:0,SubTypeOf_bussiness:0,TypesOf_Bussiness:0,description:0,PAN_No:0,
+        // Year_of_establishment:0})
+        // const datatArray= [];
+        // const user= test.filter((item)=>datatArray.push({id:item._id}))
 
-        console.log("helloo",datatArray)
+        // console.log("helloo",datatArray)
         const {
             auther_Id,
             mobile_no,
@@ -64,6 +64,7 @@ router.post(
             total,
             Amount
         } = req.body;
+        console.log("daringbaba",auther_Id)
 
         if (!auther_Id) {
             res.json({ success: false, message: "user select Name is mandatory" });
@@ -176,9 +177,10 @@ router.delete("/delete_subscription/:_id", async (req, res) => {
     const { _id } = req.params;
 
     try {
-        const service = await Services.findOneAndDelete({ _id: _id });
+        const service = await Subscription.findOneAndDelete({ _id: _id });
 
         res.json({
+            success:true,
             message: `${service?.name} has deleted Sucessfully`,
             service,
         });

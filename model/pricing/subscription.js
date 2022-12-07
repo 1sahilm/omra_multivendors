@@ -2,20 +2,14 @@ const mongoose = require("mongoose")
 const Schema = mongoose.Schema
 
 const SubscriptionSchema = new Schema({
-    auther_Id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-    },
-    mobile_no: {
-        type: mongoose.Schema.Types.String,
-        ref: "User",
-    },
-    vendors_name: { type: mongoose.Schema.Types.String, ref: "User" },
-    email: { type: mongoose.Schema.Types.String, ref: "User" },
-    address: { type: mongoose.Schema.Types.String, ref: "User" },
+    auther_Id:{type:String,required:false},
+    mobile_no:{type:String,required:false},
+    vendors_name:{type:String,required:false},
+    email: {type:String,required:false},
+    address: {type:String,required:false},
     name:{type:String,required:false},
-    plan:{type:mongoose.Schema.Types.Array,ref:"Services"},
-    plan2:{type:mongoose.Schema.Types.Array,ref:"Packages"},
+    plan:{type:String,required:false},
+    plan2:{type:String,required:false},
     payment_mode:{type:String,required:false},
     start_date:{type:Date, required:false},
     end_date:{type:Date,required:false},
@@ -23,7 +17,7 @@ const SubscriptionSchema = new Schema({
     price:{type:Number,required:false},
     benifits:{type:String,required:false},
     validity:{type:String,required:false},
-    gst:{type:Number,required:false},
+    gst:{type:String,required:false},
     
     Amount: {type:Number,required:false,default:0},
     type:{type:String,required:false},
@@ -31,5 +25,5 @@ const SubscriptionSchema = new Schema({
     timestamps:true
 })
 
-const Subscription=mongoose.model("pricing/subscription",SubscriptionSchema)
+const Subscription=mongoose.model("subscription",SubscriptionSchema)
 module.exports =Subscription

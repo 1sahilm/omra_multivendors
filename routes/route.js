@@ -8,6 +8,8 @@ const res = require("express/lib/response");
 const UserModel = require("../model/model");
 const bcrypt = require("bcrypt");
 const sendEmail = require("../lib/mailer");
+
+const { hashPassword, comparePassword } = require("../functions/passwordHash");
 // const { sendEmail } = require("../lib/mailer");
 require("dotenv").config();
 
@@ -43,61 +45,50 @@ require("dotenv").config();
 //     // Store hash in your password DB.
 // //});
 
-router.post(
-  "/signup",
-  // passport.authenticate('signup', { session: false }),
-  async (req, res) => {
-    const { email, mobile_no, password, role } = req.body;
+router.post("/signup", async (req, res) => {
+  const { email, mobile_no, password, role } = req.body;
 
-    const data = {
-      email: email,
-      mobile_no: mobile_no,
-      password: password,
-      role: role,
+  const data = {
+    email: email,
+    mobile_no: mobile_no,
+    password: hashPassword(password),
+    role: role,
+  };
+
+  if (!email || !mobile_no) {
+    return res.json({ success: false, data: "emai and mobile no requied" });
+  }
+
+  const isUser = await UserModel.findOne({
+    email: email,
+    mobile_no: mobile_no,
+  });
+
+  if (isUser) {
+    return res.json({ success: false, data: "user created Already" });
+  }
+
+  try {
+    const user = await UserModel.create(data);
+
+    const JWTPayload = {
+      email: user.email,
+      _id: user._id,
+      role: user.role,
     };
 
-    if (!email || !mobile_no) {
-      res.json({ success: false, data: "emai and mobile no requied" });
-    } else {
-      const isUser = await UserModel.findOne({
-        email: email,
-        mobile_no: mobile_no,
-      });
-      if (isUser) {
-        res.json({ success: false, data: "user created Already" });
-      } else {
-        try {
-          const verify = UserModel.findOne(email);
-          // if(verify){
-          //   return res.status(409).json({success:false,message:"account already created"})
-          // }
-          const user = await UserModel.create(data);
-          const payload = {
-            email: user.email,
+    const token = jwt.sign({ user: JWTPayload }, "TOP_SECRET");
 
-            _id: user._id,
-            role: user.role,
-          };
-          const token = jwt.sign({ user: payload }, "TOP_SECRET");
-
-          res.status(201).json({
-            success: true,
-            data: "created successfully",
-            user: user,
-            token: token,
-          });
-        } catch (err) {
-          console.log({ error: err.message });
-        }
-      }
-    }
-
-    // res.json({
-    //   message: 'Signup successful',
-    //   user: req.user
-    // });
+    res.status(201).json({
+      success: true,
+      data: "created successfully",
+      user: user,
+      token: token,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, data: err?.message });
   }
-);
+});
 
 //   router.post(
 //     '/login',
@@ -150,103 +141,109 @@ router.post(
 // );
 
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(404).json({ message: "invalid email or password" });
-  }
-
   try {
-    const user = await UserModel.findOne({ email });
+    const { email, password } = req.body;
 
-    if (!user) {
-      return res.status(404).json({ message: "invalid email or password" });
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ success: false, message: "invalid email or password" });
     }
 
-    const checkPassword = bcrypt.compare(password, user.password);
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, message: "invalid email or password" });
+    }
+
+    const checkPassword = comparePassword(password, user.password);
+    
+
     const checkIsActive = user.isActive;
 
-    if (!checkPassword || !checkIsActive) {
-      return res.status(404).json({ message: "invalid email or password" });
+    if (!checkPassword) {
+      return res
+        .status(400)
+        .json({ success: false, message: "invalid email or password" });
+    }
+    
+    if (!checkIsActive) {
+      return res
+        .status(400)
+        .json({ success: false, message: "user is deactivated" });
     }
 
-    const body = {
+    const JWTPayload = {
       _id: user._id,
       email: user.email,
       role: user.role,
       isRegistered: user?.company_Name ? true : false,
     };
 
-    const token = jwt.sign({ user: body }, "TOP_SECRET");
+    const token = jwt.sign({ user: JWTPayload }, "TOP_SECRET");
+    res.cookie("access_token", token, { maxAge: 1000 * 60 * 60 * 24 * 7 });
+    console.log("token".token)
 
     res.status(200).json({
-      user: body,
+      user: JWTPayload,
       token,
+      message: "You are Logged in Successfully",
+
+      sucess: true,
     });
   } catch (error) {
     res.status(500).send(error);
   }
 });
 
-router.get(
-  "/logout",
-  // passport.authenticate('signup', { session: false }),
-  async (req, res) => {
-    try {
-      res.clearCookie("jwt");
-      const user = await req.user.save();
-
-      res.status(201).json({
-        success: true,
-        data: "logout successfully",
-        user: user,
-        token: user,
-      });
-    } catch (err) {
-      console.log({ error: err.message });
-    }
-    // res.json({
-    //   message: 'Signup successful',
-    //   user: req.user
-    // });
-  }
-);
-router.patch("/forgotpassword", async (req, res) => {
-  const { description, phoneNumber, merchantId } = req.body;
-  const { email } = req.query;
-
-  const merchant = await UserModel.findOne({ email: email });
-
-  if (!merchant) {
-    return res
-      .status(404)
-      .json({ message: "merchant not found", success: false });
-  }
-
+router.post("/logout", async (req, res) => {
   try {
-    const user = await UserModel.updateOne(
+    res.clearCookie("access_token");
+    res.status(200).json({
+      success: true,
+      data: "logout successfully",
+    });
+  } catch (err) {
+    console.log({ error: err.message });
+  }
+});
+router.patch("/forgotpassword/:_id", async (req, res) => {
+  try {
+    const { _id } = req.params;
+
+    // Check If User Exists
+    const findUser = await UserModel.findOne({ _id }).lean();
+
+    if (!findUser) {
+      return res
+        .status(400)
+        .json({ success: false, message: "user not found" });
+    }
+
+    // UPDATE PASSWORD
+    const updatePassword = await UserModel.updateOne(
       { _id },
-      {
-        password: req.body.password,
-      },
-      {
-        new: true,
-        upsert: true,
-      }
+      { $set: { password: hashPassword(req.body.password) } }
     );
+
+    res
+      .status(200)
+      .json({ success: true, message: "password updated successfully" });
+
   } catch (error) {
     console.log({ error: error.message });
   }
 });
 
 router.post("/send-mail", async (req, res) => {
-  const { description, phoneNumber, email,merchantId } = req.body;
-  console.log("merchant Id",merchantId)
+  const { description, phoneNumber, email, merchantId } = req.body;
+  console.log("merchant Id", merchantId);
   // const {id} = req.query.merchantId
   // console.log("iddddd",id)
 
   const merchant = await UserModel.findOne({ _id: merchantId });
-  console.log("userdata",merchant)
+  console.log("userdata", merchant);
 
   if (!merchant) {
     return res
@@ -257,7 +254,7 @@ router.post("/send-mail", async (req, res) => {
   try {
     await sendEmail({
       merchantEmail: merchant.email,
-      merchantId:merchantId,
+      merchantId: merchantId,
       email,
       phoneNumber,
       description,

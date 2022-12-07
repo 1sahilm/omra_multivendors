@@ -471,6 +471,35 @@ router.get("/get_subcategory-lazy", async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 });
+
+//===============================Get Subcategory by Category in SuperAdmin============
+
+router.get("/get_subcategory-list", async (req, res) => {
+  let { page = 1, limit = 100 ,_id} = req.query;
+
+  page = parseInt(page);
+  limit = parseInt(limit);
+
+  try {
+    const category= await Category.find({})
+    const product = await SubCategory.find({})
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .exec();
+    const count = await SubCategory.countDocuments();
+
+    const totalPages = Math.ceil(count / limit);
+    console.log("category",category)
+
+    res.status(200).json({
+      product,
+      totalPages,
+      nextPage: page < totalPages ? page + 1 : null,
+    });
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
 //=======================get SubCat By Category================
 router.get("/get_subcategoryByCat", async (req, res) => {
   category_name = req.query.category_name;

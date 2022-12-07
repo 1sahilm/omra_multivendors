@@ -9,6 +9,7 @@ const path = require("path");
 const multer = require("multer");
 
 const Services = require("../../../model/pricing/service");
+const MRP_Rate = require("../../../model/pricing/pricing");
 
 //=====================================================
 
@@ -28,44 +29,37 @@ const imageStorage = multer.diskStorage({
 const upload = multer({ storage: imageStorage });
 
 router.post(
-  "/add_service",
-  upload.fields([
-    { name: "category_image", maxCount: 1 },
-    { name: "category_image2", maxCount: 1 },
-  ]),
+  "/add_price",
+ 
   async (req, res) => {
     const { 
-      name,
-      rate,
-      unit,
-      quantity,
-      price,
-      benifits,
-      type
+   
+    price,
+    unit,
+  type,
 } = req.body;
+console.log("price",price)
 
-    if (!name) {
-      res.json({ success: false, message: "Service Name is mandatory" });
+    if (!price) {
+      res.json({ success: false, message: "Price in RS is mandatory" });
     } else {
-      const isService = await Services.findOne({
-        name: name,
+      const isRate = await MRP_Rate.findOne({
+        price: price,
       });
-      if (isService) {
-        res.json({ success: false, message: `${isService?.name} has Already created try with new` });
+      if (isRate) {
+        res.json({ success: false, message: `${isRate?.price} has Already created try with new` });
       } else {
         try {
-          const service = await new Services({
-            name: name,
-            rate:rate,
-            quantity:quantity,
-            unit:unit,
+          const pricing = await new MRP_Rate({
+           
             price: price,
-            benifits: benifits,
+            unit:unit,
+       
             type:type
-            // category_image: `${process.env.BASE_URL}/category-image/${req.files.category_image[0].filename}`,
+         
           });
-          await service.save();
-          res.status(200).json({success:true,data:service,message:`${service?.name} services has  created Successfully`});
+          await pricing.save();
+          res.status(200).json({success:true,data:pricing,message:`${pricing?.name} services has  created Successfully`});
         } catch (err) {
           res.status(500).send({ message: err?.message });
         }
@@ -75,21 +69,19 @@ router.post(
 );
 
 router.patch(
-  "/update_service/:_id",
-
+  "/update_price/:_id",
+  
   async (req, res) => {
     const { _id } = req.params;
 
     try {
-      const service = await Services.updateOne(
+      const price = await MRP_Rate.updateOne(
         { _id },
         {
-          name: req.body.name,
-          rate:rate.body.rate,
-          unit:req.body.unit,
-          quantity:req.body.quantity,
+       
           price:req.body.price,
-          benifits:req.body.benifits
+          unit:req.body.unit,
+       
 
        
         },
@@ -102,8 +94,8 @@ router.patch(
 
       res.json({
         success:true,
-        message: `${service?.name} Service  has Updated Sucessfully`,
-        data:service,
+        message: `${price?.name} price  has Updated Sucessfully`,
+        data:price,
       });
     } catch (err) {
       res.json({
@@ -117,27 +109,27 @@ router.patch(
 
 ///=====================
 
-router.delete("/delete_service/:_id", async (req, res) => {
+router.delete("/delete_price/:_id", async (req, res) => {
   const { _id } = req.params;
 
   try {
-    const service =await Services.findOneAndDelete({ _id:_id });
+    const rate =await MRP_Rate.findOneAndDelete({ _id:_id });
     
     res.json({
-      success:true,
-      message: `${service?.name} has deleted Sucessfully`,
-      service,
+        success:true,
+      message: `${rate?.name} has deleted Sucessfully`,
+      data:rate,
     });
   } catch (error) {
     res.json({ message: error?.message, success: false });
   }
 });
 
-router.get("/get_service", async (req, res) => {
+router.get("/get_price", async (req, res) => {
   try {
-    const service = await Services.find({});
+    const price = await MRP_Rate.find({});
 
-    res.status(200).json(await service);
+    res.status(200).json({data:await price,success:true,});
   } catch (error) {
     res.status(404).json({ message: error.message });
   }

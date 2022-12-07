@@ -3,18 +3,19 @@ const jwt = require("jsonwebtoken");
 const verifyJwt = async (req, res, next) => {
   const authToken = req.headers["authorization"]?.split(" ")[1];
   const cookieToken = req?.cookies?.access_token;
-  console.log({ cookieToken });
   let token = "";
 
-  if (authToken) {
-    token = authToken;
-  } else {
+  if (cookieToken) {
     token = cookieToken;
+  } else {
+    token = authToken;
   }
+
+  console.log({token})
 
   if (token) {
     try {
-      const decoded = jwt.verify(token, "TOP_SECRET");
+      const decoded = await jwt.verify(token, "TOP_SECRET");
       req.user = decoded.user;
       next();
     } catch (err) {

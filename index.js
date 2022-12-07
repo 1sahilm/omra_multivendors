@@ -23,15 +23,18 @@ const bannerImage = require("./routes/banner_images");
 const blogs = require("./routes/blogs");
 const banner = require("./routes/banner");
 const service = require("./routes/secure/subscription/service");
+const price = require("./routes/secure/subscription/price")
 const package = require("./routes/secure/subscription/package");
 const subscribe = require("./routes/secure/subscription/subscribe")
 const sendMail = require("./lib/mailer")
+const cookieParser = require("cookie-parser")
 
 const app = express();
 
 // app.use(express.json());
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser())
 // images=================
 
 app.set("view engine", "ejs");
@@ -72,6 +75,7 @@ app.use("/api", bannerImage);
 app.use("/api/user", verifyJwt, secureRoute);
 app.use("/api/user/blog", verifyJwt, blogs);
 app.use("/api/banner", verifyJwt, banner);
+app.use("/api/pricing",price)
 app.use("/api/pricing",service)
 app.use("/api/pricing/package",package)
 app.use("/api/pricing",subscribe)

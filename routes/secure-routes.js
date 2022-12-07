@@ -435,7 +435,9 @@ router.post(
             Merchant_Address: 1,
             mobile_no: 1,
             isActive: 1,
-        });
+        })
+        console.log("userdatata",userData)
+
         if (!product_name || !category) {
             res.json({
                 success: false,
@@ -460,6 +462,7 @@ router.post(
                     const product = await new Product({
                         auther_Id: _id,
                         Vendor_Id: userData.GST_No,
+                        merchant:userData,
                         vendors_name: userData.Merchant_Name,
                         mobile_no: userData.mobile_no,
                         isActive: userData.isActive,
@@ -634,13 +637,14 @@ router.patch(
 );
 
 router.get("/get_products", async (req, res) => {
-    // const { user } = req.user;
+     const { _id } = req.user
+    console.log("new userrr",_id)
     // const userData = await UserModel.findOne(
     //   { _id: user._id },
     //   { GST_No: 1, Merchant_Name: 1 ,TypesOf_Bussiness: 1}
     // );
     try {
-        const product1 = await Product.find().sort({ createdAt: -1 });
+        const product1 = await Product.find({auther_Id:_id}).sort({ createdAt: -1 });
         const userData = await UserModel.find({}, { _id: 1, isActive: 1 });
         const product = { ...product1, ...userData };
 
@@ -875,6 +879,21 @@ router.get("/waitingproductFilterByDate/:key", async (req, res) => {
         res.json(404);
     }
 });
+
+// get Leads from Buyer
+
+router.get("/getbuyerQuery", async (req, res) => {
+    const { _id }= req.user
+    try {
+      const buyerQuery = await CustomerQueryByProduct.find({merchant_Id:_id}).sort({
+        createdAt: -1,
+      });
+  
+      res.status(200).json(buyerQuery);
+    } catch (error) {
+      res.status(404).json({ message: error.message });
+    }
+  });
 //=========================================================
 /// product profile
 

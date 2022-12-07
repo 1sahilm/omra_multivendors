@@ -4,14 +4,21 @@ const UserModel = require("../model");
 const Schema = mongoose.Schema;
 
 const ProductSchema = new Schema({
-    Vendor_Id: { type: mongoose.Schema.Types.String, ref: "User" },
+    Vendor_Id: { type: mongoose.Schema.Types.String, ref: "User",required:true },
     auther_Id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
+        required:true,
     },
     mobile_no: {
         type: mongoose.Schema.Types.String,
         ref: "User",
+    },
+    merchant:{
+        type: Object,
+        required:true,
+        
+
     },
     vendors_name: { type: mongoose.Schema.Types.String, ref: "User" },
     TypesOf_Bussiness: { type: mongoose.Schema.Types.String, ref: "User" },
