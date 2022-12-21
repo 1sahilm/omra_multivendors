@@ -62,7 +62,9 @@ router.post(
             validity,
             gst,
             total,
-            Amount
+            Amount,
+            payment_link,
+            payment_status
         } = req.body;
         console.log("daringbaba",auther_Id)
 
@@ -74,7 +76,9 @@ router.post(
             });
             if (isSubscribe) {
                 res.json({ success: false, message: `${isSubscribe?.vendors_name} has Already Subscribe try with new` });
-            } else {
+            } 
+
+               
                 try {
                     const subscribe = await new Subscription({
                         auther_Id: auther_Id,
@@ -94,6 +98,8 @@ router.post(
                         gst: gst,
                         total: total,
                         Amount: Amount,
+                        payment_link: payment_link,
+                        payment_status:payment_status
                         // category_image: `${process.env.BASE_URL}/category-image/${req.files.category_image[0].filename}`,
                     });
 
@@ -103,7 +109,67 @@ router.post(
                 } catch (err) {
                     res.status(500).send({ message: err?.message });
                 }
+            
+                
             }
+        }
+    
+);
+
+router.patch(
+    "/upload_payment_details/:_id",
+    upload.fields([
+        { name: "image", maxCount: 1 },
+       
+      ]),
+    async (req, res) => {
+        const { _id } = req.params;
+    
+    
+      
+
+        try {
+            const payment = await Subscription.updateOne(
+                { _id },
+                {
+                  
+                    auther_Id: req.body.auther_Id,
+                   
+                   
+                    payment_mode: req.body.payment_mode,
+                    payment_status:req.body.payment_status,
+                    start_date: req.body.start_date,
+                    end_date: req.body.end_date,
+                    price: req.body.price,
+                    benifits: req.body.benifits,
+                    image:`${process.env.BASE_URL}/billing-image/${req.files.image[0].filename}`,
+                  
+                    validity: req.body.validity,
+                  
+                    Amount: req.body.Amount
+
+
+
+
+                },
+                {
+                    new: true,
+                    upsert: true,
+                }
+            );
+            //Fields
+
+            res.json({
+                success: true,
+                message: `
+                 ${payment?.name}
+                 Service  has Updated Sucessfully`,
+                data: payment,
+            });
+        } catch (err) {
+            res.json({
+                message: err?.message,
+            });
         }
     }
 );

@@ -33,7 +33,7 @@ router.post(
                     };
                     const banner = await new Banners(item);
                     banner.save();
-                    res.status(200).send(banner);
+                    res.status(200).json({success:true,message:"Added Successfully",data:banner});
                 } catch (err) {
                     res.status(500).send({ message: err?.message });
                 }
@@ -67,7 +67,7 @@ router.patch(
             //Fields
 
             res.json({
-                message: "User Updated Sucessfully",
+                success:true,message:"Added Successfully",
                 user,
             });
         } catch (err) {

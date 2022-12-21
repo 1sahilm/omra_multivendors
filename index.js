@@ -50,6 +50,7 @@ app.use("/product-image", express.static("public/images"));
 app.use("/category-image", express.static("public/images"));
 app.use("/blog-image", express.static("public/blog"));
 app.use("/banner-image", express.static("public/banner"));
+app.use("/billing-image", express.static("public/billing"));
 
 // app.use(cors({
 //   origin:"http://localhost:3000",

@@ -8,6 +8,7 @@ const res = require("express/lib/response");
 const UserModel = require("../model/model");
 const bcrypt = require("bcrypt");
 const sendEmail = require("../lib/mailer");
+const axios = require("axios")
 
 const { hashPassword, comparePassword } = require("../functions/passwordHash");
 // const { sendEmail } = require("../lib/mailer");
@@ -56,7 +57,7 @@ router.post("/signup", async (req, res) => {
   };
 
   if (!email || !mobile_no) {
-    return res.json({ success: false, data: "emai and mobile no requied" });
+    return res.json({ success: false, data: "email and mobile no requied" });
   }
 
   const isUser = await UserModel.findOne({
@@ -158,7 +159,7 @@ router.post("/login", async (req, res) => {
     }
 
     const checkPassword = comparePassword(password, user.password);
-    
+
 
     const checkIsActive = user.isActive;
 
@@ -167,7 +168,7 @@ router.post("/login", async (req, res) => {
         .status(400)
         .json({ success: false, message: "invalid email or password" });
     }
-    
+
     if (!checkIsActive) {
       return res
         .status(400)
@@ -264,4 +265,58 @@ router.post("/send-mail", async (req, res) => {
     res.status(500).json({ message: error?.message, success: false });
   }
 });
+
+router.post("/send-sms", async (req, res) => {
+  const { mobileno, vendors_name } = req.body
+
+  const message = `Dear ${vendors_name}, You have received a New Lead from a buyer for your product inquiry. Please check your registered email for more information. Regards, E-Laundry Marketplace. OMRA Solutions`
+
+  try {
+    const { data } = await axios({
+      url: "http://sms.tyrodigital.com/api/mt/SendSMS",
+
+      params: {
+        user:"omra1",
+        // "Laundriz",
+        //  "omra1",
+        password:"omra1@1234",
+        //  "Laundriz@1234",
+        // "omra1@1234",
+        senderid: "ELDRYD",
+        channel: "Trans",
+        // "Transactional",
+        DCS: 0,
+        flashsms: 0,
+        number: mobileno,
+        text: message,
+        // "DLTAPPROVEDTEMPLATE",
+        // message,
+        route: 05,
+        Peid: "1201159168754003726",
+        DLTTemplateId: "1707166747148902896",
+      },
+
+      responseType: "json",
+      method: "get",
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json',
+      },
+
+
+
+
+
+    })
+
+
+    console.log("SMS DATA", data);
+  } catch (error) {
+    console.log(error);
+  }
+}
+)
+
+
+
 module.exports = router;

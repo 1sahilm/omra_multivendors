@@ -18,8 +18,10 @@ const SubscriptionSchema = new Schema({
     benifits:{type:String,required:false},
     validity:{type:String,required:false},
     gst:{type:String,required:false},
+    image: { type: Array, required: false },
     
     Amount: {type:Number,required:false,default:0},
+    payment_status:{type:Boolean,required:false,default:false},
     type:{type:String,required:false},
 },{
     timestamps:true

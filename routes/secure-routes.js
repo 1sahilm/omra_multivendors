@@ -10,6 +10,7 @@ const path = require("path");
 const multer = require("multer");
 const CustomerQueryByProduct = require("../model/products/CustomerQuery");
 const Category = require("../model/products/category");
+const Subscription = require("../model/pricing/subscription");
 // const fs = require("fs");
 // const { sendEmail } = require("../lib/mailer");
 // const { request } = require("http");
@@ -132,6 +133,8 @@ router.patch("/deactivat1111111/:_id", async (req, res) => {
 
 router.patch("/details", async (req, res) => {
     const { _id } = req.user;
+    console.log("detallllllll",_id)
+    console.log("helloghggg")
 
     try {
         const user = await UserModel.findOneAndUpdate({ _id: _id }, {
@@ -894,6 +897,20 @@ router.get("/getbuyerQuery", async (req, res) => {
       res.status(404).json({ message: error.message });
     }
   });
+  // for SuperAdmin
+
+  router.get("/getbuyerQueryfor", async (req, res) => {
+    const { _id }= req.user
+    try {
+      const buyerQuery = await CustomerQueryByProduct.find({}).sort({
+        createdAt: -1,
+      });
+  
+      res.status(200).json(buyerQuery);
+    } catch (error) {
+      res.status(404).json({ message: error.message });
+    }
+  });
 //=========================================================
 /// product profile
 
@@ -914,6 +931,19 @@ router.post("/company_profile", async (req, res) => {
         res.status(200).send(product);
     } catch (err) {
         res.status(500).json({ message: err?.message });
+    }
+});
+
+
+// invoice
+router.get("/get_invoice", async (req, res) => {
+    const {_id}=req.user
+    try {
+        const service = await Subscription.find({auther_Id:_id});
+
+        res.status(200).json({ data: service, success: true });
+    } catch (error) {
+        res.status(404).json({ message: error.message });
     }
 });
 module.exports = router;
