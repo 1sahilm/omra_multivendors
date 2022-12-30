@@ -42,7 +42,7 @@ router.post(
             benifits,
             validity,
             gst,
-            
+
             Amount,
             type
         } = req.body;
@@ -57,23 +57,23 @@ router.post(
                 res.json({ success: false, data: `${ispackage?.name} has Already created try with new` });
             } else {
                 try {
-                    const amount = await new Packages({name:name})
+                    const amount = await new Packages({ name: name })
                     // const tttc= [...amount.Services,amount?.Services]
                     // const total1 =[...amount?.price,amount.price].reduce((a, b) => a + b, 0)
                     const package = await new Packages({
                         name: name,
                         price: price,
                         benifits: benifits,
-                        Services:Services,
+                        Services: JSON.parse(Services),
                         validity: validity,
                         gst: gst,
-                       
+
                         Amount: Amount,
-                        type:type
+                        type: type
                         // category_image: `${process.env.BASE_URL}/category-image/${req.files.category_image[0].filename}`,
                     });
                     await package.save();
-                    res.status(200).json({success:true, data: package, message: `${package?.name} has  created Successfully` });
+                    res.status(200).json({ success: true, data: package, message: `${package?.name} has  created Successfully` });
                 } catch (err) {
                     res.status(500).send({ message: err?.message });
                 }
@@ -93,18 +93,43 @@ router.patch(
     ),
     async (req, res) => {
         const { _id } = req.params;
+        const {
+            name,
+            Services,
+            price,
+            benifits,
+            validity,
+            gst,
+            total,
+            Amount } = req.body
+        console.log("hello bhai", name,
+            price,
+            benifits,
+            validity,
+            gst,
+            total,
+            Amount)
+
 
         try {
             const service = await Packages.updateOne(
                 { _id },
                 {
-                    name: req.body.name,
-                    price: req.body.price,
-                    benifits: req.body.benifits,
-                    validity: req.body.validity,
-                    gst: req.body.gst,
-                    total: req.body.total,
-                    Amount: req.body.Amount,
+                    name:
+                        name,
+                    Services: JSON.parse(Services),
+                    price:
+                        price,
+                    benifits:
+                        benifits,
+                    validity:
+                        validity,
+                    gst:
+                        gst,
+                    total:
+                        total,
+                    Amount:
+                        Amount,
 
 
 
@@ -117,11 +142,11 @@ router.patch(
             //Fields
 
             res.json({
-                success:true,
+                success: true,
                 message: `
                  ${service?.name}
                  Package  has Updated Sucessfully`,
-                data:user,
+                data: user,
             });
         } catch (err) {
             res.json({
@@ -142,7 +167,7 @@ router.delete("/delete_package/:_id", async (req, res) => {
         const service = await Packages.findOneAndDelete({ _id: _id });
 
         res.json({
-            success:true,
+            success: true,
             message: `${service?.name} has deleted Sucessfully`,
             service,
         });
@@ -155,7 +180,7 @@ router.get("/get_package", async (req, res) => {
     try {
         const service = await Packages.find({});
 
-        res.status(200).json({data:service,success:true});
+        res.status(200).json({ data: service, success: true });
     } catch (error) {
         res.status(404).json({ message: error.message });
     }

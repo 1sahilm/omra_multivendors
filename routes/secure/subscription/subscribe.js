@@ -50,6 +50,7 @@ router.post(
             mobile_no,
             vendors_name,
             email,
+            GST_No,
             address,
             name,
             plan,
@@ -85,9 +86,10 @@ router.post(
                         mobile_no: mobile_no,
                         vendors_name: vendors_name,
                         email: email,
+                        GST_No:GST_No,
                         address: address,
                         name: name,
-                        plan: plan,
+                        plan: JSON.parse(plan),
                         plan2: plan2,
                         payment_mode: payment_mode,
                         start_date: start_date,
@@ -189,15 +191,14 @@ router.patch(
         try {
             const service = await Subscription.updateOne(
                 { _id },
-                {
-                  
-                    auther_Id: req.body.auther_Id,
+                {   auther_Id: req.body.auther_Id,
                     mobile_no: req.body.mobile_no,
                     vendors_name: req.body.vendors_name,
                     email: req.body.email,
+                    GST_No:req.body. GST_No,
                     address: req.body.address,
                     name: req.body.name,
-                    plan: req.body.plan,
+                    plan: JSON.parse(req.body.plan),
                     plan2: req.body.plan2,
                     payment_mode: req.body.payment_mode,
                     start_date: req.body.start_date,
@@ -208,10 +209,6 @@ router.patch(
                     gst: req.body.gst,
                     total: req.body.total,
                     Amoun: req.body.Amount
-
-
-
-
                 },
                 {
                     new: true,

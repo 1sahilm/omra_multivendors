@@ -150,6 +150,7 @@ router.post("/login", async (req, res) => {
         .status(400)
         .json({ success: false, message: "invalid email or password" });
     }
+    
 
     const user = await UserModel.findOne({ email });
     if (!user) {
@@ -157,8 +158,10 @@ router.post("/login", async (req, res) => {
         .status(400)
         .json({ success: false, message: "invalid email or password" });
     }
+   
 
     const checkPassword = comparePassword(password, user.password);
+    console.log(checkPassword,password,user.password )
 
 
     const checkIsActive = user.isActive;
@@ -184,7 +187,7 @@ router.post("/login", async (req, res) => {
 
     const token = jwt.sign({ user: JWTPayload }, "TOP_SECRET");
     res.cookie("access_token", token, { maxAge: 1000 * 60 * 60 * 24 * 7 });
-    console.log("token".token)
+    console.log("token",token)
 
     res.status(200).json({
       user: JWTPayload,
@@ -237,6 +240,36 @@ router.patch("/forgotpassword/:_id", async (req, res) => {
   }
 });
 
+router.patch("/forgotpassword2", async (req, res) => {
+  try {
+    const { _id } = req.params;
+    const {email} = req.body
+
+    // Check If User Exists
+    const findUser = await UserModel.findOne({ _id }).lean();
+    const findUser1 = await UserModel.findOne({ email:email }).lean();
+
+    if (!findUser1) {
+      return res
+        .status(400)
+        .json({ success: false, message: "user not found" });
+    }
+
+    // UPDATE PASSWORD
+    const updatePassword = await UserModel.updateOne(
+      { email },
+      { $set: { password: hashPassword(req.body.password) } }
+    );
+
+    res
+      .status(200)
+      .json({ success: true, message: "password updated successfully" });
+
+  } catch (error) {
+    console.log({ error: error.message });
+  }
+});
+
 router.post("/send-mail", async (req, res) => {
   const { description, phoneNumber, email, merchantId } = req.body;
   console.log("merchant Id", merchantId);
@@ -266,20 +299,94 @@ router.post("/send-mail", async (req, res) => {
   }
 });
 
+router.post("/send-mail-contact-us", async (req, res) => {
+  const { name, businessName, description, phoneNumber, email, merchantId } = req.body;
+
+  // const {id} = req.query.merchantId
+  // console.log("iddddd",id)
+  console.log("hello baba")
+
+  const merchantbyEmail = await UserModel.findOne({ email: email });
+  const merchantbymobile = await UserModel.findOne({ mobile_no: phoneNumber })
+
+  console.log("testdata",merchantbyEmail,
+
+
+
+    email,
+    phoneNumber,
+  )
+
+
+
+
+  // if (merchantbyEmail || merchantbymobile) {
+  //   res.status(403).json({ message: `this user is exist  `, success: false })
+  //   console.log(
+  //     "testttts babab"
+  //   )
+
+  // }
+  
+    try {
+      await sendEmail({
+        name,
+        businessName,
+        merchantEmail: email,
+        merchantId: merchantId,
+        email: email,
+        phoneNumber,
+        description,
+      });
+      res.status(200).json({ message: "email sent successfully", success: true });
+    } catch (error) {
+      res.status(500).json({ message: error?.message, success: false });
+    }
+
+   }
+
+
+);
+
 router.post("/send-sms", async (req, res) => {
-  const { mobileno, vendors_name } = req.body
+  const { mobileno, vendors_name, type, price, url, invoiceno } = req.body
+  console.log(mobileno, vendors_name)
+  const url1 = "https://marketplace.elaundry.co.in/"
+  let message = ""
+  let templateId = ""
+  switch (type) {
+    case "leads":
+      templateId = "1707166747148902896"
+      message = `Dear ${vendors_name}, You have received a New Lead from a buyer for your product inquiry. Please check your registered email for more information. Regards, E-Laundry Marketplace. OMRA Solutions`
 
-  const message = `Dear ${vendors_name}, You have received a New Lead from a buyer for your product inquiry. Please check your registered email for more information. Regards, E-Laundry Marketplace. OMRA Solutions`
+      break;
+    case "payment":
 
+      templateId = "1707161160676155343"
+      // message = `Dear ${vendors_name} , We have received payment ${price} by ${vendors_name}. Thanks for your visit to ${url1} . OMRA SOLUTIONS`
+      message = `Dear ${vendors_name} , Your order payment received successfully. Your Invoice No is ${vendors_name} , amount paid is Rs ${price} by ${vendors_name} and balance amount is Rs ${price}. Thanks for your visit to ${url1} . OMRA SOLUTIONS`
+
+      break;
+
+
+    default:
+      templateId = "1707161160651766248"
+      message = `Dear ${vendors_name} , Please use this link to pay your bill for Invoice No. {#var#} and Amount {#var#}, Pay now ${invoiceno}. Thanks for your visit to {#var#}. OMRA SOLUTIONS`
+      break;
+  }
+  console.log("type", type, templateId)
+
+  // const message = `Dear ${vendors_name}, You have received a New Lead from a buyer for your product inquiry. Please check your registered email for more information. Regards, E-Laundry Marketplace. OMRA Solutions`
+  console.log(message)
   try {
     const { data } = await axios({
       url: "http://sms.tyrodigital.com/api/mt/SendSMS",
 
       params: {
-        user:"omra1",
+        user: "omra1",
         // "Laundriz",
         //  "omra1",
-        password:"omra1@1234",
+        password: "omra1@1234",
         //  "Laundriz@1234",
         // "omra1@1234",
         senderid: "ELDRYD",
@@ -293,7 +400,7 @@ router.post("/send-sms", async (req, res) => {
         // message,
         route: 05,
         Peid: "1201159168754003726",
-        DLTTemplateId: "1707166747148902896",
+        DLTTemplateId: templateId,
       },
 
       responseType: "json",
@@ -311,12 +418,12 @@ router.post("/send-sms", async (req, res) => {
 
 
     console.log("SMS DATA", data);
-  } catch (error) {
+  }
+  catch (error) {
     console.log(error);
+    res.json({ message: error })
   }
 }
 )
-
-
 
 module.exports = router;

@@ -29,18 +29,7 @@ const imageStorage = multer.diskStorage({
         // path.extname get the uploaded file extension
     },
 });
-// const imageStorage2 = multer.diskStorage({
-//   // Destination to store image
-//   destination: "public/image_source",
-//   filename: (req, file, cb) => {
-//     cb(
-//       null,
-//       file.fieldname + "_" + Date.now() + path.extname(file.originalname)
-//     );
-//     // file.fieldname is name of the field (image)
-//     // path.extname get the uploaded file extension
-//   },
-// });
+
 
 const imageUpload = multer({
     storage: imageStorage,

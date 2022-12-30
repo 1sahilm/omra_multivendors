@@ -26,6 +26,7 @@ const service = require("./routes/secure/subscription/service");
 const price = require("./routes/secure/subscription/price")
 const package = require("./routes/secure/subscription/package");
 const subscribe = require("./routes/secure/subscription/subscribe")
+const enquiry = require("./routes/enquiry")
 const sendMail = require("./lib/mailer")
 const cookieParser = require("cookie-parser")
 
@@ -79,6 +80,7 @@ app.use("/api/banner", verifyJwt, banner);
 app.use("/api/pricing",price)
 app.use("/api/pricing",service)
 app.use("/api/pricing/package",package)
+app.use("/api/enquiry",enquiry)
 app.use("/api/pricing",subscribe)
 
 

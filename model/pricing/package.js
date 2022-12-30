@@ -3,7 +3,7 @@ const Schema = mongoose.Schema
 
 const PackageSchema = new Schema({
     name:{type:String,required:false},
-    Services:{type:mongoose.Schema.Types.Array,ref:"Services"},
+    Services:{type:Array,required:false},
     
     price:{type:Number,required:false},
     benifits:{type:String,required:false},

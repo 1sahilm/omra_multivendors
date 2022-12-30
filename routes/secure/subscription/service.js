@@ -9,6 +9,7 @@ const path = require("path");
 const multer = require("multer");
 
 const Services = require("../../../model/pricing/service");
+const MRP_Rate = require("../../../model/pricing/pricing");
 
 //=====================================================
 
@@ -34,83 +35,115 @@ router.post(
     { name: "category_image2", maxCount: 1 },
   ]),
   async (req, res) => {
-    const { 
+    const {
       name,
+      mrp_id,
       rate,
       unit,
+      mrp,
+
       quantity,
       price,
       benifits,
       type
-} = req.body;
+    } = req.body;
+
+   
 
     if (!name) {
       res.json({ success: false, message: "Service Name is mandatory" });
-    } else {
+    }  const mrpData = await MRP_Rate.findOne({ _id: mrp_id }, { price: 1, unit: 1 })
+    if (!mrpData) {
+      res.status(400).json({ message: "Mrp Rate is Mandatory" })
+    }else {
       const isService = await Services.findOne({
         name: name,
-      });
+       });
+     
       if (isService) {
         res.json({ success: false, message: `${isService?.name} has Already created try with new` });
       } else {
-        try {
-          const service = await new Services({
-            name: name,
-            rate:rate,
-            quantity:quantity,
-            unit:unit,
-            price: price,
-            benifits: benifits,
-            type:type
-            // category_image: `${process.env.BASE_URL}/category-image/${req.files.category_image[0].filename}`,
-          });
-          await service.save();
-          res.status(200).json({success:true,data:service,message:`${service?.name} services has  created Successfully`});
-        } catch (err) {
-          res.status(500).send({ message: err?.message });
+    
+          try {
+            console.log("hello")
+
+            const service = await new Services({
+              name: name,
+              mrp_id: mrp_id,
+              rate: mrpData?.price,
+              unit: mrpData?.unit,
+              mrp: mrpData,
+              quantity: quantity,
+              price: price,
+              benifits: benifits,
+              type: type
+              // category_image: `${process.env.BASE_URL}/category-image/${req.files.category_image[0].filename}`,
+            });
+            await service.save();
+            res.status(200).json({ success: true, data: service, message: `${service?.name} services has  created Successfully` });
+          } catch (err) {
+            res.status(500).send({ message: err?.message });
+          }
+
         }
+
       }
     }
-  }
+  
 );
 
 router.patch(
   "/update_service/:_id",
-
   async (req, res) => {
     const { _id } = req.params;
-
-    try {
-      const service = await Services.updateOne(
-        { _id },
-        {
-          name: req.body.name,
-          rate:rate.body.rate,
-          unit:req.body.unit,
-          quantity:req.body.quantity,
-          price:req.body.price,
-          benifits:req.body.benifits
-
-       
-        },
-        {
-          new: true,
-          upsert: true,
-        }
-      );
-      //Fields
-
-      res.json({
-        success:true,
-        message: `${service?.name} Service  has Updated Sucessfully`,
-        data:service,
-      });
-    } catch (err) {
-      res.json({
-        message: err?.message,
-      });
+    const { name, mrp_id, rate, unit, mrp, quantity, price, benifits } = req.body
+    const mrpData = await MRP_Rate.findOne(
+      { _id: mrp_id }, {
+      price: 1,
+      unit: 1
     }
-  }
+    )
+    console.log("testinggg",name,benifits,price)
+    const serviceData= await Services.find({_id:_id})
+
+    // if(mrpData?.price==(serviceData?.rate)){
+     
+    //   res.status(403).json({success:false,message:`${mrpData?.price} is already exist`})
+
+    // }else{
+      try {
+        const service = await Services.updateOne(
+          { _id },
+          {
+            name: name,
+            mrp_id: mrp_id,
+            rate: mrpData?.price,
+            unit: mrpData?.unit,
+            mrp: mrpData,
+            quantity: quantity,
+            price: price,
+            benifits: benifits
+          },
+          {
+            new: true,
+            upsert: true,
+          }
+        );
+        //Fields
+        res.json({
+          success: true,
+          message: `${service?.name} Service  has Updated Sucessfully`,
+          data: service,
+        });
+      } catch (err) {
+        res.json({
+          message: err?.message,
+        });
+      }
+
+    }
+    
+  
 );
 
 
@@ -121,10 +154,10 @@ router.delete("/delete_service/:_id", async (req, res) => {
   const { _id } = req.params;
 
   try {
-    const service =await Services.findOneAndDelete({ _id:_id });
-    
+    const service = await Services.findOneAndDelete({ _id: _id });
+
     res.json({
-      success:true,
+      success: true,
       message: `${service?.name} has deleted Sucessfully`,
       service,
     });
