@@ -14,15 +14,14 @@ const SubscriptionSchema = new Schema({
     payment_mode:{type:String,required:false},
     start_date:{type:Date, required:false},
     end_date:{type:Date,required:false},
-    
     price:{type:Number,required:false},
     benifits:{type:String,required:false},
     validity:{type:String,required:false},
     gst:{type:String,required:false},
     image: { type: Array, required: false },
-    
     Amount: {type:Number,required:false,default:0},
     payment_status:{type:Boolean,required:false,default:false},
+    payment_link:{type:String,required:false},
     type:{type:String,required:false},
 },{
     timestamps:true
