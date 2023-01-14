@@ -76,7 +76,7 @@ app.use("/api", bannerImage);
 // Plug in the JWT strategy as a middleware so only verified users can access this route.
 app.use("/api/user", verifyJwt, secureRoute);
 app.use("/api/user/blog", verifyJwt, blogs);
-app.use("/api/banner", verifyJwt, banner);
+app.use("/api/banner", banner);
 app.use("/api/pricing",price)
 app.use("/api/pricing",service)
 app.use("/api/pricing/package",package)
