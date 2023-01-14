@@ -43,6 +43,20 @@ router.get("/get_products", async (req, res) => {
   }
 });
 
+
+router.get("/get_product/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const product = await Product.findById({ _id: id })
+
+
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
+
 // api for list of approval product
 router.get("/get_productforApproval", async (req, res) => {
   try {
@@ -136,10 +150,10 @@ router.get("/get_user", async (req, res) => {
       {
         email: 1,
         company_Name: 1,
-        description:1,
+        description: 1,
         mobile_no: 1,
         Merchant_Name: 1,
-        GST_No:1,
+        GST_No: 1,
         Year_of_establishment: 1,
       }
     );
@@ -149,6 +163,48 @@ router.get("/get_user", async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 });
+
+router.get("/productByUserId/:auther_Id", async (req, res) => {
+  const { auther_Id } = req.params
+  console.log("userrrrrr", auther_Id)
+  try {
+    const userData = await Product.find({ isActive: true, isApproved: true, isDeclined: false, auther_Id: auther_Id })
+
+    if (!userData) {
+      res.status(400).json({ success: false, message: "Data not found" })
+    }
+    res.status(200).json({ success: true, data: userData })
+
+  } catch (error) {
+    res.json({ message: error.message })
+
+  }
+}
+
+)
+
+
+router.get("/productByCategory/:category", async (req, res) => {
+  const { page = 1, limit = 20, toDate, fromDate } = req.query;
+  const { category } = req.params
+  console.log("userrrrrr", category)
+  try {
+    const userData = await Product.find({ isActive: true, isApproved: true, isDeclined: false, category: category })
+    .limit(limit)
+    .skip((page - 1) * limit)
+
+    if (!userData) {
+      res.status(400).json({ success: false, message: "Data not found" })
+    }
+    res.status(200).json({ success: true, data:await userData })
+
+  } catch (error) {
+    res.json({ message: error.message })
+
+  }
+}
+
+)
 
 router.get("/getByCategory", async (req, res) => {
   let filter = {};

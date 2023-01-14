@@ -33,14 +33,13 @@ router.post(
  
   async (req, res) => {
     const { 
-   
-    price,
-    unit,
+   price,
+   unit,
   type,
 } = req.body;
 console.log("price",price)
 
-    if (!price) {
+    if (!price ||!unit) {
       res.json({ success: false, message: "Price in RS is mandatory" });
     } else {
       const isRate = await MRP_Rate.findOne({
@@ -59,7 +58,7 @@ console.log("price",price)
          
           });
           await pricing.save();
-          res.status(200).json({success:true,data:pricing,message:`${pricing?.name} services has  created Successfully`});
+          res.status(200).json({success:true,data:pricing,message:`${pricing?.price} services has  created Successfully`});
         } catch (err) {
           res.status(500).send({ message: err?.message });
         }

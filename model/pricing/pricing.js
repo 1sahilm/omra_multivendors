@@ -2,8 +2,8 @@ const mongoose = require("mongoose")
 const Schema = mongoose.Schema
 
 const PriceRateSchema = new Schema({
-    price:{type:String,required:false,unique:true},
-    unit:{type:String,required:false,unique:true},
+    price:{type:String,required:false},
+    unit:{type:String,required:false},
     type:{type:String,required:false}
 
 
