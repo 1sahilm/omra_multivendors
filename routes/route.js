@@ -150,7 +150,7 @@ router.post("/login", async (req, res) => {
         .status(400)
         .json({ success: false, message: "invalid email or password" });
     }
-    
+
 
     const user = await UserModel.findOne({ email });
     if (!user) {
@@ -158,10 +158,10 @@ router.post("/login", async (req, res) => {
         .status(400)
         .json({ success: false, message: "invalid email or password" });
     }
-   
+
 
     const checkPassword = comparePassword(password, user.password);
-    console.log(checkPassword,password,user.password )
+    console.log(checkPassword, password, user.password)
 
 
     const checkIsActive = user.isActive;
@@ -187,7 +187,7 @@ router.post("/login", async (req, res) => {
 
     const token = jwt.sign({ user: JWTPayload }, "TOP_SECRET");
     res.cookie("access_token", token, { maxAge: 1000 * 60 * 60 * 24 * 7 });
-    console.log("token",token)
+    console.log("token", token)
 
     res.status(200).json({
       user: JWTPayload,
@@ -243,11 +243,11 @@ router.patch("/forgotpassword/:_id", async (req, res) => {
 router.patch("/forgotpassword2", async (req, res) => {
   try {
     const { _id } = req.params;
-    const {email} = req.body
+    const { email } = req.body
 
     // Check If User Exists
     const findUser = await UserModel.findOne({ _id }).lean();
-    const findUser1 = await UserModel.findOne({ email:email }).lean();
+    const findUser1 = await UserModel.findOne({ email: email }).lean();
 
     if (!findUser1) {
       return res
@@ -309,7 +309,7 @@ router.post("/send-mail-contact-us", async (req, res) => {
   const merchantbyEmail = await UserModel.findOne({ email: email });
   const merchantbymobile = await UserModel.findOne({ mobile_no: phoneNumber })
 
-  console.log("testdata",merchantbyEmail,
+  console.log("testdata", merchantbyEmail,
 
 
 
@@ -327,23 +327,23 @@ router.post("/send-mail-contact-us", async (req, res) => {
   //   )
 
   // }
-  
-    try {
-      await sendEmail({
-        name,
-        businessName,
-        merchantEmail: email,
-        merchantId: merchantId,
-        email: email,
-        phoneNumber,
-        description,
-      });
-      res.status(200).json({ message: "email sent successfully", success: true });
-    } catch (error) {
-      res.status(500).json({ message: error?.message, success: false });
-    }
 
-   }
+  try {
+    await sendEmail({
+      name,
+      businessName,
+      merchantEmail: email,
+      merchantId: merchantId,
+      email: email,
+      phoneNumber,
+      description,
+    });
+    res.status(200).json({ message: "email sent successfully", success: true });
+  } catch (error) {
+    res.status(500).json({ message: error?.message, success: false });
+  }
+
+}
 
 
 );
@@ -361,17 +361,29 @@ router.post("/send-sms", async (req, res) => {
 
       break;
     case "payment":
-
-      templateId = "1707161160676155343"
-      // message = `Dear ${vendors_name} , We have received payment ${price} by ${vendors_name}. Thanks for your visit to ${url1} . OMRA SOLUTIONS`
-      message = `Dear ${vendors_name} , Your order payment received successfully. Your Invoice No is ${vendors_name} , amount paid is Rs ${price} by ${vendors_name} and balance amount is Rs ${price}. Thanks for your visit to ${url1} . OMRA SOLUTIONS`
+      templateId = "1707167309378301462"
+      message = `Dear ${vendors_name} , We have received your payment. Your Receipt No. ${invoiceno} and Amount is ${price}. Thank you to choosing our services. E-Laundry Marketplace. OMRA Solutions`
 
       break;
 
+    case "subscription":
+      templateId = "1707167309358954239"
+      message = `Dear ${vendors_name}, Your Service ${vendors_name} has been activated from ${vendors_name} to ${vendors_name}. Enjoy the Service! Regards, E-Laundry Marketplace. OMRA Solutions.`
+      break;
+
+    case "registration":
+      templateId = "1707167309353498718"
+      message = `Dear ${vendors_name}, You have registered successfully on E-Laundry Marketplace. Welcome On-boarding !.Regards, E-Laundry Marketplace. OMRA Solutions`
+      break;
+
+    case "payment-reminder":
+      templateId = "1707167309363253224"
+      message = `Dear ${vendors_name}, Your Subscription renewal date is {#var#}. Please renew it. E-Laundry Marketplace. OMRA Solutions`
+      break;
 
     default:
-      templateId = "1707161160651766248"
-      message = `Dear ${vendors_name} , Please use this link to pay your bill for Invoice No. {#var#} and Amount {#var#}, Pay now ${invoiceno}. Thanks for your visit to {#var#}. OMRA SOLUTIONS`
+      // templateId = "1707161160651766248"
+      // message = `Dear ${vendors_name} , Please use this link to pay your bill for Invoice No. {#var#} and Amount {#var#}, Pay now ${invoiceno}. Thanks for your visit to {#var#}. OMRA SOLUTIONS`
       break;
   }
   console.log("type", type, templateId)
