@@ -257,7 +257,7 @@ router.post(
                 });
                 const CountDocuments = product.CountDocuments;
           
-                res.status(200).json({success:true,message:"created successfully",data:product,count:CountDocuments});
+                res.status(200).json({success:true,message:"We have received your details successfully",data:product,count:CountDocuments});
               } catch (err) {
                 res.status(500).send({ message: err?.message });
               }

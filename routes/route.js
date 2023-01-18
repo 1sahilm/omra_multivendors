@@ -349,7 +349,7 @@ router.post("/send-mail-contact-us", async (req, res) => {
 );
 
 router.post("/send-sms", async (req, res) => {
-  const { mobileno, vendors_name, type, price, url, invoiceno } = req.body
+  const { mobileno, vendors_name, type, price, url, invoiceno,start_date,end_date,plan } = req.body
   console.log(mobileno, vendors_name)
   const url1 = "https://marketplace.elaundry.co.in/"
   let message = ""
@@ -368,7 +368,7 @@ router.post("/send-sms", async (req, res) => {
 
     case "subscription":
       templateId = "1707167309358954239"
-      message = `Dear ${vendors_name}, Your Service ${vendors_name} has been activated from ${vendors_name} to ${vendors_name}. Enjoy the Service! Regards, E-Laundry Marketplace. OMRA Solutions.`
+      message = `Dear ${vendors_name}, Your Service ${plan} has been activated from ${start_date} to ${end_date}. Enjoy the Service! Regards, E-Laundry Marketplace. OMRA Solutions.`
       break;
 
     case "registration":

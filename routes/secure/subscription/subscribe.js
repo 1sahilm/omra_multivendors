@@ -71,7 +71,8 @@ router.post(
             total,
             Amount,
             payment_link,
-            payment_status
+            payment_status,
+            isActive
         } = req.body;
         console.log("daringbaba", auther_Id)
 
@@ -107,7 +108,8 @@ router.post(
                     total: total,
                     Amount: Amount,
                     payment_link: payment_link,
-                    payment_status: payment_status
+                    payment_status: payment_status,
+                    
                     // category_image: `${process.env.BASE_URL}/category-image/${req.files.category_image[0].filename}`,
                 });
                 await subscribe.save();
@@ -192,29 +194,21 @@ router.patch(
     async (req, res) => {
         const { _id } = req.params;
 
+        const {plan,start_date,end_date,validity,isActive}= req.body
+
         try {
             const service = await Subscription.updateOne(
                 { _id },
                 {
-                    auther_Id: req.body.auther_Id,
-                    mobile_no: req.body.mobile_no,
-                    vendors_name: req.body.vendors_name,
-                    email: req.body.email,
-                    GST_No: req.body.GST_No,
-                    address: req.body.address,
-                    name: req.body.name,
-                    plan: JSON.parse(req.body.plan),
-                    plan2: req.body.plan2,
-                    payment_mode: req.body.payment_mode,
-                    start_date: req.body.start_date,
-                    end_date: req.body.end_date,
-                    price: req.body.price,
-                    benifits: req.body.benifits,
-                    validity: req.body.validity,
-                    gst: req.body.gst,
-                    total: req.body.total,
-                    Amoun: req.body.Amount,
-                    payment_link: req.body.payment_link
+                    
+                    start_date: start_date,
+                    end_date: end_date,
+                    plan: JSON.parse(plan),
+                    
+                  
+                    validity: validity,
+                    isActive:isActive
+                 
                 },
                 {
                     new: true,
@@ -226,7 +220,9 @@ router.patch(
             res.json({
                 success: true,
                 message: `
-                 ${service?.name}
+                 ${service?.plan.map((item)=>{
+                    item.label
+                 })}
                  Service  has Updated Sucessfully`,
                
             });
@@ -237,6 +233,7 @@ router.patch(
         }
     }
 );
+
 
 router.post("/payment-link",async (req,res)=>{
 

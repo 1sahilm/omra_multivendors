@@ -158,6 +158,7 @@ router.patch(
             //Fields
 
             res.json({
+                success:true,
                 message: "User Updated Sucessfully",
                 user,
             });

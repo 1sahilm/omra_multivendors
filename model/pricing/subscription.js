@@ -22,6 +22,8 @@ const SubscriptionSchema = new Schema({
     Amount: {type:Number,required:false,default:0},
     payment_status:{type:Boolean,required:false,default:false},
     payment_link:{type:String,required:false},
+    isActive:{type:Boolean,required:false,default:false},
+
     type:{type:String,required:false},
 },{
     timestamps:true

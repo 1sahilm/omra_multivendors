@@ -185,7 +185,8 @@ router.delete("/delete_category/:_id", async (req, res) => {
 
 router.get("/get_category", async (req, res) => {
   try {
-    const product = await Category.find({});
+    const product = await Category.find({isHide: false});
+    console.log("categorydata",product)
 
     res.status(200).json(await product);
   } catch (error) {
@@ -196,7 +197,7 @@ router.get("/get_category", async (req, res) => {
 // for use of uploading Product
 router.get("/product_category", async (req, res) => {
   try {
-    const product = await Category.find({ isHide: false });
+    const product = await Category.find({  });
 
     res.status(200).json(await product);
   } catch (error) {
@@ -210,7 +211,7 @@ router.get("/get_home_cat", async (req, res) => {
   page = parseInt(page);
   limit = parseInt(limit);
   try {
-    const product = await Category.find({})
+    const product = await Category.find({isHide:false})
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .exec();
@@ -409,7 +410,7 @@ router.patch(
 
 router.get("/get_subcategory", async (req, res) => {
   try {
-    const product = await SubCategory.find();
+    const product = await SubCategory.find({});
 
     res.status(200).json(product);
   } catch (error) {

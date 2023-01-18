@@ -206,7 +206,7 @@ router.get("/userDetails", async (req, res) => {
 });
 router.get("/userDetailsPaginate", async (req, res) => {
     const { _id, password, email } = req.user;
-    let { page = 1, limit = 50, toDate, fromDate } = req.query;
+    let { page = 1, limit = 20, toDate, fromDate } = req.query;
     page = Number(page);
     limit = Number(limit);
 
@@ -235,6 +235,7 @@ router.get("/userDetailsPaginate", async (req, res) => {
                     user: newdata,
 
                     totalPages: pages,
+                    count:totalDocuments,
                     currentPage: page,
                     nextPage: page < pages ? page + 1 : null,
                 });
