@@ -173,6 +173,173 @@ router.get("/details", async (req, res) => {
     }
 });
 
+router.patch("/product-upload-services/:_id", async (req, res) => {
+    // const { _id } = req.user;
+    const {_id} = req.params
+    const  _testid= req
+
+   
+    if(_testid.user.role=="SuperAdmin"){
+        try {
+            console.log("hello testing")
+            const user = await UserModel.findOneAndUpdate({ _id: _id }, {
+                isUpload: req.body.isUpload,
+               
+               
+            }, {
+                new: true,
+                upsert: true,
+            });
+            //Fields
+        
+    
+            res.json({
+                message: "User Updated Sucessfully",
+                user,
+            });
+        } catch (err) {
+            res.json({
+                message: err.message,
+            });
+        }
+
+    }
+});
+
+router.patch("/activate-email-Service/:_id", async (req, res) => {
+    // const { _id } = req.user;
+    const {_id} = req.params
+    const  _testid= req
+    const {isEmail}=req.body
+
+    console.log(_id,"hello testin",isEmail)
+   
+
+  
+    if(_testid.user.role=="SuperAdmin"){
+        try {
+       
+            const user = await UserModel.findOneAndUpdate({ _id: _id }, {
+              
+                isEmail:req.body.isEmail,
+                
+               
+            }, {
+                new: true,
+                upsert: true,
+            });
+            //Fields
+            user.save()
+         
+    
+            res.json({
+                message: "Email Service Updated Sucessfully",
+                user,
+            });
+        } catch (err) {
+            res.json({
+                message: err.message,
+            });
+        }
+
+    }
+});
+
+router.patch("/activate-call-Service/:_id", async (req, res) => {
+    // const { _id } = req.user;
+    const {_id} = req.params
+    const  _testid= req
+   
+
+  
+    if(_testid.user.role=="SuperAdmin"){
+        try {
+       
+            const user = await UserModel.findOneAndUpdate({ _id: _id }, {
+              
+                isCall: req.body.isCall,
+                
+               
+            }, {
+                new: true,
+                upsert: true,
+            });
+            //Fields
+           
+    
+            res.json({
+                message: "Call Service Updated Sucessfully",
+                user,
+            });
+            console.log("calling api")
+        } catch (err) {
+            res.json({
+                message: err.message,
+            });
+        }
+
+    }
+});
+
+router.patch("/activate-leads-Service/:_id", async (req, res) => {
+    // const { _id } = req.user;
+    const {_id} = req.params
+    
+
+    const  _testid= req
+   
+
+    console.log("islead","islead","islead","islead")
+    if(_testid.user.role=="SuperAdmin"){
+        
+        try {
+           
+            const user = await UserModel.findOneAndUpdate({ _id: _id }, {
+                isLead: req.body.isLead}, {
+                new: true,
+                upsert: true,
+            });
+            //Fields
+            
+    console.log("islead","islead","islead","islead")
+            res.status(201).json({
+                success:true,
+                message: "Leads Service Updated Sucessfully",
+                user,
+            });
+            console.log("islead233")
+        } catch (err) {
+            res.json({
+                message: err.message,
+            });
+        }
+
+    }
+});
+
+
+router.get("/get-services", async (req, res) => {
+    const { _id } = req.user;
+    const  _testid= req
+
+    console.log("useris",_id,_testid.user.role)
+
+    try {
+        const user = await UserModel.findOne({_id}, { isUpload: 1,isCall:1,isEmail:1,isLead:1 });
+        // const user = await UserModel.find({ role: "Admin" });
+        //Fields
+
+        res.json({
+            success: true,
+            data:user,
+        });
+    } catch (err) {
+        res.json({
+            message: err?.message,
+        });
+    }
+});
+
 router.get("/userDetails", async (req, res) => {
     const { _id, password, email } = req.user;
     let { page = 1, limit = 5, toDate, fromDate } = req.query;
@@ -204,16 +371,20 @@ router.get("/userDetails", async (req, res) => {
         });
     }
 });
-router.get("/userDetailsPaginate", async (req, res) => {
+router.get("/userDetailsPaginate?", async (req, res) => {
+    // const {page} = req.query
+   
+    
     const { _id, password, email } = req.user;
     let { page = 1, limit = 20, toDate, fromDate } = req.query;
+    console.log("21333",page)
     page = Number(page);
     limit = Number(limit);
 
     try {
         const user = await UserModel.find({}, { password: 0 })
-            .limit(limit)
-            .skip((page - 1) * limit)
+            .limit(limit*1)
+            .skip((page-1)*limit)
             .sort({ createdAt: -1 })
             .lean()
             .then(async (data) => {
@@ -228,7 +399,9 @@ router.get("/userDetailsPaginate", async (req, res) => {
                 );
                 const totalDocuments = await UserModel.countDocuments({});
 
-                const pages = Math.ceil(totalDocuments / limit);
+                const pages = Math.ceil(totalDocuments / 20);
+                console.log(pages,"user",newdata.length,limit)
+
 
                 res.json({
                     success: true,
@@ -236,6 +409,9 @@ router.get("/userDetailsPaginate", async (req, res) => {
 
                     totalPages: pages,
                     count:totalDocuments,
+                    min:limit*page-limit,
+                    max:limit*page,
+
                     currentPage: page,
                     nextPage: page < pages ? page + 1 : null,
                 });

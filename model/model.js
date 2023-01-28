@@ -99,6 +99,22 @@ const UserSchema = new Schema(
       required: false,
       // unique:true
     },
+    isUpload: {
+      type: Boolean,
+      required: false,
+    },
+    isLead: {
+      type: Boolean,
+      required: false,
+    },
+    isEmail: {
+      type: Boolean,
+      required: false,
+    },
+    isCall: {
+      type: Boolean,
+      required: false,
+    },
   },
   { timestamps: true }
 );

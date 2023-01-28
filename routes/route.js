@@ -56,20 +56,22 @@ router.post("/signup", async (req, res) => {
     role: role,
   };
 
-  if (!email || !mobile_no) {
-    return res.json({ success: false, data: "email and mobile no requied" });
-  }
 
+  try {
+
+    
+  if (!email || !mobile_no) {
+    return res.json({ success: false, message: "email and mobile no required" });
+  }else{
+    
   const isUser = await UserModel.findOne({
     email: email,
     mobile_no: mobile_no,
   });
 
   if (isUser) {
-    return res.json({ success: false, data: "user created Already" });
-  }
-
-  try {
+    return res.status(403).json({ success: false, message:"This user is already exists" });
+  } else{
     const user = await UserModel.create(data);
 
     const JWTPayload = {
@@ -82,10 +84,16 @@ router.post("/signup", async (req, res) => {
 
     res.status(201).json({
       success: true,
-      data: "created successfully",
+      // data: "created successfully",
+      message:"created successfully",
       user: user,
       token: token,
     });
+  }
+
+  }
+
+    
   } catch (err) {
     res.status(500).json({ success: false, data: err?.message });
   }
@@ -206,7 +214,7 @@ router.post("/logout", async (req, res) => {
     res.clearCookie("access_token");
     res.status(200).json({
       success: true,
-      data: "logout successfully",
+      message: "logout successfully",
     });
   } catch (err) {
     console.log({ error: err.message });

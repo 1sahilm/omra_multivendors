@@ -141,8 +141,7 @@ router.get("/publishproductApi", async (req, res) => {
 
 router.get("/get_user", async (req, res) => {
   const _id = req.query._id;
-  console.log("idddd", req.query);
-  console.log("hello bababa");
+ 
 
   try {
     const user = await UserModel.find(
@@ -155,6 +154,8 @@ router.get("/get_user", async (req, res) => {
         Merchant_Name: 1,
         GST_No: 1,
         Year_of_establishment: 1,
+        isEmail:1,
+        isCall:1
       }
     );
 
