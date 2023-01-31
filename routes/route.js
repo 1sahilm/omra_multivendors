@@ -64,14 +64,25 @@ router.post("/signup", async (req, res) => {
     return res.json({ success: false, message: "email and mobile no required" });
   }else{
     
-  const isUser = await UserModel.findOne({
+  const isEmail = await UserModel.findOne({
     email: email,
+    // mobile_no: mobile_no,
+   
+  });
+  const isMobile = await UserModel.findOne({
+   
     mobile_no: mobile_no,
   });
 
-  if (isUser) {
-    return res.status(403).json({ success: false, message:"This user is already exists" });
-  } else{
+
+  if (isEmail) {
+  
+  return res.json({ success: false, message:"This Email is already exists" });
+  }else if(isMobile){
+    return res.json({ success: false, message:"This Mobile is already exists" });
+
+  }
+   else{
     const user = await UserModel.create(data);
 
     const JWTPayload = {
@@ -81,13 +92,14 @@ router.post("/signup", async (req, res) => {
     };
 
     const token = jwt.sign({ user: JWTPayload }, "TOP_SECRET");
+    console.log("This user is already exists")
 
     res.status(201).json({
       success: true,
       // data: "created successfully",
       message:"created successfully",
-      user: user,
-      token: token,
+      data:user,
+      // token: token,
     });
   }
 
@@ -175,14 +187,12 @@ router.post("/login", async (req, res) => {
     const checkIsActive = user.isActive;
 
     if (!checkPassword) {
-      return res
-        .status(400)
-        .json({ success: false, message: "invalid email or password" });
+      return res.json({ success: false, message: "invalid email or password" });
     }
 
     if (!checkIsActive) {
       return res
-        .status(400)
+        
         .json({ success: false, message: "user is deactivated" });
     }
 
@@ -202,7 +212,7 @@ router.post("/login", async (req, res) => {
       token,
       message: "You are Logged in Successfully",
 
-      sucess: true,
+      success: true,
     });
   } catch (error) {
     res.status(500).send(error);
