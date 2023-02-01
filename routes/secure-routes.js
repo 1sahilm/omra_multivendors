@@ -154,6 +154,47 @@ router.patch("/details", async (req, res) => {
     }
 });
 
+router.patch("/update-user/:_id", async (req, res) => {
+    // const { _id } = req.user;
+    const _id= req.params
+    const isAdmin = req
+    console.log("detallllllll",_id)
+    console.log("helloghggg")
+    if(isAdmin.user.role==="SuperAdmin"){
+        try {
+            const user = await UserModel.findOneAndUpdate({ _id: _id }, {
+                Merchant_Name: req.body.Merchant_Name,
+                Merchant_Address: req.body.Merchant_Address,
+                Merchant_City:req.body.Merchant_City,
+                TypesOf_Bussiness: req.body.TypesOf_Bussiness,
+                SubTypeOf_bussiness: req.body.SubTypeOf_bussiness,
+                Merchant_Designation: req.body.Merchant_Designation,
+                Year_of_establishment: req.body.Year_of_establishment,
+                // Merchant_ServiceArea_Pincodes: req.body.Merchant_ServiceArea_Pincodes,
+                GST_No: req.body.GST_No,
+                PAN_No: req.body.PAN_No,
+            }, {
+                new: true,
+                upsert: true,
+            });
+            //Fields
+    
+            res.status(200).json({
+                success:true,
+                message: "User Updated Sucessfully",
+                user,
+            });
+        } catch (err) {
+            res.json({
+                message: err.message,
+            });
+        }
+
+    }
+
+   
+});
+
 router.get("/details", async (req, res) => {
     const { _id } = req.user;
 

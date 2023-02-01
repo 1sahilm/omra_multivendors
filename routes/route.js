@@ -61,7 +61,7 @@ router.post("/signup", async (req, res) => {
 
     
   if (!email || !mobile_no) {
-    return res.json({ success: false, message: "email and mobile no required" });
+    return res.json({ success: false, message: "email and mobile no is required" });
   }else{
     
   const isEmail = await UserModel.findOne({
@@ -78,7 +78,8 @@ router.post("/signup", async (req, res) => {
   if (isEmail) {
   
   return res.json({ success: false, message:"This Email is already exists" });
-  }else if(isMobile){
+  }
+  else if(isMobile){
     return res.json({ success: false, message:"This Mobile is already exists" });
 
   }
@@ -166,22 +167,18 @@ router.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res
-        .status(400)
-        .json({ success: false, message: "invalid email or password" });
+      return res.json({ success: false, message: "Enter email or password is required" });
     }
 
 
     const user = await UserModel.findOne({ email });
     if (!user) {
-      return res
-        .status(400)
-        .json({ success: false, message: "invalid email or password" });
+      return res.json({ success: false, message: "Please register your details" });
     }
 
 
     const checkPassword = comparePassword(password, user.password);
-    console.log(checkPassword, password, user.password)
+    
 
 
     const checkIsActive = user.isActive;
@@ -191,9 +188,7 @@ router.post("/login", async (req, res) => {
     }
 
     if (!checkIsActive) {
-      return res
-        
-        .json({ success: false, message: "user is deactivated" });
+      return res.json({ success: false, message: "user is deactivated" });
     }
 
     const JWTPayload = {
@@ -290,9 +285,7 @@ router.patch("/forgotpassword2", async (req, res) => {
 
 router.post("/send-mail", async (req, res) => {
   const { description, phoneNumber, email, merchantId } = req.body;
-  console.log("merchant Id", merchantId);
-  // const {id} = req.query.merchantId
-  // console.log("iddddd",id)
+ 
 
   const merchant = await UserModel.findOne({ _id: merchantId });
   console.log("userdata", merchant);

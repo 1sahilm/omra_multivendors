@@ -410,7 +410,7 @@ router.get("/searchUser/:key", async (req, res) => {
         { Merchant_Address: { $regex: req.params.key, $options: "$i" } },
         { company_Name: { $regex: req.params.key, $options: "$i" } },
       ],
-    });
+    }).sort({createdAt:-1}).limit(20);
     res.json(data);
   } catch (error) {
     res.json(404);
