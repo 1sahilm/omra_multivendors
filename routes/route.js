@@ -195,7 +195,9 @@ router.post("/login", async (req, res) => {
       _id: user._id,
       email: user.email,
       role: user.role,
-      isRegistered: user?.company_Name ? true : false,
+      isRegistered: (user?.company_Name && user.Merchant_Name) ? true : false,
+      isBusinessDetails:(user?.Merchant_Name&&user?.SubTypeOf_bussiness)?true:false,
+      isCompany:user?.company_Name? true:false
     };
 
     const token = jwt.sign({ user: JWTPayload }, "TOP_SECRET");

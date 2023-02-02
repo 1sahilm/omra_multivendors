@@ -671,7 +671,7 @@ router.post(
                 try {
                     const product = await new Product({
                         auther_Id: _id,
-                        Vendor_Id: userData.GST_No,
+                        Vendor_Id: userData?.GST_No,
                         merchant:userData,
                         vendors_name: userData.Merchant_Name,
                         mobile_no: userData.mobile_no,
