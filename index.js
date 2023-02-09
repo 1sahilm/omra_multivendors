@@ -16,8 +16,10 @@ const secureRoute = require("./routes/secure-routes");
 const upload = require("./routes/upload");
 const category = require("./routes/category");
 const buyer = require("./routes/buyer");
-const { verifyJwt } = require("./Middleware/jwtMiddleware");
+const { verifyJwt, verifyJwt1 } = require("./Middleware/jwtMiddleware");
+const {IsAdmin } = require("./Middleware/isAdmin")
 const getProduct = require("./routes/getproduct");
+const adminProduct =require("./routes/superAdmin/adminproduct")
 // const images = require('./routes/images')
 const bannerImage = require("./routes/banner_images");
 const blogs = require("./routes/blogs");
@@ -82,6 +84,9 @@ app.use("/api/pricing",service)
 app.use("/api/pricing/package",package)
 app.use("/api/enquiry",enquiry)
 app.use("/api/pricing",subscribe)
+// api for SuperAdmin==================
+app.use("/api/admin",verifyJwt1,adminProduct)
+console.log("hello testbabab",verifyJwt)
 
 
 app.use("/api", getProduct);

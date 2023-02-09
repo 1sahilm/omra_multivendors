@@ -59,54 +59,54 @@ router.post("/signup", async (req, res) => {
 
   try {
 
-    
-  if (!email || !mobile_no) {
-    return res.json({ success: false, message: "email and mobile no is required" });
-  }else{
-    
-  const isEmail = await UserModel.findOne({
-    email: email,
-    // mobile_no: mobile_no,
-   
-  });
-  const isMobile = await UserModel.findOne({
-   
-    mobile_no: mobile_no,
-  });
+
+    if (!email || !mobile_no) {
+      return res.json({ success: false, message: "email and mobile no is required" });
+    } else {
+
+      const isEmail = await UserModel.findOne({
+        email: email,
+        // mobile_no: mobile_no,
+
+      });
+      const isMobile = await UserModel.findOne({
+
+        mobile_no: mobile_no,
+      });
 
 
-  if (isEmail) {
-  
-  return res.json({ success: false, message:"This Email is already exists" });
-  }
-  else if(isMobile){
-    return res.json({ success: false, message:"This Mobile is already exists" });
+      if (isEmail) {
 
-  }
-   else{
-    const user = await UserModel.create(data);
+        return res.json({ success: false, message: "This Email is already exists" });
+      }
+      else if (isMobile) {
+        return res.json({ success: false, message: "This Mobile is already exists" });
 
-    const JWTPayload = {
-      email: user.email,
-      _id: user._id,
-      role: user.role,
-    };
+      }
+      else {
+        const user = await UserModel.create(data);
 
-    const token = jwt.sign({ user: JWTPayload }, "TOP_SECRET");
-    console.log("This user is already exists")
+        const JWTPayload = {
+          email: user.email,
+          _id: user._id,
+          role: user.role,
+        };
 
-    res.status(201).json({
-      success: true,
-      // data: "created successfully",
-      message:"created successfully",
-      data:user,
-      // token: token,
-    });
-  }
+        const token = jwt.sign({ user: JWTPayload }, "TOP_SECRET");
+        console.log("This user is already exists")
 
-  }
+        res.status(201).json({
+          success: true,
+          // data: "created successfully",
+          message: "created successfully",
+          data: user,
+          // token: token,
+        });
+      }
 
-    
+    }
+
+
   } catch (err) {
     res.status(500).json({ success: false, data: err?.message });
   }
@@ -178,7 +178,7 @@ router.post("/login", async (req, res) => {
 
 
     const checkPassword = comparePassword(password, user.password);
-    
+
 
 
     const checkIsActive = user.isActive;
@@ -196,8 +196,8 @@ router.post("/login", async (req, res) => {
       email: user.email,
       role: user.role,
       isRegistered: (user?.company_Name && user.Merchant_Name) ? true : false,
-      isBusinessDetails:(user?.Merchant_Name&&user?.SubTypeOf_bussiness)?true:false,
-      isCompany:user?.company_Name? true:false
+      isBusinessDetails: (user?.Merchant_Name && user?.SubTypeOf_bussiness) ? true : false,
+      isCompany: user?.company_Name ? true : false
     };
 
     const token = jwt.sign({ user: JWTPayload }, "TOP_SECRET");
@@ -286,11 +286,11 @@ router.patch("/forgotpassword2", async (req, res) => {
 });
 
 router.post("/send-mail", async (req, res) => {
-  const { description, phoneNumber, email, merchantId } = req.body;
- 
+  const { description, phoneNumber, email, merchantId,price,invoice_Id,type } = req.body;
 
+  console.log("userdata",description, phoneNumber, email, merchantId,type);
   const merchant = await UserModel.findOne({ _id: merchantId });
-  console.log("userdata", merchant);
+  
 
   if (!merchant) {
     return res
@@ -303,8 +303,12 @@ router.post("/send-mail", async (req, res) => {
       merchantEmail: merchant.email,
       merchantId: merchantId,
       email,
+      merchantName:merchant?.Merchant_Name,
+      price,
+      invoice_Id,
       phoneNumber,
       description,
+      type
     });
     res.status(200).json({ message: "email sent successfully", success: true });
   } catch (error) {
@@ -362,7 +366,7 @@ router.post("/send-mail-contact-us", async (req, res) => {
 );
 
 router.post("/send-sms", async (req, res) => {
-  const { mobileno, vendors_name, type, price, url, invoiceno,start_date,end_date,plan } = req.body
+  const { mobileno, vendors_name, type, price, url, invoiceno, start_date, end_date, plan } = req.body
   console.log(mobileno, vendors_name)
   const url1 = "https://marketplace.elaundry.co.in/"
   let message = ""
@@ -452,26 +456,26 @@ router.post("/send-sms", async (req, res) => {
 )
 
 
-router.post("/callingApi",async(req,res)=>{
+router.post("/callingApi", async (req, res) => {
   const {
     Agent_Mob_No,
-    buyer_Mob}=req.body
+    buyer_Mob } = req.body
   // try {
-   const callingApi= await axios.get(
-      // `http://www.apiconnecto.com/UniProUser/Click-2-Call-API.aspx?UserId=DIGIVOICE&pwd=pwd2020&AgentNum=${Agent_Mob_No}&CustomerNum=${buyer_Mob}&CampId=15823`
-      // `https://callapi.hrmsomra.com/UniProUser/Click-2-Call-API.aspx?UserId=DIGIVOICE&pwd=pwd2020&AgentNum=${number3}&CustomerNum=${number2}&CampId=15823`
-      `http://obd1.nexgplatforms.com/ClickToCallApi?ApiKey=a1fee4a676cd6366100bbaf37cccc0c3&CampaignId=62&ConnectedTo=${Agent_Mob_No}&CalledNum=${buyer_Mob}&disableAgentCheck=1`
-    );
-    console.log("callingApi",callingApi?.data)
-    res.status(200).json({success:true,data:callingApi?.data})
+  const callingApi = await axios.get(
+    // `http://www.apiconnecto.com/UniProUser/Click-2-Call-API.aspx?UserId=DIGIVOICE&pwd=pwd2020&AgentNum=${Agent_Mob_No}&CustomerNum=${buyer_Mob}&CampId=15823`
+    // `https://callapi.hrmsomra.com/UniProUser/Click-2-Call-API.aspx?UserId=DIGIVOICE&pwd=pwd2020&AgentNum=${number3}&CustomerNum=${number2}&CampId=15823`
+    `http://obd1.nexgplatforms.com/ClickToCallApi?ApiKey=a1fee4a676cd6366100bbaf37cccc0c3&CampaignId=62&ConnectedTo=${Agent_Mob_No}&CalledNum=${buyer_Mob}&disableAgentCheck=1`
+  );
+  console.log("callingApi", callingApi?.data)
+  res.status(200).json({ success: true, data: callingApi?.data })
 
 
-    
-    
-  
+
+
+
   // catch (error) {
   //   res.status(500).json({success:false,message:error?.message,data:error})
-    
+
   // }
 })
 

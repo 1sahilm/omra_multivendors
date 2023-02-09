@@ -229,7 +229,7 @@ router.get("/getByCategory", async (req, res) => {
       }
       // { isActive: true, isApproved: true, isDeclined: false }
       // filter
-    ).sort({ createdAt: -1 });
+    ).collation({locale:'en',strength: 2}).sort({product_name:1});
     // .filter({ isActive: true, isApproved: true, isDeclined: false });
     // console.log({ category: { $in: category.split(",") } }),
     console.log({ test: category });

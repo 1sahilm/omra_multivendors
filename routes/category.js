@@ -12,6 +12,7 @@ const SubCategory = require("../model/products/subcategory");
 
 const CustomerQueryByProduct = require("../model/products/CustomerQuery");
 const sendEmail = require("../lib/mailer");
+const Product = require("../model/products/product");
 
 //=====================================================
 
@@ -418,6 +419,63 @@ router.get("/get_subcategory", async (req, res) => {
   }
 });
 
+router.get("/catebycount",async(req,res)=>{
+  try {
+    const cat= await Product.aggregate( [
+      {
+        $sort:{ category : 1 }
+      },
+      { $group: {  _id : "$category", count: { $count: { } }}},
+      // { $project: { _id: 0, category: 1 }}]]
+    ]
+     )
+
+     res.json({data:cat,message:"success"})
+    
+  } catch (error) {
+    console.log(error)
+    
+  }
+})
+
+router.get("/catebycount1",async(req,res)=>{
+  try {
+    const cat= await Product.aggregate( [
+      {
+        $sort:{ category : 1 }
+      },
+      { $group: {  _id : "$category", count: { $count: { } }}},
+      // { $project: { _id: 0, category: 1 }}]]
+    ]
+     )
+
+     const categoryData= await Category.find({}).lean()
+     const arrayData= []
+      categoryData.map((item)=>arrayData.push({_id:item.category_name,category_image:item.category_image,count:0}))
+      const countArray=[...cat,...arrayData]
+     
+      
+
+     res.json({data:countArray,message:"success"})
+    
+  } catch (error) {
+    console.log(error)
+    
+  }
+})
+
+/// sorting subcategory by name
+router.get("/get_subcategory-sort-by-name", async (req, res) => {
+  try {
+    const product = await SubCategory.find({isHide:false}).collation({locale:'en',strength: 2}).sort({sub_category_name:1}).limit(50)
+    
+
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
+
 
 //=================== delete SubCategory=============
 
@@ -506,7 +564,7 @@ router.get("/get_subcategoryByCat", async (req, res) => {
   category_name = req.query.category_name;
 
   try {
-    const product = await SubCategory.find({ category_name: category_name });
+    const product = await SubCategory.find({ category_name: category_name }).limit(15);
 
     res.status(200).json(product);
   } catch (error) {
