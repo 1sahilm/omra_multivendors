@@ -22,6 +22,7 @@ const SubscriptionSchema = new Schema({
     Amount: {type:Number,required:false,default:0},
     payment_status:{type:Boolean,required:false,default:false},
     payment_link:{type:String,required:false},
+    invoice_no:{type:String,required:false,unique:true,default:0},
     isActive:{type:Boolean,required:false,default:false},
 
     type:{type:String,required:false},

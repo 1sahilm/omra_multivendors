@@ -366,7 +366,7 @@ router.post("/send-mail-contact-us", async (req, res) => {
 );
 
 router.post("/send-sms", async (req, res) => {
-  const { mobileno, vendors_name, type, price, url, invoiceno, start_date, end_date, plan } = req.body
+  const { mobileno, vendors_name, type, price, url, invoice_Id, start_date, end_date, plan } = req.body
   console.log(mobileno, vendors_name)
   const url1 = "https://marketplace.elaundry.co.in/"
   let message = ""
@@ -374,18 +374,23 @@ router.post("/send-sms", async (req, res) => {
   switch (type) {
     case "leads":
       templateId = "1707166747148902896"
-      message = `Dear ${vendors_name}, You have received a New Lead from a buyer for your product inquiry. Please check your registered email for more information. Regards, E-Laundry Marketplace. OMRA Solutions`
+      message = `Dear ${vendors_name}, You have received a new Lead from a buyer for your product inquiry.
+                 Please check your registered email for more information. Regards, E-Laundry Marketplace.
+                 OMRA Solutions`
 
       break;
     case "payment":
       templateId = "1707167309378301462"
-      message = `Dear ${vendors_name} , We have received your payment. Your Receipt No. ${invoiceno} and Amount is ${price}. Thank you to choosing our services. E-Laundry Marketplace. OMRA Solutions`
+      message = `Dear ${vendors_name} , We have received your payment. Your Receipt No. ${invoice_Id} and Amount is ${price}. Thank you to choosing our services. E-Laundry Marketplace. OMRA Solutions`
 
       break;
 
     case "subscription":
       templateId = "1707167309358954239"
-      message = `Dear ${vendors_name}, Your Service ${plan} has been activated from ${start_date} to ${end_date}. Enjoy the Service! Regards, E-Laundry Marketplace. OMRA Solutions.`
+      message = `Dear ${vendors_name}, Your Service ${plan.map((item,index)=>{
+        return item.label
+        
+      })} has been activated from ${start_date.slice(0,10)} to ${end_date.slice(0,10)}. Enjoy the Service! Regards, E-Laundry Marketplace. OMRA Solutions.`
       break;
 
     case "registration":

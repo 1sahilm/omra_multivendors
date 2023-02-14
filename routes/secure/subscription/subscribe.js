@@ -14,7 +14,8 @@ const UserModel = require("../../../model/model");
 const sdk = require('@cashfreepayments/cashfree-sdk');
 const Subscription = require("../../../model/pricing/subscription");
 
-const { CFConfig, CFPaymentGateway, CFEnvironment,CFLinkCustomerDetailsEntity,CFLinkNotifyEntity,CFLinkRequest,prodCfConfig, } = require("cashfree-pg-sdk-nodejs")
+const { CFConfig, CFPaymentGateway, CFEnvironment,CFLinkCustomerDetailsEntity,CFLinkNotifyEntity,CFLinkRequest,prodCfConfig, } = require("cashfree-pg-sdk-nodejs");
+const getNextSequenceValue = require("./sequence");
 
 //=====================================================
 console.log("console")
@@ -72,6 +73,7 @@ router.post(
             Amount,
             payment_link,
             payment_status,
+
             isActive
         } = req.body;
         console.log("daringbaba", auther_Id)
@@ -109,6 +111,7 @@ router.post(
                     Amount: Amount,
                     payment_link: payment_link,
                     payment_status: payment_status,
+                    // invoice_no:getNextSequenceValue("_id")
                     
                     // category_image: `${process.env.BASE_URL}/category-image/${req.files.category_image[0].filename}`,
                 });
@@ -136,14 +139,16 @@ router.patch(
 
 
 
+         const testdata = await Subscription.find({},{invoice_no:1})
+          length = testdata.length
+         const invoice =testdata[testdata.length-2]
+         console.log("consilelog",testdata)
+
         try {
             const payment = await Subscription.updateOne(
                 { _id },
                 {
-
                     auther_Id: req.body.auther_Id,
-
-
                     payment_mode: req.body.payment_mode,
                     payment_status: req.body.payment_status,
                     start_date: req.body.start_date,
@@ -151,14 +156,9 @@ router.patch(
                     price: req.body.price,
                     benifits: req.body.benifits,
                     image: `${process.env.BASE_URL}/billing-image/${req.files.image[0].filename}`,
-
                     validity: req.body.validity,
-
-                    Amount: req.body.Amount
-
-
-
-
+                    Amount: req.body.Amount,
+                    // invoice_no:getNextSequenceValue("_id")
                 },
                 {
                     new: true,
@@ -221,7 +221,7 @@ router.patch(
                 success: true,
                 message: `
                  ${service?.plan.map((item)=>{
-                    item.label
+                    return item.label
                  })}
                  Service  has Updated Sucessfully`,
                
@@ -440,6 +440,12 @@ router.delete("/delete_subscription/:_id", async (req, res) => {
 });
 
 router.get("/get_subscribe", async (req, res) => {
+
+    const testdata = await Subscription.find({}).sort({createdDate:"asc"})
+    length = testdata.length
+   const invoice =testdata[testdata.length-1]
+   console.log("consilelog",testdata)
+   console.log("consilelog2","0000000"+(parseInt(invoice.invoice_no)+1))
     try {
         const service = await Subscription.find({});
 
