@@ -11,7 +11,7 @@ const verifyJwt = async (req, res, next) => {
     token = authToken;
   }
 
-  console.log({token})
+ 
 
   if (token) {
     try {
@@ -45,13 +45,13 @@ const verifyJwt1 = async (req, res, next) => {
     token = authToken;
   }
 
-  console.log({"token1234bfdjfhdhfd":token})
+ 
 
   if (token) {
     try {
       const decoded = await jwt.verify(token, "TOP_SECRET");
       req.user= decoded.user
-      console.log("userDataaa",req.user,"decoded",decoded.user)
+   
       if(req.user.role=="SuperAdmin"){
         next();
 

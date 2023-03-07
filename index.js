@@ -29,6 +29,7 @@ const price = require("./routes/secure/subscription/price")
 const package = require("./routes/secure/subscription/package");
 const subscribe = require("./routes/secure/subscription/subscribe")
 const enquiry = require("./routes/enquiry")
+const leads= require("./routes/superAdmin/leads")
 const sendMail = require("./lib/mailer")
 const cookieParser = require("cookie-parser")
 
@@ -86,7 +87,8 @@ app.use("/api/enquiry",enquiry)
 app.use("/api/pricing",subscribe)
 // api for SuperAdmin==================
 app.use("/api/admin",verifyJwt1,adminProduct)
-console.log("hello testbabab",verifyJwt)
+app.use("/api/admin",verifyJwt1,leads)
+
 
 
 app.use("/api", getProduct);
@@ -102,7 +104,7 @@ app.use(function (err, req, res, next) {
 
 
 app.post("/api/test-mail",(req,res)=>{
-  console.log("test1")
+
 
   try{
   const mail = sendMail({

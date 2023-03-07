@@ -65,7 +65,7 @@ router.post(
       } else {
     
           try {
-            console.log("hello")
+          
 
             const service = await new Services({
               name: name,
@@ -103,7 +103,7 @@ router.patch(
       unit: 1
     }
     )
-    console.log("testinggg",name,benifits,price)
+    
     const serviceData= await Services.find({_id:_id})
 
     // if(mrpData?.price==(serviceData?.rate)){

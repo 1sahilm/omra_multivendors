@@ -2,7 +2,8 @@ const mongoose = require("mongoose");
 const schema = mongoose.Schema;
 
 const SubCategorySchema = new schema(
-  {
+  { 
+    category:{type:schema.Types.ObjectId,ref:"categories",required:true},
     category_Id: {
       type: String,
       require: false,
@@ -10,8 +11,10 @@ const SubCategorySchema = new schema(
 
     category_name: {
       type: String,
-      require: false,
+      require: true,
       trim: true,
+      message:"Category name is mandatory"
+      
     },
     sub_category_name: {
       type: String,

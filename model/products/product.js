@@ -26,6 +26,14 @@ const ProductSchema = new Schema({
         // default: UserModel.description,
         ref: "User",
     },
+    cat:{  type: mongoose.Schema.Types.ObjectId,
+        ref:"categories",
+        required:true
+    },
+    test:{
+        type:Object,
+        required:false
+    },
 
     // true all above
     SubTypeOf_bussiness: { type: mongoose.Schema.Types.String, ref: "User" },
@@ -34,6 +42,7 @@ const ProductSchema = new Schema({
         type: String,
         required: false,
         //  index: true
+        trim:true,
     },
     manufacturer_name: {
         type: String,
@@ -51,21 +60,21 @@ const ProductSchema = new Schema({
         type: String,
         required: false,
         index: true,
+        trim:true
     },
     product_image: {
         type: Array,
         required: false,
     },
     category: {
-        type: String,
+        type: Schema.Types.ObjectId,
         required: false,
-        trim: true,
+        // trim: true,
         // index: true,
     },
     sub_category: {
-        type: String,
+        type: Schema.Types.ObjectId,
         required: false,
-        trim: true,
         // index: true,
     },
 

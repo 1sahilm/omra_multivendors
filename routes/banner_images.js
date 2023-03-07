@@ -22,9 +22,7 @@ router.post(
   ),
 
   async (req, res) => {
-    console.log({ test: req.body });
-    console.log({ amitbaba: req.files });
-    console.log({ amitbaba1: req.files });
+   
 
     // const { user } = req.user;
 

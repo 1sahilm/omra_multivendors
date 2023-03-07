@@ -11,6 +11,7 @@ const multer = require("multer");
 const CustomerQueryByProduct = require("../model/products/CustomerQuery");
 const Category = require("../model/products/category");
 const Subscription = require("../model/pricing/subscription");
+const SubCategoy = require("../model/products/subcategory");
 // const fs = require("fs");
 // const { sendEmail } = require("../lib/mailer");
 // const { request } = require("http");
@@ -122,8 +123,7 @@ router.patch("/deactivat1111111/:_id", async (req, res) => {
 
 router.patch("/details", async (req, res) => {
     const { _id } = req.user;
-    console.log("detallllllll",_id)
-    console.log("helloghggg")
+   
 
     try {
         const user = await UserModel.findOneAndUpdate({ _id: _id }, {
@@ -158,8 +158,7 @@ router.patch("/update-user/:_id", async (req, res) => {
     // const { _id } = req.user;
     const _id= req.params
     const isAdmin = req
-    console.log("detallllllll",_id)
-    console.log("helloghggg")
+  
     if(isAdmin.user.role==="SuperAdmin"){
         try {
             const user = await UserModel.findOneAndUpdate({ _id: _id }, {
@@ -222,7 +221,7 @@ router.patch("/product-upload-services/:_id", async (req, res) => {
    
     if(_testid.user.role=="SuperAdmin"){
         try {
-            console.log("hello testing")
+           
             const user = await UserModel.findOneAndUpdate({ _id: _id }, {
                 isUpload: req.body.isUpload,
                
@@ -253,7 +252,7 @@ router.patch("/activate-email-Service/:_id", async (req, res) => {
     const  _testid= req
     const {isEmail}=req.body
 
-    console.log(_id,"hello testin",isEmail)
+
    
 
   
@@ -312,7 +311,7 @@ router.patch("/activate-call-Service/:_id", async (req, res) => {
                 message: "Call Service Updated Sucessfully",
                 user,
             });
-            console.log("calling api")
+            
         } catch (err) {
             res.json({
                 message: err.message,
@@ -330,7 +329,7 @@ router.patch("/activate-leads-Service/:_id", async (req, res) => {
     const  _testid= req
    
 
-    console.log("islead","islead","islead","islead")
+   
     if(_testid.user.role=="SuperAdmin"){
         
         try {
@@ -342,13 +341,13 @@ router.patch("/activate-leads-Service/:_id", async (req, res) => {
             });
             //Fields
             
-    console.log("islead","islead","islead","islead")
+
             res.status(201).json({
                 success:true,
                 message: "Leads Service Updated Sucessfully",
                 user,
             });
-            console.log("islead233")
+       
         } catch (err) {
             res.json({
                 message: err.message,
@@ -363,7 +362,7 @@ router.get("/get-services", async (req, res) => {
     const { _id } = req.user;
     const  _testid= req
 
-    console.log("useris",_id,_testid.user.role)
+
 
     try {
         const user = await UserModel.findOne({_id}, { isUpload: 1,isCall:1,isEmail:1,isLead:1 });
@@ -418,7 +417,7 @@ router.get("/userDetailsPaginate?", async (req, res) => {
     
     const { _id, password, email } = req.user;
     let { page = 1, limit = 20, toDate, fromDate } = req.query;
-    console.log("21333",page)
+
     page = Number(page);
     limit = Number(limit);
 
@@ -441,7 +440,7 @@ router.get("/userDetailsPaginate?", async (req, res) => {
                 const totalDocuments = await UserModel.countDocuments({});
 
                 const pages = Math.ceil(totalDocuments / 20);
-                console.log(pages,"user",newdata.length,limit)
+             
 
 
                 res.json({
@@ -634,7 +633,7 @@ router.post(
         const { other, pdf, url } = req.body;
         const { product_image1 } = req.files;
         const source_image = await Product.find({});
-        console.log("Source Image", source_image);
+   
         
 
         const userData = await UserModel.findOne({ _id: _id }, {
@@ -646,7 +645,8 @@ router.post(
             mobile_no: 1,
             isActive: 1,
         })
-        console.log("userdatata",userData)
+        const cattest= await UserModel.findOne({category_name:category})
+       
 
         if (!product_name || !category) {
             res.json({
@@ -705,6 +705,7 @@ router.post(
                         videos: videos,
                         video_url: video_url,
                         category: category,
+                        cat:category,
                         sub_category: sub_category,
                         price: price,
                         product_Specification: product_Specification,
@@ -747,7 +748,52 @@ router.post(
     }
 );
 
+// ============update by CategoryName
+router.patch("/updatecat",async(req,res)=>{
+    const {category}=req.body
+    try {
+        const cat_id = await Category.findOne({category_name:"pharma"},{category_name:1} )
+    
+        const product = await Product.updateMany({category:"pharma"},{
+            test:cat_id,
+            cat:cat_id._id,
+            category:cat_id._id
+        },{
+            upsert:true,
+            new:true
+        })
+    //    await product.save()
+        res.status(201).json({success:true,product,message:"updated"})
+        
+    } catch (error) {
+        throw error
+        
+    }
+})
+
 //=============================================
+
+// ============update by CategoryName
+router.patch("/updatesubcat",async(req,res)=>{
+    const {category}=req.body
+    try {
+        const cat_id = await SubCategoy.findOne({sub_category:"automobile"},{sub_category:1} )
+      
+        const product = await Product.updateMany({sub_category:"automobile"},{
+            
+            sub_category:cat_id._id
+        },{
+            upsert:true,
+            new:true
+        })
+    //    await product.save()
+        res.status(201).json({success:true,product,message:"updated"})
+        
+    } catch (error) {
+        throw error
+        
+    }
+})
 
 router.patch(
     "/update_product_By/:_id",
@@ -848,7 +894,7 @@ router.patch(
 
 router.get("/get_products", async (req, res) => {
      const { _id } = req.user
-    console.log("new userrr",_id)
+   
     // const userData = await UserModel.findOne(
     //   { _id: user._id },
     //   { GST_No: 1, Merchant_Name: 1 ,TypesOf_Bussiness: 1}
@@ -903,7 +949,7 @@ router.get("/notification", async (req, res) => {
             .then(async (data) => {
                 const newdata = await Promise.all(
                     data.map(async (user) => {
-                        console.log(user?._id);
+                       
                         let test = await Product.find({ auther_Id: user?._id }
                             // { isApproved: 1, isDeclined: 1 }
                         );
@@ -1008,8 +1054,7 @@ router.get("/ApprovedSearch/:key", async (req, res) => {
 //========================
 router.get("/ApprovedFilterByDate/:key", async (req, res) => {
     // let today = new date().getTime();
-    console.log("helloooo",req.params.key)
-    console.log("hello", new Date(req.params.key), new Date());
+   
 
     try {
         const data = await Product.find({
@@ -1026,8 +1071,7 @@ router.get("/ApprovedFilterByDate/:key", async (req, res) => {
 //========================
 router.get("/WaitingFilterByDate/:key", async (req, res) => {
     // let today = new date().getTime();
-    console.log("helloooo",req.params.key)
-    console.log("hello", new Date(req.params.key), new Date());
+  
 
     try {
         const data = await Product.find({
@@ -1072,7 +1116,7 @@ router.get("/waitingApprovalSearch/:key", async (req, res) => {
 //=================================================
 router.get("/waitingproductFilterByDate/:key", async (req, res) => {
     // let today = new date().getTime();
-    console.log("hello", new Date(req.params.key), new Date());
+   
 
     try {
         const data = await Product.find({

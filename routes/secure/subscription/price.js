@@ -37,7 +37,7 @@ router.post(
    unit,
   type,
 } = req.body;
-console.log("price",price)
+
 
     if (!price ||!unit) {
       res.json({ success: false, message: "Price in RS is mandatory" });

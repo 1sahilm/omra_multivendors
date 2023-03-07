@@ -18,8 +18,8 @@ const { CFConfig, CFPaymentGateway, CFEnvironment,CFLinkCustomerDetailsEntity,CF
 const getNextSequenceValue = require("./sequence");
 
 //=====================================================
-console.log("console")
-console.log(sdk.payment_link)
+
+
 const {} =sdk
 
 const imageStorage = multer.diskStorage({
@@ -76,7 +76,7 @@ router.post(
 
             isActive
         } = req.body;
-        console.log("daringbaba", auther_Id)
+       
 
         if (!auther_Id) {
             res.json({ success: false, message: "user select Name is mandatory" });
@@ -142,7 +142,7 @@ router.patch(
          const testdata = await Subscription.find({},{invoice_no:1})
           length = testdata.length
          const invoice =testdata[testdata.length-2]
-         console.log("consilelog",testdata)
+       
 
         try {
             const payment = await Subscription.updateOne(
@@ -388,7 +388,7 @@ router.patch(
     async (req, res) => {
         const { _id } = req.params;
         const {payment_link}=req.body
-        console.log(_id,payment_link)
+       
 
         try {
             const service = await Subscription.updateOne(
@@ -444,8 +444,7 @@ router.get("/get_subscribe", async (req, res) => {
     const testdata = await Subscription.find({}).sort({createdDate:"asc"})
     length = testdata.length
    const invoice =testdata[testdata.length-1]
-   console.log("consilelog",testdata)
-   console.log("consilelog2","0000000"+(parseInt(invoice.invoice_no)+1))
+ 
     try {
         const service = await Subscription.find({});
 

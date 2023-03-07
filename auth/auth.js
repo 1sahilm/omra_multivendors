@@ -46,7 +46,7 @@ passport.use(
       try {
         const user = await UserModel.findOne({ email });
 
-        console.log({ user, email, password });
+       
 
         if (!user) {
           return done(null, false, { message: "User not found" });

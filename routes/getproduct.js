@@ -46,12 +46,21 @@ router.get("/get_products", async (req, res) => {
 
 router.get("/get_product/:id", async (req, res) => {
   const { id } = req.params;
+  console.log("hell getid", id)
 
   try {
-    const product = await Product.findById({ _id: id })
+    console.log( "productbaba1")
+    const product = await Product.findById({ _id: id }).populate({path:"auther_Id",select:{email:1,Merchant_Name:1,Merchant_Address:1,mobile_no:1,description:1,GST_No:1,company_Name:1,Year_of_establishment:1,isCall:1,isEmail:1}})
+   
+    console.log(product, "productbabafff")
 
+    const category = await Category.findById({ "_id": product?.category }, { category_name: 1 })
 
-    res.status(200).json(product);
+    const sub_category = await SubCategoy.findById({ _id: product?.sub_category }, { sub_category_name: 1 })
+//     const user = await UserModel.findById({ _id: product?.auther_Id }, { Merchant_Name: 1,mobile_no:1,GST_No:1,description:1 })
+// console.log(user,"userbaba")
+
+    res.status(200).json({ data: product,category:category,subcategory:sub_category });
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
@@ -141,7 +150,7 @@ router.get("/publishproductApi", async (req, res) => {
 
 router.get("/get_user", async (req, res) => {
   const _id = req.query._id;
- 
+
 
   try {
     const user = await UserModel.find(
@@ -154,8 +163,8 @@ router.get("/get_user", async (req, res) => {
         Merchant_Name: 1,
         GST_No: 1,
         Year_of_establishment: 1,
-        isEmail:1,
-        isCall:1
+        isEmail: 1,
+        isCall: 1
       }
     );
 
@@ -167,7 +176,7 @@ router.get("/get_user", async (req, res) => {
 
 router.get("/productByUserId/:auther_Id", async (req, res) => {
   const { auther_Id } = req.params
-  console.log("userrrrrr", auther_Id)
+
   try {
     const userData = await Product.find({ isActive: true, isApproved: true, isDeclined: false, auther_Id: auther_Id })
 
@@ -188,16 +197,38 @@ router.get("/productByUserId/:auther_Id", async (req, res) => {
 router.get("/productByCategory/:category", async (req, res) => {
   const { page = 1, limit = 20, toDate, fromDate } = req.query;
   const { category } = req.params
-  console.log("userrrrrr", category)
+
   try {
     const userData = await Product.find({ isActive: true, isApproved: true, isDeclined: false, category: category })
-    .limit(limit)
-    .skip((page - 1) * limit)
+      .limit(limit)
+      .skip((page - 1) * limit)
 
     if (!userData) {
       res.status(400).json({ success: false, message: "Data not found" })
     }
-    res.status(200).json({ success: true, data:await userData })
+    res.status(200).json({ success: true, data: await userData })
+
+  } catch (error) {
+    res.json({ message: error.message })
+
+  }
+}
+
+)
+
+router.get("/product-by-subcategory/:subcategory", async (req, res) => {
+  const { page = 1, limit = 20, toDate, fromDate } = req.query;
+  const { subcategory } = req.params
+
+  try {
+    const userData = await Product.find({ isActive: true, isApproved: true, isDeclined: false, sub_category: subcategory })
+      .limit(limit)
+      .skip((page - 1) * limit)
+
+    if (!userData) {
+      res.status(400).json({ success: false, message: "Data not found" })
+    }
+    res.status(200).json({ success: true, data: await userData })
 
   } catch (error) {
     res.json({ message: error.message })
@@ -211,16 +242,19 @@ router.get("/getByCategory", async (req, res) => {
   let filter = {};
 
   const category = req.query.category;
+  const TypesOf_Bussiness= req.query.TypesOf_Bussiness;
   // const sub_category = req.query.sub_category;
   // console.log("categoryyyy", category.split(","));
   // if (req.query.categories) {
   //   filter = { category: [req.query.categories] };
   // }
+  
 
   try {
     const product = await Product.find(
       {
         category: { $in: category.split(",") },
+      
         // sub_category: { $in: sub_category },
 
         isActive: true,
@@ -229,10 +263,64 @@ router.get("/getByCategory", async (req, res) => {
       }
       // { isActive: true, isApproved: true, isDeclined: false }
       // filter
-    ).collation({locale:'en',strength: 2}).sort({product_name:1});
+    ).collation({ locale: 'en', strength: 2 }).sort({ product_name: 1 });
     // .filter({ isActive: true, isApproved: true, isDeclined: false });
     // console.log({ category: { $in: category.split(",") } }),
-    console.log({ test: category });
+
+  
+
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
+
+router.get("/get-by-businessType", async (req, res) => {
+  let filter = {};
+
+
+  const business= req.query.business;
+ 
+  
+  const populateQuery = [
+    
+    {
+     
+      path: "auther_Id",
+      model: UserModel,
+     
+      match: {
+        // product_name:"Paracetomol",
+        
+        TypesOf_Bussiness: { $in: business.split(",") }
+    },
+      
+      
+      select:{email:1,mobile_no:1,TypesOf_Bussiness:1,Merchant_Name:1,company_Name:1}
+    },
+    {
+      path: "category",
+      model: Category,
+      select:{category_name:1}
+    },
+   
+  ];
+
+  try {
+   
+    const product = await Product.find({ isActive: true,
+      isApproved: true,
+      isDeclined: false,
+    
+      }).populate(populateQuery)
+
+     
+    
+    // console.log("new value",product.find({auther_Id[TypesOf_Bussiness] : { $in: business.split(",") },})
+   
+console.log(product,"hello")
+  
+
     res.status(200).json(product);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -284,7 +372,7 @@ router.get("/search=", async (req, res) => {
 });
 
 router.get("/search/:key", async (req, res) => {
-  console.log(req.params.key);
+
   var regx = new RegExp(req.params.key);
   try {
     const data = await Product.find({
@@ -410,7 +498,7 @@ router.get("/searchUser/:key", async (req, res) => {
         { Merchant_Address: { $regex: req.params.key, $options: "$i" } },
         { company_Name: { $regex: req.params.key, $options: "$i" } },
       ],
-    }).sort({createdAt:-1}).limit(20);
+    }).sort({ createdAt: -1 }).limit(20);
     res.json(data);
   } catch (error) {
     res.json(404);

@@ -56,7 +56,7 @@ router.post(
 
 router.patch("/book-demo/:_id", async (req, res) => {
   const { _id } = req.params;
-  console.log(_id);
+ 
   const { isCompleted, isDeclined, merchant_Id,
     name,
     email,
@@ -125,7 +125,7 @@ router.post(
 
       date,
       type } = req.body;
-    console.log("enquairy", product_category, comment)
+   
 
     if (!name || !email || !mobile) {
       res.json(
@@ -173,7 +173,7 @@ router.post(
       )
     } else {
       const user = await UserModel.findOne({ mobile_no: mobile })
-      console.log("tsed bhaat", user)
+    
       if (user) {
         res.status(400).json({ success: false, message: "Mobile no. already exist, please contact with Customer Care" })
       } else {
@@ -182,7 +182,7 @@ router.post(
           const CountDocuments = product.CountDocuments;
           res.status(200).json({ success: true, message: "created successfully", data: product, count: CountDocuments });
         } catch (err) {
-          console.log("errorr", err)
+          
           res.status(500).json({ message: err?.message });
         }
       }
@@ -246,8 +246,7 @@ router.post(
       )
     } else {
       const user =amc_requirement? await Category.findOne({ _id: amc_requirement }):""
-      console.log("tsed bhaat", user)
-      console.log("amc_requirement",user?.category_name)
+    
       const payload={
         name:name,
         company_name:company_name,
@@ -265,7 +264,7 @@ router.post(
           const CountDocuments = amc.CountDocuments;
           res.status(200).json({ success: true, message: "created successfully", data: amc, count: CountDocuments });
         } catch (err) {
-          console.log("errorr", err)
+         
           res.status(500).json({ message: err?.message });
         }
       }

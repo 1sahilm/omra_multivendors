@@ -117,7 +117,7 @@ router.post(
     // const userData = await ProductModel.findOne({_id:user.id},{GST_No:1,Merchant_Name:1})
 
     try {
-      console.log(req.body.file);
+     
 
       const product = new ProductModel({
         Vendor_Id: req.body.Vendor_Id,

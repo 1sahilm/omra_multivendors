@@ -10,7 +10,7 @@ router.post(
   "/connect_to_buy",
 
   async (req, res) => {
-    console.log({ imagesss: req.body });
+   
 
     try {
       const product = await CustomerQueryByProduct.create({
@@ -33,7 +33,7 @@ router.post(
 
 router.patch("/leads_update/:_id", async (req, res) => {
   const { _id } = req.params;
-  console.log(_id);
+  
   const { isCompleted, isDeclined } = req.body;
   try {
     const updateQuery = await CustomerQueryByProduct.findByIdAndUpdate(
@@ -62,7 +62,7 @@ router.patch("/leads_update/:_id", async (req, res) => {
 
 router.patch("/declined_lead/:_id", async (req, res) => {
   const { _id } = req.params;
-  console.log(_id);
+
 
   try {
     // const updateQuery= await CustomerQueryByProduct.updateOne(
@@ -121,7 +121,7 @@ router.get("/getbuyerQueryCount", async (req, res) => {
 
   try {
     const merchant_Id = query?.merchant_Id;
-    console.log({ "testing buyer": merchant_Id });
+   
     const buyerQuery = await CustomerQueryByProduct.find(
       {},
       { merchant_Id: 1 }
@@ -131,7 +131,7 @@ router.get("/getbuyerQueryCount", async (req, res) => {
     res
       .status(200)
       .json({ success: true, data: buyerQuery, totalDocuments: count });
-    // console.log("hellonanana",res.status(200).json(buyerQuery,count))
+  
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
