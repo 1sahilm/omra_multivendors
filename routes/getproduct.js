@@ -56,11 +56,11 @@ router.get("/get_product/:id", async (req, res) => {
 
     const category = await Category.findById({ "_id": product?.category }, { category_name: 1 })
 
-    const sub_category = await SubCategoy.findById({ _id: product?.sub_category }, { sub_category_name: 1 })
+    // const sub_category = await SubCategoy.findById({ _id: product?.sub_category }, { sub_category_name: 1 })
 //     const user = await UserModel.findById({ _id: product?.auther_Id }, { Merchant_Name: 1,mobile_no:1,GST_No:1,description:1 })
 // console.log(user,"userbaba")
 
-    res.status(200).json({ data: product,category:category,subcategory:sub_category });
+    res.status(200).json({ data: product,category:category });
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
