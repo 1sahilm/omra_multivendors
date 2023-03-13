@@ -242,7 +242,6 @@ router.get("/get_postionCat", async (req, res) => {
     const product = await Category.find({},{category_name:1,position:1} ).sort({"position":-1}).limit(5);
     //.sort({ position: 1 }).limit(5)
     //{ category_name: 1,position: 1 }
-    console.log("helloBaba",product)
 
     res.status(200).json(product);
   } catch (error) {
