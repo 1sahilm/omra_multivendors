@@ -5,10 +5,12 @@ const jwt = require("jsonwebtoken");
 const router = express.Router();
 // const ProductModel = require("../model/sellerProduct/product");
 const res = require("express/lib/response");
+const otpGenerator = require('otp-generator')
 const UserModel = require("../model/model");
 const bcrypt = require("bcrypt");
 const sendEmail = require("../lib/mailer");
 const axios = require("axios")
+
 
 const { hashPassword, comparePassword } = require("../functions/passwordHash");
 // const { sendEmail } = require("../lib/mailer");
@@ -45,7 +47,6 @@ require("dotenv").config();
 // ///  bcrypt.hash(myPlaintextPassword, saltRounds).then(function(hash) {
 //     // Store hash in your password DB.
 // //});
-
 router.post("/signup", async (req, res) => {
   const { email, mobile_no, password, role } = req.body;
 
@@ -164,7 +165,7 @@ router.post("/signup", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password ,otp} = req.body;
 
     if (!email || !password) {
       return res.json({ success: false, message: "Enter email or password is required" });
@@ -182,6 +183,7 @@ router.post("/login", async (req, res) => {
 
 
     const checkIsActive = user.isActive;
+    const otpLogin = otp
 
     if (!checkPassword) {
       return res.json({ success: false, message: "invalid email or password" });
@@ -366,17 +368,20 @@ router.post("/send-mail-contact-us", async (req, res) => {
 );
 
 router.post("/send-sms", async (req, res) => {
-  const { mobileno, vendors_name, type, price, url, invoice_Id, start_date, end_date, plan } = req.body
+  const { mobileno, vendors_name, price, type, url, invoice_Id, start_date, end_date, plan } = req.body
   console.log(mobileno, vendors_name)
+ const otp= otpGenerator.generate(6, {digits: true, lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false});
+ console.log("otp", otp)
   const url1 = "https://marketplace.elaundry.co.in/"
   let message = ""
   let templateId = ""
   switch (type) {
     case "leads":
       templateId = "1707166747148902896"
-      message = `Dear ${vendors_name}, You have received a new Lead from a buyer for your product inquiry.
-                 Please check your registered email for more information. Regards, E-Laundry Marketplace.
-                 OMRA Solutions`
+      message = `Dear ${vendors_name}, You have received a new Lead from a buyer
+       for your product inquiry.Please check your registered 
+       email for more information. Regards, E-Laundry Marketplace.
+       OMRA Solutions`
 
       break;
     case "payment":
@@ -405,7 +410,7 @@ router.post("/send-sms", async (req, res) => {
 
     case "otp-login":
         templateId = "1707161160681288183"
-        message = `Auth code ${989870} to verify your mobile number. OMRA SOLUTIONS`
+        message = `Auth code ${otp} to verify your mobile number. OMRA SOLUTIONS`
         break;
 
     default:
