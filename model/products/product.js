@@ -67,13 +67,15 @@ const ProductSchema = new Schema({
         required: false,
     },
     category: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
+        ref:"categories",
         required: false,
         // trim: true,
         // index: true,
     },
     sub_category: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
+        ref:"subcategories",
         required: false,
         // index: true,
     },

@@ -915,13 +915,40 @@ router.get("/getproductForApproval", async (req, res) => {
     //   { _id: user._id },
     //   { GST_No: 1, Merchant_Name: 1 ,TypesOf_Bussiness: 1}
     // );
+
+    const populateQuery = [
+    
+        {
+         
+          path: "auther_Id",
+          model: UserModel,
+         
+          
+          
+          
+          select:{email:1,mobile_no:1,TypesOf_Bussiness:1,Merchant_Name:1,company_Name:1}
+        },
+        {
+          path: "category",
+          model: Category,
+          select:{category_name:1}
+        },
+        {
+            path: "sub_category",
+            model: SubCategoy,
+            select:{sub_category_name:1}
+          },
+       
+      ];
     try {
         const product1 = await Product.find({
             isApproved: false,
             isDeclined: false,
-        }).sort({ createdAt: -1 });
-        const userData = await UserModel.find({}, { _id: 1, isActive: 1 });
-        const product = { ...product1, ...userData };
+           
+        }).populate(populateQuery).sort({ createdAt: -1 })
+        // const userData = await Product.find({isApproved:false}).populate(populateQuery)
+        // const product = { ...product1, ...userData };
+        // console.log(userData,"Hello")
 
         res.status(200).json(product1);
     } catch (error) {

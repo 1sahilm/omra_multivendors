@@ -98,17 +98,38 @@ router.get("/getcompanyDescription", async (req, res) => {
 
 ///
 router.get("/get_publish_product", async (req, res) => {
+  const populateQuery = [
+    
+    {
+     
+      path: "auther_Id",
+      model: UserModel,
+      select:{TypesOf_Bussiness:1,Merchant_Name:1,company_Name:1}
+    },
+    {
+      path: "category",
+      model: Category,
+      select:{category_name:1}
+    },
+    // {
+    //     path: "sub_category",
+    //     model: SubCategoy,
+    //     select:{sub_category_name:1}
+    //   },
+   
+  ];
   try {
     const product = await Product.find({
       isApproved: true,
       isActive: true,
       isDeclined: false,
-    }).sort({ updatedAt: -1 });
+    }).populate(populateQuery).sort({ updatedAt: -1 });
     const totalDocuments = await Product.countDocuments({
       isActive: true,
       isApproved: true,
       isDeclined: false,
     });
+    console.log(product,"hellobaba")
 
     res.status(200).json(product);
   } catch (error) {
