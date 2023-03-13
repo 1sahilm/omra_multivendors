@@ -80,11 +80,11 @@ app.use("/api", bannerImage);
 app.use("/api/user", verifyJwt, secureRoute);
 app.use("/api/user/blog", verifyJwt, blogs);
 app.use("/api/banner", banner);
-app.use("/api/pricing",price)
-app.use("/api/pricing",service)
-app.use("/api/pricing/package",package)
+app.use("/api/pricing",verifyJwt1,price)
+app.use("/api/pricing",verifyJwt1,service)
+app.use("/api/pricing/package",verifyJwt1,package)
 app.use("/api/enquiry",enquiry)
-app.use("/api/pricing",subscribe)
+app.use("/api/pricing",verifyJwt1,subscribe)
 // api for SuperAdmin==================
 app.use("/api/admin",verifyJwt1,adminProduct)
 app.use("/api/admin",verifyJwt1,leads)

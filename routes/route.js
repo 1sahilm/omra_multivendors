@@ -285,54 +285,54 @@ router.patch("/forgotpassword2", async (req, res) => {
   }
 });
 
-// router.post("/send-mail", async (req, res) => {
-//   const { description, phoneNumber, email, merchantId,price,invoice_Id,type } = req.body;
+router.post("/send-mail", async (req, res) => {
+  const { description, phoneNumber, email, merchantId,price,invoice_Id,type } = req.body;
 
-//   console.log("userdata",description, phoneNumber, email, merchantId,type);
-//   const merchant = await UserModel.findOne({ _id: merchantId });
+  console.log("userdata",description, phoneNumber, email, merchantId,type);
+  const merchant = await UserModel.findOne({ _id: merchantId });
   
 
-//   if (!merchant) {
-//     return res
-//       .status(404)
-//       .json({ message: "merchant not found", success: false });
-//   }
+  if (!merchant) {
+    return res
+      .status(404)
+      .json({ message: "merchant not found", success: false });
+  }
 
-//   try {
-//     await sendEmail({
-//       merchantEmail: merchant.email,
-//       merchantId: merchantId,
-//       email,
-//       merchantName:merchant?.Merchant_Name,
-//       price,
-//       invoice_Id,
-//       phoneNumber,
-//       description,
-//       type
-//     });
-//     res.status(200).json({ message: "email sent successfully", success: true });
-//   } catch (error) {
-//     res.status(500).json({ message: error?.message, success: false });
-//   }
-// });
+  try {
+    await sendEmail({
+      merchantEmail: merchant.email,
+      merchantId: merchantId,
+      email,
+      merchantName:merchant?.Merchant_Name,
+      price,
+      invoice_Id,
+      phoneNumber,
+      description,
+      type
+    });
+    res.status(200).json({ message: "email sent successfully", success: true });
+  } catch (error) {
+    res.status(500).json({ message: error?.message, success: false });
+  }
+});
 
-// router.post("/send-mail-contact-us", async (req, res) => {
-//   const { name, businessName, description, phoneNumber, email, merchantId } = req.body;
+router.post("/send-mail-contact-us", async (req, res) => {
+  const { name, businessName, description, phoneNumber, email, merchantId } = req.body;
 
-//   // const {id} = req.query.merchantId
-//   // console.log("iddddd",id)
-//   console.log("hello baba")
+  // const {id} = req.query.merchantId
+  // console.log("iddddd",id)
+  console.log("hello baba")
 
-//   const merchantbyEmail = await UserModel.findOne({ email: email });
-//   const merchantbymobile = await UserModel.findOne({ mobile_no: phoneNumber })
+  const merchantbyEmail = await UserModel.findOne({ email: email });
+  const merchantbymobile = await UserModel.findOne({ mobile_no: phoneNumber })
 
-//   console.log("testdata", merchantbyEmail,
+  console.log("testdata", merchantbyEmail,
 
 
 
-//     email,
-//     phoneNumber,
-//   )
+    email,
+    phoneNumber,
+  )
 
 
 
@@ -345,143 +345,145 @@ router.patch("/forgotpassword2", async (req, res) => {
 
 //   // }
 
-//   try {
-//     await sendEmail({
-//       name,
-//       businessName,
-//       merchantEmail: email,
-//       merchantId: merchantId,
-//       email: email,
-//       phoneNumber,
-//       description,
-//     });
-//     res.status(200).json({ message: "email sent successfully", success: true });
-//   } catch (error) {
-//     res.status(500).json({ message: error?.message, success: false });
-//   }
+  try {
+    await sendEmail({
+      name,
+      businessName,
+      merchantEmail: email,
+      merchantId: merchantId,
+      email: email,
+      phoneNumber,
+      description,
+    });
+    res.status(200).json({ message: "email sent successfully", success: true });
+  } catch (error) {
+    res.status(500).json({ message: error?.message, success: false });
+  }
 
-// }
+}
 
 
-// );
+);
 
-// router.post("/send-sms", async (req, res) => {
-//   const { mobileno, vendors_name, type, price, url, invoice_Id, start_date, end_date, plan } = req.body
-//   console.log(mobileno, vendors_name)
-//   const url1 = "https://marketplace.elaundry.co.in/"
-//   let message = ""
-//   let templateId = ""
-//   switch (type) {
-//     case "leads":
-//       templateId = "1707166747148902896"
-//       message = `Dear ${vendors_name}, You have received a new Lead from a buyer for your product inquiry.
-//                  Please check your registered email for more information. Regards, E-Laundry Marketplace.
-//                  OMRA Solutions`
+router.post("/send-sms", async (req, res) => {
+  const { mobileno, vendors_name, type, price, url, invoice_Id, start_date, end_date, plan } = req.body
+  console.log(mobileno, vendors_name)
+  const url1 = "https://marketplace.elaundry.co.in/"
+  let message = ""
+  let templateId = ""
+  switch (type) {
+    case "leads":
+      templateId = "1707166747148902896"
+      message = `Dear ${vendors_name}, You have received a new Lead from a buyer for your product inquiry.
+                 Please check your registered email for more information. Regards, E-Laundry Marketplace.
+                 OMRA Solutions`
 
-//       break;
-//     case "payment":
-//       templateId = "1707167309378301462"
-//       message = `Dear ${vendors_name} , We have received your payment. Your Receipt No. ${invoice_Id} and Amount is ${price}. Thank you to choosing our services. E-Laundry Marketplace. OMRA Solutions`
+      break;
+    case "payment":
+      templateId = "1707167309378301462"
+      message = `Dear ${vendors_name} , We have received your payment. Your Receipt No. ${invoice_Id} and Amount is ${price}. Thank you to choosing our services. E-Laundry Marketplace. OMRA Solutions`
 
-//       break;
+      break;
 
-//     case "subscription":
-//       templateId = "1707167309358954239"
-//       message = `Dear ${vendors_name}, Your Service ${plan.map((item,index)=>{
-//         return item.label
+    case "subscription":
+      templateId = "1707167309358954239"
+      message = `Dear ${vendors_name}, Your Service ${plan.map((item,index)=>{
+        return item.label
         
-//       })} has been activated from ${start_date.slice(0,10)} to ${end_date.slice(0,10)}. Enjoy the Service! Regards, E-Laundry Marketplace. OMRA Solutions.`
-//       break;
+      })} has been activated from ${start_date.slice(0,10)} to ${end_date.slice(0,10)}. Enjoy the Service! Regards, E-Laundry Marketplace. OMRA Solutions.`
+      break;
 
-//     case "registration":
-//       templateId = "1707167309353498718"
-//       message = `Dear ${vendors_name}, You have registered successfully on E-Laundry Marketplace. Welcome On-boarding !.Regards, E-Laundry Marketplace. OMRA Solutions`
-//       break;
+    case "registration":
+      templateId = "1707167309353498718"
+      message = `Dear ${vendors_name}, You have registered successfully on E-Laundry Marketplace. Welcome On-boarding !.Regards, E-Laundry Marketplace. OMRA Solutions`
+      break;
 
-//     case "payment-reminder":
-//       templateId = "1707167309363253224"
-//       message = `Dear ${vendors_name}, Your Subscription renewal date is {#var#}. Please renew it. E-Laundry Marketplace. OMRA Solutions`
-//       break;
+    case "payment-reminder":
+      templateId = "1707167309363253224"
+      message = `Dear ${vendors_name}, Your Subscription renewal date is {#var#}. Please renew it. E-Laundry Marketplace. OMRA Solutions`
+      break;
 
-//     default:
-//       // templateId = "1707161160651766248"
-//       // message = `Dear ${vendors_name} , Please use this link to pay your bill for Invoice No. {#var#} and Amount {#var#}, Pay now ${invoiceno}. Thanks for your visit to {#var#}. OMRA SOLUTIONS`
-//       break;
-//   }
-//   console.log("type", type, templateId)
+    case "otp-login":
+        templateId = "1707161160681288183"
+        message = `Auth code ${989870} to verify your mobile number. OMRA SOLUTIONS`
+        break;
 
-//   // const message = `Dear ${vendors_name}, You have received a New Lead from a buyer for your product inquiry. Please check your registered email for more information. Regards, E-Laundry Marketplace. OMRA Solutions`
-//   console.log(message)
-//   try {
-//     const { data } = await axios({
-//       url: "http://sms.tyrodigital.com/api/mt/SendSMS",
+    default:
+      // templateId = "1707161160651766248"
+      // message = `Dear ${vendors_name} , Please use this link to pay your bill for Invoice No. {#var#} and Amount {#var#}, Pay now ${invoiceno}. Thanks for your visit to {#var#}. OMRA SOLUTIONS`
+      break;
+  }
 
-//       params: {
-//         user: "omra1",
-//         // "Laundriz",
-//         //  "omra1",
-//         password: "omra1@1234",
-//         //  "Laundriz@1234",
-//         // "omra1@1234",
-//         senderid: "ELDRYD",
-//         channel: "Trans",
-//         // "Transactional",
-//         DCS: 0,
-//         flashsms: 0,
-//         number: mobileno,
-//         text: message,
-//         // "DLTAPPROVEDTEMPLATE",
-//         // message,
-//         route: 05,
-//         Peid: "1201159168754003726",
-//         DLTTemplateId: templateId,
-//       },
+  try {
+    const { data } = await axios({
+      url: "http://sms.tyrodigital.com/api/mt/SendSMS",
 
-//       responseType: "json",
-//       method: "get",
-//       headers: {
-//         'Access-Control-Allow-Origin': '*',
-//         'Content-Type': 'application/json',
-//       },
+      params: {
+        user: process.env.SMS_USER,
+        // "Laundriz",
+        //  "omra1",
+        password: process.env.PASSWORD,
+        //  "Laundriz@1234",
+        // "omra1@1234",
+        senderid: process.env.SENDER_ID,
+        channel: process.env.CHANNEL,
+        // "Transactional",
+        DCS: 0,
+        flashsms: 0,
+        number: mobileno,
+        text: message,
+        // "DLTAPPROVEDTEMPLATE",
+        // message,
+        route: 05,
+        Peid: "1201159168754003726",
+        DLTTemplateId: templateId,
+      },
 
-
-
-
-
-//     })
-
-
-//     console.log("SMS DATA", data);
-//   }
-//   catch (error) {
-//     console.log(error);
-//     res.json({ message: error })
-//   }
-// }
-// )
-
-
-// router.post("/callingApi", async (req, res) => {
-//   const {
-//     Agent_Mob_No,
-//     buyer_Mob } = req.body
-//   // try {
-//   const callingApi = await axios.get(
-//     // `http://www.apiconnecto.com/UniProUser/Click-2-Call-API.aspx?UserId=DIGIVOICE&pwd=pwd2020&AgentNum=${Agent_Mob_No}&CustomerNum=${buyer_Mob}&CampId=15823`
-//     // `https://callapi.hrmsomra.com/UniProUser/Click-2-Call-API.aspx?UserId=DIGIVOICE&pwd=pwd2020&AgentNum=${number3}&CustomerNum=${number2}&CampId=15823`
-//     `http://obd1.nexgplatforms.com/ClickToCallApi?ApiKey=a1fee4a676cd6366100bbaf37cccc0c3&CampaignId=62&ConnectedTo=${Agent_Mob_No}&CalledNum=${buyer_Mob}&disableAgentCheck=1`
-//   );
-//   console.log("callingApi", callingApi?.data)
-//   res.status(200).json({ success: true, data: callingApi?.data })
+      responseType: "json",
+      method: "get",
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json',
+      },
 
 
 
 
 
-//   // catch (error) {
-//   //   res.status(500).json({success:false,message:error?.message,data:error})
+    })
 
-//   // }
-// })
+
+    // console.log("SMS DATA", data);
+  }
+  catch (error) {
+    // console.log(error);
+    res.json({ message: error })
+  }
+}
+)
+
+
+router.post("/callingApi", async (req, res) => {
+  const {
+    Agent_Mob_No,
+    buyer_Mob } = req.body
+  // try {
+  const callingApi = await axios.get(
+    // `http://www.apiconnecto.com/UniProUser/Click-2-Call-API.aspx?UserId=DIGIVOICE&pwd=pwd2020&AgentNum=${Agent_Mob_No}&CustomerNum=${buyer_Mob}&CampId=15823`
+    // `https://callapi.hrmsomra.com/UniProUser/Click-2-Call-API.aspx?UserId=DIGIVOICE&pwd=pwd2020&AgentNum=${number3}&CustomerNum=${number2}&CampId=15823`
+    `http://obd1.nexgplatforms.com/ClickToCallApi?ApiKey=a1fee4a676cd6366100bbaf37cccc0c3&CampaignId=62&ConnectedTo=${Agent_Mob_No}&CalledNum=${buyer_Mob}&disableAgentCheck=1`
+  );
+  console.log("callingApi", callingApi?.data)
+  res.status(200).json({ success: true, data: callingApi?.data })
+
+
+
+
+
+  // catch (error) {
+  //   res.status(500).json({success:false,message:error?.message,data:error})
+
+  // }
+})
 
 module.exports = router;
