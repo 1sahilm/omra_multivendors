@@ -496,8 +496,8 @@ router.get("/homepageSearch/:key", async (req, res) => {
       // },
 
       $or: [
-        { category: { $regex: req.params.key, $options: "$i" } },
-        { sub_category: { $regex: req.params.key, $options: "$i" } },
+        // { category: { $regex: req.params.key, $options: "$i" } },
+        // { sub_category: { $regex: req.params.key, $options: "$i" } },
         { brand: { $regex: req.params.key, $options: "$i" } },
         { product_name: { $regex: req.params.key, $options: "$i" } },
       ],
