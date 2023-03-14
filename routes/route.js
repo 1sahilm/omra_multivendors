@@ -162,10 +162,14 @@ router.post("/signup", async (req, res) => {
 //     });
 //   }
 // );
+let userOtp=0000
+console.log(userOtp,"helloBVjhai")
 
 router.post("/login", async (req, res) => {
+  
   try {
     const { email, password ,otp} = req.body;
+    
 
     if (!email || !password) {
       return res.json({ success: false, message: "Enter email or password is required" });
@@ -176,6 +180,7 @@ router.post("/login", async (req, res) => {
     if (!user) {
       return res.json({ success: false, message: "Please register your details" });
     }
+  
 
 
     const checkPassword = comparePassword(password, user.password);
@@ -192,6 +197,7 @@ router.post("/login", async (req, res) => {
     if (!checkIsActive) {
       return res.json({ success: false, message: "user is deactivated" });
     }
+   
 
     const JWTPayload = {
       _id: user._id,
@@ -201,9 +207,51 @@ router.post("/login", async (req, res) => {
       isBusinessDetails: (user?.Merchant_Name && user?.SubTypeOf_bussiness) ? true : false,
       isCompany: user?.company_Name ? true : false
     };
+    const JWTPayload1 = {
+      _id: user._id,
+      email: user.email,
+      role: user.role,
+      password:password,
+      mobile_no:user.mobile_no
+      
+    };
+    // console.log(JWTPayload,"hellotesttt")
+   
+   
 
     const token = jwt.sign({ user: JWTPayload }, "TOP_SECRET");
     res.cookie("access_token", token, { maxAge: 1000 * 60 * 60 * 24 * 7 });
+    
+    if(user.role==="SuperAdmin"){
+      return res.status(200).json({
+        user: JWTPayload1,
+        token,
+        
+        // message: "You are Logged in Successfully",
+  
+        success: true,
+      });
+      
+
+    }
+
+    if(user.role==="SuperAdmin"){
+      console.log("hellohehffesr",userOtp==otp)
+      if(userOtp==otp){
+        return res.status(200).json({
+          user: JWTPayload,
+          token,
+          message: "You are Logged in Successfully",
+    
+          success: true,
+        });
+      }
+      
+      else{
+        return res.json({ success: false, message: "you have Entered wrong otp" });
+
+      }
+    }
   
 
     res.status(200).json({
@@ -214,7 +262,7 @@ router.post("/login", async (req, res) => {
       success: true,
     });
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).json(error);
   }
 });
 
@@ -370,8 +418,16 @@ router.post("/send-mail-contact-us", async (req, res) => {
 router.post("/send-sms", async (req, res) => {
   const { mobileno, vendors_name, price, type, url, invoice_Id, start_date, end_date, plan } = req.body
   console.log(mobileno, vendors_name)
- const otp= otpGenerator.generate(6, {digits: true, lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false});
+ const otp= otpGenerator.generate(4, {digits: true, lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false});
  console.log("otp", otp)
+ userOtp=otp
+ function Otp(otp){
+  userOtp=otp
+
+ }
+ Otp(otp)
+
+
   const url1 = "https://marketplace.elaundry.co.in/"
   let message = ""
   let templateId = ""
