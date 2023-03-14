@@ -1,52 +1,14 @@
 const express = require("express");
-// const passport = require("passport");
 const jwt = require("jsonwebtoken");
-
 const router = express.Router();
-// const ProductModel = require("../model/sellerProduct/product");
-const res = require("express/lib/response");
-const otpGenerator = require('otp-generator')
+const otpGenerator = require("otp-generator");
 const UserModel = require("../model/model");
-const bcrypt = require("bcrypt");
 const sendEmail = require("../lib/mailer");
-const axios = require("axios")
-
+const axios = require("axios");
 
 const { hashPassword, comparePassword } = require("../functions/passwordHash");
-// const { sendEmail } = require("../lib/mailer");
 require("dotenv").config();
 
-// //=====================================================
-// // router.post('/uploadproduct',async (req,res)=> {
-// //   // const {user} = req.body;
-
-// //     // const userData = await ProductModel.findOne({_id:user.id},{GST_No:1,Merchant_Name:1})
-
-// //   try{
-
-// //     const product = new ProductModel({
-// //       Vendor_Id: req.body.Vendor_Id,
-// //       vendors_name: req.body.vendors_name,
-// //       product_name:req.body.product_name,
-// //       product_image:req.body.product_image,
-// //       category:req.body.category,
-// //       price:req.body.price,
-// //       product_Specification:req.body.product_Specification,
-// //       type:req.body.type,
-// //     })
-// //     await product.save()
-// //     res.status(200).send(product)
-
-// //   } catch(err){
-// //     res.status(500).send({message:err?.message})
-// //   }
-
-// // })
-
-// //=======================================================
-// ///  bcrypt.hash(myPlaintextPassword, saltRounds).then(function(hash) {
-//     // Store hash in your password DB.
-// //});
 router.post("/signup", async (req, res) => {
   const { email, mobile_no, password, role } = req.body;
 
@@ -57,34 +19,32 @@ router.post("/signup", async (req, res) => {
     role: role,
   };
 
-
   try {
-
-
     if (!email || !mobile_no) {
-      return res.json({ success: false, message: "email and mobile no is required" });
+      return res.json({
+        success: false,
+        message: "email and mobile no is required",
+      });
     } else {
-
       const isEmail = await UserModel.findOne({
         email: email,
         // mobile_no: mobile_no,
-
       });
       const isMobile = await UserModel.findOne({
-
         mobile_no: mobile_no,
       });
 
-
       if (isEmail) {
-
-        return res.json({ success: false, message: "This Email is already exists" });
-      }
-      else if (isMobile) {
-        return res.json({ success: false, message: "This Mobile is already exists" });
-
-      }
-      else {
+        return res.json({
+          success: false,
+          message: "This Email is already exists",
+        });
+      } else if (isMobile) {
+        return res.json({
+          success: false,
+          message: "This Mobile is already exists",
+        });
+      } else {
         const user = await UserModel.create(data);
 
         const JWTPayload = {
@@ -94,101 +54,44 @@ router.post("/signup", async (req, res) => {
         };
 
         const token = jwt.sign({ user: JWTPayload }, "TOP_SECRET");
-        console.log("This user is already exists")
+        console.log("This user is already exists");
 
         res.status(201).json({
           success: true,
-          // data: "created successfully",
           message: "created successfully",
           data: user,
           // token: token,
         });
       }
-
     }
-
-
   } catch (err) {
     res.status(500).json({ success: false, data: err?.message });
   }
 });
 
-//   router.post(
-//     '/login',
-//   async (req,res)=>{
-//     const {email,password}=req.body;
-//     try{
-
-//     if(!email || !password){
-//       return res.status(401).json({success:false,message:"invalid credentials"})
-//     }
-//     const User= await UserModel.findOne({email})
-//     if(User){
-//       if(bcrypt.compare(password,User.password)){
-//         const jwtvar=jwt.sign(User)
-//         return res.status(200).json({success:true,token:jwtvar})
-//       }
-//       else{
-//         return res.status(401).json({success:false,message:"invalid credentials"})
-
-//       }
-
-//     }else{
-//       return res.status(401).json({success:false,message:"invalid credentials"})
-//     }
-
-//   }
-
-//   catch(err){
-//     console.log({"error":err.message})
-//   }
-// });
-
-// module.exports = router;
-
-// const express = require('express');
-// const passport = require('passport');
-
-// const router = express.Router();
-// const jwt = require('jsonwebtoken');
-
-// router.post(
-//   '/signup',
-//   passport.authenticate('signup', { session: false }),
-//   async (req, res, next) => {
-//     res.json({
-//       message: 'Signup successful',
-//       user: req.user
-//     });
-//   }
-// );
-let userOtp=0000
-console.log(userOtp,"helloBVjhai")
+let userOtp = 0000;
+console.log(userOtp, "Printing OTP");
 
 router.post("/login", async (req, res) => {
-  
   try {
-    const { email, password ,otp} = req.body;
-    
+    const { email, password, otp } = req.body;
 
     if (!email || !password) {
-      return res.json({ success: false, message: "Enter email or password is required" });
+      return res.json({
+        success: false,
+        message: "Enter email or password is required",
+      });
     }
-
 
     const user = await UserModel.findOne({ email });
     if (!user) {
-      return res.json({ success: false, message: "Please register your details" });
+      return res.json({
+        success: false,
+        message: "Please register your details",
+      });
     }
-  
-
-
     const checkPassword = comparePassword(password, user.password);
-
-
-
     const checkIsActive = user.isActive;
-    const otpLogin = otp
 
     if (!checkPassword) {
       return res.json({ success: false, message: "invalid email or password" });
@@ -197,68 +100,55 @@ router.post("/login", async (req, res) => {
     if (!checkIsActive) {
       return res.json({ success: false, message: "user is deactivated" });
     }
-   
 
     const JWTPayload = {
       _id: user._id,
       email: user.email,
       role: user.role,
-      isRegistered: (user?.company_Name && user.Merchant_Name) ? true : false,
-      isBusinessDetails: (user?.Merchant_Name && user?.SubTypeOf_bussiness) ? true : false,
-      isCompany: user?.company_Name ? true : false
+      isRegistered: user?.company_Name && user.Merchant_Name ? true : false,
+      isBusinessDetails:
+        user?.Merchant_Name && user?.SubTypeOf_bussiness ? true : false,
+      isCompany: user?.company_Name ? true : false,
     };
     const JWTPayload1 = {
       _id: user._id,
       email: user.email,
       role: user.role,
-      password:password,
-      mobile_no:user.mobile_no
-      
+      password: password,
+      mobile_no: user.mobile_no,
     };
-    // console.log(JWTPayload,"hellotesttt")
-   
-   
 
     const token = jwt.sign({ user: JWTPayload }, "TOP_SECRET");
     res.cookie("access_token", token, { maxAge: 1000 * 60 * 60 * 24 * 7 });
-    
-    if(user.role==="SuperAdmin"){
+
+    if (user.role === "SuperAdmin") {
       return res.status(200).json({
         user: JWTPayload1,
         token,
-        
-        // message: "You are Logged in Successfully",
-  
         success: true,
       });
-      
-
     }
 
-    if(user.role==="SuperAdmin"){
-      console.log("hellohehffesr",userOtp==otp)
-      if(userOtp==otp){
+    if (user.role === "SuperAdmin") {
+      console.log("Printing SuperAdmin OTP", userOtp == otp);
+      if (userOtp == otp) {
         return res.status(200).json({
           user: JWTPayload,
           token,
           message: "You are Logged in Successfully",
-    
           success: true,
         });
-      }
-      
-      else{
-        return res.json({ success: false, message: "you have Entered wrong otp" });
-
+      } else {
+        return res.json({
+          success: false,
+          message: "you have Entered wrong otp",
+        });
       }
     }
-  
-
     res.status(200).json({
       user: JWTPayload,
       token,
       message: "You are Logged in Successfully",
-
       success: true,
     });
   } catch (error) {
@@ -299,7 +189,6 @@ router.patch("/forgotpassword/:_id", async (req, res) => {
     res
       .status(200)
       .json({ success: true, message: "password updated successfully" });
-
   } catch (error) {
     console.log({ error: error.message });
   }
@@ -308,7 +197,7 @@ router.patch("/forgotpassword/:_id", async (req, res) => {
 router.patch("/forgotpassword2", async (req, res) => {
   try {
     const { _id } = req.params;
-    const { email } = req.body
+    const { email } = req.body;
 
     // Check If User Exists
     const findUser = await UserModel.findOne({ _id }).lean();
@@ -329,18 +218,24 @@ router.patch("/forgotpassword2", async (req, res) => {
     res
       .status(200)
       .json({ success: true, message: "password updated successfully" });
-
   } catch (error) {
     console.log({ error: error.message });
   }
 });
 
 router.post("/send-mail", async (req, res) => {
-  const { description, phoneNumber, email, merchantId,price,invoice_Id,type } = req.body;
+  const {
+    description,
+    phoneNumber,
+    email,
+    merchantId,
+    price,
+    invoice_Id,
+    type,
+  } = req.body;
 
-  console.log("userdata",description, phoneNumber, email, merchantId,type);
+  console.log("userdata", description, phoneNumber, email, merchantId, type);
   const merchant = await UserModel.findOne({ _id: merchantId });
-  
 
   if (!merchant) {
     return res
@@ -353,12 +248,12 @@ router.post("/send-mail", async (req, res) => {
       merchantEmail: merchant.email,
       merchantId: merchantId,
       email,
-      merchantName:merchant?.Merchant_Name,
+      merchantName: merchant?.Merchant_Name,
       price,
       invoice_Id,
       phoneNumber,
       description,
-      type
+      type,
     });
     res.status(200).json({ message: "email sent successfully", success: true });
   } catch (error) {
@@ -367,33 +262,13 @@ router.post("/send-mail", async (req, res) => {
 });
 
 router.post("/send-mail-contact-us", async (req, res) => {
-  const { name, businessName, description, phoneNumber, email, merchantId } = req.body;
-
-  // const {id} = req.query.merchantId
-  // console.log("iddddd",id)
-  console.log("hello baba")
+  const { name, businessName, description, phoneNumber, email, merchantId } =
+    req.body;
 
   const merchantbyEmail = await UserModel.findOne({ email: email });
-  const merchantbymobile = await UserModel.findOne({ mobile_no: phoneNumber })
+  const merchantbymobile = await UserModel.findOne({ mobile_no: phoneNumber });
 
-  console.log("testdata", merchantbyEmail,
-
-
-
-    email,
-    phoneNumber,
-  )
-
-
-
-
-//   // if (merchantbyEmail || merchantbymobile) {
-//   //   res.status(403).json({ message: `this user is exist  `, success: false })
-//   //   console.log(
-//   //     "testttts babab"
-//   //   )
-
-//   // }
+  console.log("testdata", merchantbyEmail, email, phoneNumber);
 
   try {
     await sendEmail({
@@ -409,65 +284,78 @@ router.post("/send-mail-contact-us", async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error?.message, success: false });
   }
-
-}
-
-
-);
+});
 
 router.post("/send-sms", async (req, res) => {
-  const { mobileno, vendors_name, price, type, url, invoice_Id, start_date, end_date, plan } = req.body
-  console.log(mobileno, vendors_name)
- const otp= otpGenerator.generate(4, {digits: true, lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false});
- console.log("otp", otp)
- userOtp=otp
- function Otp(otp){
-  userOtp=otp
+  const {
+    mobileno,
+    vendors_name,
+    price,
+    type,
+    url,
+    invoice_Id,
+    start_date,
+    end_date,
+    plan,
+  } = req.body;
+  console.log(mobileno, vendors_name);
+  const otp = otpGenerator.generate(4, {
+    digits: true,
+    lowerCaseAlphabets: false,
+    upperCaseAlphabets: false,
+    specialChars: false,
+  });
+  console.log("otp", otp);
+  userOtp = otp;
+  function Otp(otp) {
+    userOtp = otp;
+  }
+  Otp(otp);
 
- }
- Otp(otp)
-
-
-  const url1 = "https://marketplace.elaundry.co.in/"
-  let message = ""
-  let templateId = ""
+  const url1 = "https://marketplace.elaundry.co.in/";
+  let message = "";
+  let templateId = "";
   switch (type) {
     case "leads":
-      templateId = "1707166747148902896"
+      templateId = "1707166747148902896";
       message = `Dear ${vendors_name}, You have received a new Lead from a buyer
        for your product inquiry.Please check your registered 
        email for more information. Regards, E-Laundry Marketplace.
-       OMRA Solutions`
+       OMRA Solutions`;
 
       break;
     case "payment":
-      templateId = "1707167309378301462"
-      message = `Dear ${vendors_name} , We have received your payment. Your Receipt No. ${invoice_Id} and Amount is ${price}. Thank you to choosing our services. E-Laundry Marketplace. OMRA Solutions`
+      templateId = "1707167309378301462";
+      message = `Dear ${vendors_name} , We have received your payment. Your Receipt No. ${invoice_Id} and Amount is ${price}. Thank you to choosing our services. E-Laundry Marketplace. OMRA Solutions`;
 
       break;
 
     case "subscription":
-      templateId = "1707167309358954239"
-      message = `Dear ${vendors_name}, Your Service ${plan.map((item,index)=>{
-        return item.label
-        
-      })} has been activated from ${start_date.slice(0,10)} to ${end_date.slice(0,10)}. Enjoy the Service! Regards, E-Laundry Marketplace. OMRA Solutions.`
+      templateId = "1707167309358954239";
+      message = `Dear ${vendors_name}, Your Service ${plan.map(
+        (item, index) => {
+          return item.label;
+        }
+      )} has been activated from ${start_date.slice(0, 10)} to ${end_date.slice(
+        0,
+        10
+      )}. Enjoy the Service! Regards, E-Laundry Marketplace. OMRA Solutions.`;
       break;
 
     case "registration":
-      templateId = "1707167309353498718"
-      message = `Dear ${vendors_name}, You have registered successfully on E-Laundry Marketplace. Welcome On-boarding !.Regards, E-Laundry Marketplace. OMRA Solutions`
+      templateId = "1707167309353498718";
+      message = `Dear ${vendors_name}, You have registered successfully on E-Laundry Marketplace. Welcome On-boarding !.Regards, E-Laundry Marketplace. OMRA Solutions`;
       break;
 
     case "payment-reminder":
-      templateId = "1707167309363253224"
-      message = `Dear ${vendors_name}, Your Subscription renewal date is {#var#}. Please renew it. E-Laundry Marketplace. OMRA Solutions`
+      templateId = "1707167309363253224";
+      message = `Dear ${vendors_name}, Your Subscription renewal date is {#var#}. Please renew it. E-Laundry Marketplace. OMRA Solutions`;
       break;
 
     case "otp-login":
-        templateId = "1707161160681288183"
-        message = `Auth code ${otp} to verify your mobile number. OMRA SOLUTIONS`
-        break;
+      templateId = "1707161160681288183";
+      message = `Auth code ${otp} to verify your mobile number. OMRA SOLUTIONS`;
+      break;
 
     default:
       // templateId = "1707161160651766248"
@@ -503,48 +391,25 @@ router.post("/send-sms", async (req, res) => {
       responseType: "json",
       method: "get",
       headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json',
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
       },
-
-
-
-
-
-    })
-
-
-    // console.log("SMS DATA", data);
+    });
+  } catch (error) {
+    res.json({ message: error });
   }
-  catch (error) {
-    // console.log(error);
-    res.json({ message: error })
-  }
-}
-)
-
+});
 
 router.post("/callingApi", async (req, res) => {
-  const {
-    Agent_Mob_No,
-    buyer_Mob } = req.body
+  const { Agent_Mob_No, buyer_Mob } = req.body;
   // try {
   const callingApi = await axios.get(
     // `http://www.apiconnecto.com/UniProUser/Click-2-Call-API.aspx?UserId=DIGIVOICE&pwd=pwd2020&AgentNum=${Agent_Mob_No}&CustomerNum=${buyer_Mob}&CampId=15823`
     // `https://callapi.hrmsomra.com/UniProUser/Click-2-Call-API.aspx?UserId=DIGIVOICE&pwd=pwd2020&AgentNum=${number3}&CustomerNum=${number2}&CampId=15823`
     `http://obd1.nexgplatforms.com/ClickToCallApi?ApiKey=a1fee4a676cd6366100bbaf37cccc0c3&CampaignId=62&ConnectedTo=${Agent_Mob_No}&CalledNum=${buyer_Mob}&disableAgentCheck=1`
   );
-  console.log("callingApi", callingApi?.data)
-  res.status(200).json({ success: true, data: callingApi?.data })
-
-
-
-
-
-  // catch (error) {
-  //   res.status(500).json({success:false,message:error?.message,data:error})
-
-  // }
-})
+  console.log("callingApi", callingApi?.data);
+  res.status(200).json({ success: true, data: callingApi?.data });
+});
 
 module.exports = router;

@@ -1,46 +1,38 @@
 const express = require("express");
-
 const bodyParser = require("body-parser");
 const cors = require("cors");
-
 const database = require("./config/database");
 require("dotenv").config();
 const PORT = process.env.PORT || 5000;
 
 database();
-
 require("./auth/auth");
 
-// const routes  = require('./routes/routes');
 const secureRoute = require("./routes/secure-routes");
 const upload = require("./routes/upload");
 const category = require("./routes/category");
 const buyer = require("./routes/buyer");
 const { verifyJwt, verifyJwt1 } = require("./Middleware/jwtMiddleware");
-const {IsAdmin } = require("./Middleware/isAdmin")
+const { IsAdmin } = require("./Middleware/isAdmin");
 const getProduct = require("./routes/getproduct");
-const adminProduct =require("./routes/superAdmin/adminproduct")
-// const images = require('./routes/images')
+const adminProduct = require("./routes/superAdmin/adminproduct");
 const bannerImage = require("./routes/banner_images");
 const blogs = require("./routes/blogs");
 const banner = require("./routes/banner");
 const service = require("./routes/secure/subscription/service");
-const price = require("./routes/secure/subscription/price")
+const price = require("./routes/secure/subscription/price");
 const package = require("./routes/secure/subscription/package");
-const subscribe = require("./routes/secure/subscription/subscribe")
-const enquiry = require("./routes/enquiry")
-const leads= require("./routes/superAdmin/leads")
-const sendMail = require("./lib/mailer")
-const cookieParser = require("cookie-parser")
+const subscribe = require("./routes/secure/subscription/subscribe");
+const enquiry = require("./routes/enquiry");
+const leads = require("./routes/superAdmin/leads");
+const sendMail = require("./lib/mailer");
+const cookieParser = require("cookie-parser");
 
 const app = express();
 
-// app.use(express.json());
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser())
-// images=================
-
+app.use(cookieParser());
 app.set("view engine", "ejs");
 
 app.use(
@@ -56,20 +48,12 @@ app.use("/blog-image", express.static("public/blog"));
 app.use("/banner-image", express.static("public/banner"));
 app.use("/billing-image", express.static("public/billing"));
 
-// app.use(cors({
-//   origin:"http://localhost:3000",
-//   method:['GET','POST']
-// }))
-
 app.get("/", (req, res) => {
-  // res.render('index.ejs', {})
   res.json({ message: "Welcome to India bazar. --------------------." });
 });
 
-// app.use('/product',upload);
 const routes = require("./routes/route");
 
-// app.use('/images', images);
 app.use("/upload", upload);
 app.use("/api", routes);
 app.use("/api", buyer);
@@ -80,17 +64,15 @@ app.use("/api", bannerImage);
 app.use("/api/user", verifyJwt, secureRoute);
 app.use("/api/user/blog", verifyJwt, blogs);
 app.use("/api/banner", banner);
-app.use("/api/pricing",verifyJwt1,price)
-app.use("/api/pricing",verifyJwt1,service)
-app.use("/api/pricing/package",verifyJwt1,package)
-app.use("/api/enquiry",enquiry)
-app.use("/api/pricing",verifyJwt1,subscribe)
+app.use("/api/pricing", verifyJwt1, price);
+app.use("/api/pricing", verifyJwt1, service);
+app.use("/api/pricing/package", verifyJwt1, package);
+app.use("/api/enquiry", enquiry);
+app.use("/api/pricing", verifyJwt1, subscribe);
+
 // api for SuperAdmin==================
-app.use("/api/admin",verifyJwt1,adminProduct)
-app.use("/api/admin",verifyJwt1,leads)
-
-
-
+app.use("/api/admin", verifyJwt1, adminProduct);
+app.use("/api/admin", verifyJwt1, leads);
 app.use("/api", getProduct);
 
 // Handle errors.
@@ -99,30 +81,22 @@ app.use(function (err, req, res, next) {
   res.json({ error: err });
 });
 
+app.post("/api/test-mail", (req, res) => {
+  try {
+    const mail = sendMail({
+      // merchantEmail:"eklavyasingh12065@gmail.com",
+      merchantEmail: "kmryvamit78@gmail.com",
+      description: "this is test",
+      phoneNumber: "8210374580",
+      email: "eklavyasingh12065@gmail.com",
+      // email:"kmryvamit78@gmail.com"
+    });
 
-//////////////////////==========================
-
-
-app.post("/api/test-mail",(req,res)=>{
-
-
-  try{
-  const mail = sendMail({
-    // merchantEmail:"eklavyasingh12065@gmail.com",
-    merchantEmail:"kmryvamit78@gmail.com",
-    description:"this is test",
-    phoneNumber:"8210374580",
-    email:"eklavyasingh12065@gmail.com"
-    // email:"kmryvamit78@gmail.com"
-  })
-
-  res.status(200).json(mail)
-}catch(error){
-  res.send(error?.message)
-  
-}
-
-})
+    res.status(200).json(mail);
+  } catch (error) {
+    res.send(error?.message);
+  }
+});
 
 //=================================
 app.listen(PORT, () => {
