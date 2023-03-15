@@ -10,7 +10,8 @@ const { hashPassword, comparePassword } = require("../functions/passwordHash");
 require("dotenv").config();
 
 router.post("/signup", async (req, res) => {
-  const { email, mobile_no, password, role } = req.body;
+  const { email, mobile_no, password  } = req.body;
+  const role="Admin"
 
   const data = {
     email: email,
@@ -121,15 +122,82 @@ router.post("/login", async (req, res) => {
     res.cookie("access_token", token, { maxAge: 1000 * 60 * 60 * 24 * 7 });
 
     if (user.role === "SuperAdmin") {
+      
       return res.status(200).json({
         user: JWTPayload1,
-        token,
+        // isAuthenticated:false,
+        // token,
         success: true,
       });
     }
 
-    if (user.role === "SuperAdmin") {
-      console.log("Printing SuperAdmin OTP", userOtp == otp);
+    
+    res.status(200).json({
+      user: JWTPayload,
+      token,
+      message: "You are Logged in Successfully",
+      success: true,
+    });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+// Super Admin Login Using OTP
+router.post("/adminlogin", async (req, res) => {
+  try {
+    const { email, password, otp } = req.body;
+    console.log("print",userOtp == otp)
+    console.log("print44",otp,userOtp)
+
+    if (!email || !password) {
+      return res.json({
+        success: false,
+        message: "Enter email or password is required",
+      });
+    }
+    if(!otp){
+      return res.json({
+        success: false,
+        message: "OTP is required",
+      });
+
+    }
+
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      return res.json({
+        success: false,
+        message: "Please register your details",
+      });
+    }
+    const checkPassword = comparePassword(password, user.password);
+    const checkIsActive = user.isActive;
+
+    if (!checkPassword) {
+      return res.json({ success: false, message: "invalid email or password" });
+    }
+
+    if (!checkIsActive) {
+      return res.json({ success: false, message: "user is deactivated" });
+    }
+
+    const JWTPayload = {
+      _id: user._id,
+      email: user.email,
+      role: user.role,
+      // isRegistered: user?.company_Name && user.Merchant_Name ? true : false,
+      // isBusinessDetails:
+      //   user?.Merchant_Name && user?.SubTypeOf_bussiness ? true : false,
+      // isCompany: user?.company_Name ? true : false,
+    };
+    
+
+    const token = jwt.sign({ user: JWTPayload }, "TOP_SECRET");
+    res.cookie("access_token", token, { maxAge: 1000 * 60 * 60 * 24 * 7 });
+
+    
+
+  
       if (userOtp == otp) {
         return res.status(200).json({
           user: JWTPayload,
@@ -137,19 +205,19 @@ router.post("/login", async (req, res) => {
           message: "You are Logged in Successfully",
           success: true,
         });
-      } else {
-        return res.json({
+      } 
+      res.json({
           success: false,
           message: "you have Entered wrong otp",
         });
-      }
-    }
-    res.status(200).json({
-      user: JWTPayload,
-      token,
-      message: "You are Logged in Successfully",
-      success: true,
-    });
+    
+    
+    // res.status(200).json({
+    //   user: JWTPayload,
+    //   token,
+    //   message: "You are Logged in Successfully",
+    //   success: true,
+    // });
   } catch (error) {
     res.status(500).json(error);
   }
@@ -297,7 +365,8 @@ router.post("/send-sms", async (req, res) => {
     end_date,
     plan,
   } = req.body;
-  console.log(mobileno, vendors_name);
+  console.log(mobileno, vendors_name,type,"testtttttype");
+  console
   const otp = otpGenerator.generate(4, {
     digits: true,
     lowerCaseAlphabets: false,
