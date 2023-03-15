@@ -70,7 +70,6 @@ router.post("/signup", async (req, res) => {
 });
 
 let userOtp = 0000;
-console.log(userOtp, "Printing OTP");
 
 router.post("/login", async (req, res) => {
   try {
@@ -404,8 +403,6 @@ router.post("/callingApi", async (req, res) => {
   const { Agent_Mob_No, buyer_Mob } = req.body;
   // try {
   const callingApi = await axios.get(
-    // `http://www.apiconnecto.com/UniProUser/Click-2-Call-API.aspx?UserId=DIGIVOICE&pwd=pwd2020&AgentNum=${Agent_Mob_No}&CustomerNum=${buyer_Mob}&CampId=15823`
-    // `https://callapi.hrmsomra.com/UniProUser/Click-2-Call-API.aspx?UserId=DIGIVOICE&pwd=pwd2020&AgentNum=${number3}&CustomerNum=${number2}&CampId=15823`
     `http://obd1.nexgplatforms.com/ClickToCallApi?ApiKey=a1fee4a676cd6366100bbaf37cccc0c3&CampaignId=62&ConnectedTo=${Agent_Mob_No}&CalledNum=${buyer_Mob}&disableAgentCheck=1`
   );
   console.log("callingApi", callingApi?.data);

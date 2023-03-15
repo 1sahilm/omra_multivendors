@@ -27,6 +27,7 @@
     "dotenv": "^16.0.1",
     "ejs": "^3.1.8",
     "express": "^4.17.1",
+    "force": "^0.0.3",
     "fs": "0.0.1-security",
     "googleapis": "^105.0.0",
     "jsonwebtoken": "^9.0.0",

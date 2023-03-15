@@ -2,7 +2,6 @@ const express = require("express");
 const { default: mongoose } = require("mongoose");
 const router = express.Router();
 const UserModel = require("../model/model");
-
 const Product = require("../model/products/product");
 const ProductProfile = require("../model/products/product_profile");
 const path = require("path");
