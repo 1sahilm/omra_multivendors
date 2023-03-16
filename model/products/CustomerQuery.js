@@ -8,6 +8,7 @@ const CustomerQurySchema = new Schema(
       type: String,
       required: false,
     },
+    company:{ type:String,required:false},
     product_Id: { type: String, required: false },
     product_name:{ type: String, required: false},
     buyer_Message: {

@@ -238,18 +238,22 @@ router.get("/supplier-enquiryFilterByDateRange", async (req, res) => {
 
 //================================================Email Leads=========
 router.get("/email-enquiry-by-search/:key", async (req, res) => {
+    const query=req.params.key
     try {
         const data = await CustomerQueryByProduct.find({
+            
 
             $or: [
-                { name: { $regex: req.params.key, $options: "$i" } },
-                { buyer_Email: { $regex: req.params.key, $options: "$i" } },
-                { product_name: { $regex: req.params.key, $options: "$i" } },
+                { buyer_Mob: { $regex: query, $options: "$i" } },
+                { buyer_Email: { $regex: query, $options: "$i" } },
+                { product_name: { $regex: query, $options: "$i" } },
 
             ],
-            // type: "demo"
+           
+            
             type: "Email Query",
         });
+        console.log(data,"Email Queryyyy")
         res.json(data);
     } catch (error) {
         res.json(404);
@@ -292,18 +296,21 @@ router.get("/email-enquiryFilterByDateRange", async (req, res) => {
 
 //================================================Mobile Leads=========
 router.get("/calling-enquiry-by-search/:key", async (req, res) => {
+    console.log(req.params.key,"search queryy")
     try {
         const data = await CustomerQueryByProduct.find({
 
             $or: [
-                { name: { $regex: req.params.key, $options: "$i" } },
+                { buyer_Mob: { $regex: req.params.key, $options: "$i" } },
                 { buyer_Email: { $regex: req.params.key, $options: "$i" } },
                 { product_name: { $regex: req.params.key, $options: "$i" } },
 
             ],
-            // type: "demo"
+       
+           
             type: "Calling Query",
         });
+       
         res.json(data);
     } catch (error) {
         res.json(404);

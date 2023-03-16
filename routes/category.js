@@ -648,7 +648,7 @@ router.get("/get_subcategoryByCat", async (req, res) => {
   category_name = req.query.category_name;
 
   try {
-    const product = await SubCategory.find({ category_name: category_name }).limit(15);
+    const product = await SubCategory.find({ category_name: category_name,isHide:false }).limit(15);
 
     res.status(200).json(product);
   } catch (error) {
