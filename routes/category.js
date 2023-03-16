@@ -47,7 +47,10 @@ router.post(
         category_name: category_name,
       });
       if (isCategory) {
-        res.json({ success: false, message: `${category_name} has Already created try with new` });
+        res.json({
+          success: false,
+          message: `${category_name} has Already created try with new`,
+        });
       } else {
         try {
           const category = await new Category({
@@ -55,7 +58,11 @@ router.post(
             category_image: `${process.env.BASE_URL}/category-image/${req.files.category_image[0].filename}`,
           });
           await category.save();
-          res.status(200).json({ success: true, data: category, message: `${category_name} has been Successfully created` });
+          res.status(200).json({
+            success: true,
+            data: category,
+            message: `${category_name} has been Successfully created`,
+          });
         } catch (err) {
           res.status(500).send({ message: err?.message });
         }
@@ -75,11 +82,10 @@ router.patch(
   ),
   async (req, res) => {
     const { _id } = req.params;
-    const { category_name } = req.body
+    const { category_name } = req.body;
 
     if (!category_name) {
-      res.json({ success: false, message: `Category name is required` })
-
+      res.json({ success: false, message: `Category name is required` });
     }
     // else{
     //   const isCategory =await Category.findOne({category_name:category_name})
@@ -108,18 +114,15 @@ router.patch(
       res.json({
         success: true,
         message: `${category_name} has been Successfully Created `,
-        data: user
+        data: user,
       });
     } catch (err) {
       res.json({
         message: err?.message,
       });
     }
-
   }
   // }
-
-
 
   // }
 );
@@ -136,7 +139,7 @@ router.patch(
   ),
   async (req, res) => {
     const { _id } = req.params;
-    const { isHide } = req.body
+    const { isHide } = req.body;
 
     try {
       const user = await Category.updateOne(
@@ -169,7 +172,7 @@ router.patch(
 
 router.delete("/delete_category/:_id", async (req, res) => {
   const { _id } = req.params;
- 
+
   try {
     const category = await Category.findOneAndDelete({ _id: _id });
 
@@ -187,7 +190,6 @@ router.delete("/delete_category/:_id", async (req, res) => {
 router.get("/get_category", async (req, res) => {
   try {
     const product = await Category.find({ isHide: false }).lean();
-   
 
     res.status(200).json(await product);
   } catch (error) {
@@ -195,20 +197,20 @@ router.get("/get_category", async (req, res) => {
   }
 });
 
-router.get("/category/:_id",async(req,res)=>{
-  const {_id}= req.params
- 
+router.get("/category/:_id", async (req, res) => {
+  const { _id } = req.params;
+
   try {
-    const category= await Category.find({_id:_id},{category_name:1}).lean()
-  
-   
+    const category = await Category.find(
+      { _id: _id },
+      { category_name: 1 }
+    ).lean();
+
     res.status(200).json(category);
-    
   } catch (error) {
-    throw error
-    
+    throw error;
   }
-})
+});
 
 // for use of uploading Product
 router.get("/product_category", async (req, res) => {
@@ -239,7 +241,9 @@ router.get("/get_home_cat", async (req, res) => {
 });
 router.get("/get_postionCat", async (req, res) => {
   try {
-    const product = await Category.find({},{category_name:1,position:1} ).sort({"position":-1}).limit(5);
+    const product = await Category.find({}, { category_name: 1, position: 1 })
+      .sort({ position: -1 })
+      .limit(5);
     //.sort({ position: 1 }).limit(5)
     //{ category_name: 1,position: 1 }
 
@@ -249,18 +253,19 @@ router.get("/get_postionCat", async (req, res) => {
   }
 });
 
-router.get("/get-category-by-name/:category_name",async(req,res)=>{
-  const {category_name} = req.params
-  console.log(category_name,"category name")
+router.get("/get-category-by-name/:category_name", async (req, res) => {
+  const { category_name } = req.params;
+  console.log(category_name, "category name");
   try {
-    const category = await Category.findOne({category_name:category_name},{_id:1})
-    res.status(200).json({success:true,category})
-    
+    const category = await Category.findOne(
+      { category_name: category_name },
+      { _id: 1 }
+    );
+    res.status(200).json({ success: true, category });
   } catch (error) {
-    res.json(500).json({success:false,message:error.message,})
-    
+    res.json(500).json({ success: false, message: error.message });
   }
-})
+});
 
 ///  SubCategory Product==========================SubCategory Product============
 
@@ -304,10 +309,7 @@ router.post(
     } else {
       const isSubCategoryName = await SubCategory.findOne({
         sub_category_name: sub_category_name,
-
       });
-     
-
 
       if (isSubCategoryName) {
         res.json({
@@ -315,10 +317,9 @@ router.post(
           message: `${sub_category_name} is Already Created in ${category_name} please Try with new`,
         });
       } else {
-        let category1 = await Category.find({ _id: category_Id })
-    
-        //      category1[0]?.sub?.push({
+        let category1 = await Category.find({ _id: category_Id });
 
+        //      category1[0]?.sub?.push({
 
         //       sub_category_name: sub_category_name,
         //       sub_category_image:
@@ -337,15 +338,21 @@ router.post(
               `${process.env.BASE_URL}/category-image/${req.files.sub_category_image[0].filename}`,
             // : undefined,
           });
-          const test = await Category.findByIdAndUpdate({ _id: category_Id }, {
-            $push: {
-              sub: category
-
+          const test = await Category.findByIdAndUpdate(
+            { _id: category_Id },
+            {
+              $push: {
+                sub: category,
+              },
             }
-          })
-          await test.save()
+          );
+          await test.save();
           await category.save();
-          res.status(200).json({ success: true, message: `${sub_category_name} has been Successfully Created in ${category_name}`, data: category });
+          res.status(200).json({
+            success: true,
+            message: `${sub_category_name} has been Successfully Created in ${category_name}`,
+            data: category,
+          });
         } catch (err) {
           res.status(500).send({ message: err?.message });
         }
@@ -366,13 +373,13 @@ router.patch(
   async (req, res) => {
     const { _id } = req.params;
 
-    const { sub_category_name } = req.body
+    const { sub_category_name } = req.body;
 
     // if(!sub_category_name){
     //   res.json({success:false,message:"SubCategory Name is required"})
     // }else{
     //   const catName =await SubCategory.findOne({_id:_id,sub_category_name:sub_category_name,sub_category_image:sub_category_image})
-    //   
+    //
     //   if(catName){
     //     res.json({success:false,message:`${sub_category_name} is Already Created in ${catName?.category_name} `})
     //   }
@@ -404,13 +411,8 @@ router.patch(
         message: err?.message,
       });
     }
-
   }
   // }
-
-
-
-
 
   // }
 );
@@ -469,9 +471,11 @@ router.get("/get_subcategory", async (req, res) => {
 });
 
 router.get("/get_subcategory/:name", async (req, res) => {
-  const {name} =req.params
+  const { name } = req.params;
   try {
-    const subcategory = await SubCategory.find({sub_category_name:name}).lean();
+    const subcategory = await SubCategory.find({
+      sub_category_name: name,
+    }).lean();
 
     res.status(200).json(subcategory);
   } catch (error) {
@@ -479,10 +483,9 @@ router.get("/get_subcategory/:name", async (req, res) => {
   }
 });
 router.get("/get_subcategory/:_id", async (req, res) => {
-  const {_id} =req.params
+  const { _id } = req.params;
   try {
-    const subcategory = await SubCategory.findOne({_id:_id})
-    
+    const subcategory = await SubCategory.findOne({ _id: _id });
 
     res.status(200).json(subcategory);
   } catch (error) {
@@ -490,12 +493,11 @@ router.get("/get_subcategory/:_id", async (req, res) => {
   }
 });
 
-
-
 router.get("/get_subcatpop", async (req, res) => {
-  
   try {
-    const product = await SubCategory.find({ category_name: req.params.category_name }).populate("SubCategories")
+    const product = await SubCategory.find({
+      category_name: req.params.category_name,
+    }).populate("SubCategories");
 
     res.status(200).json(product);
   } catch (error) {
@@ -507,59 +509,58 @@ router.get("/catebycount", async (req, res) => {
   try {
     const cat = await Product.aggregate([
       {
-        $sort: { category: 1 }
+        $sort: { category: 1 },
       },
       { $group: { _id: "$category", count: { $count: {} } } },
       // { $project: { _id: 0, category: 1 }}]]
-    ]
-    )
+    ]);
 
-    res.json({ data: cat, message: "success" })
-
+    res.json({ data: cat, message: "success" });
   } catch (error) {
-    console.log(error)
-
+    console.log(error);
   }
-})
+});
 
 router.get("/catebycount1", async (req, res) => {
   try {
     const cat = await Product.aggregate([
       {
-        $sort: { category: 1 }
+        $sort: { category: 1 },
       },
       { $group: { _id: "$category", count: { $count: {} } } },
       // { $project: { _id: 0, category: 1 }}]]
-    ]
-    )
+    ]);
 
-    const categoryData = await Category.find({}).lean()
-    const arrayData = []
-    categoryData.map((item) => arrayData.push({ _id: item.category_name, category_image: item.category_image, count: 0 }))
-    const countArray = [...cat, ...arrayData]
+    const categoryData = await Category.find({}).lean();
+    const arrayData = [];
+    categoryData.map((item) =>
+      arrayData.push({
+        _id: item.category_name,
+        category_image: item.category_image,
+        count: 0,
+      })
+    );
+    const countArray = [...cat, ...arrayData];
 
-
-
-    res.json({ data: countArray, message: "success" })
-
+    res.json({ data: countArray, message: "success" });
   } catch (error) {
-    console.log(error)
-
+    console.log(error);
   }
-})
+});
 
 /// sorting subcategory by name
 router.get("/get_subcategory-sort-by-name", async (req, res) => {
   try {
-    const product = await SubCategory.find({ isHide: false }).collation({ locale: 'en', strength: 2 }).sort({ sub_category_name: 1 }).limit(50)
-
+    const product = await SubCategory.find({ isHide: false })
+      .collation({ locale: "en", strength: 2 })
+      .sort({ sub_category_name: 1 })
+      .limit(50);
 
     res.status(200).json(product);
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
 });
-
 
 //=================== delete SubCategory=============
 
@@ -568,7 +569,7 @@ router.delete("/delete_subcategory/:_id", async (req, res) => {
 
   try {
     const category = await SubCategory.findOneAndDelete({ _id: _id });
-   
+
     // category.delete()
     res.json({
       message: "category deleted Sucessfully",
@@ -624,7 +625,7 @@ router.get("/get_subcategory-list", async (req, res) => {
   limit = parseInt(limit);
 
   try {
-    const category = await Category.find({})
+    const category = await Category.find({});
     const product = await SubCategory.find({})
       .limit(limit * 1)
       .skip((page - 1) * limit)
@@ -632,7 +633,6 @@ router.get("/get_subcategory-list", async (req, res) => {
     const count = await SubCategory.countDocuments();
 
     const totalPages = Math.ceil(count / limit);
-   
 
     res.status(200).json({
       product,
@@ -645,10 +645,48 @@ router.get("/get_subcategory-list", async (req, res) => {
 });
 //=======================get SubCat By Category================
 router.get("/get_subcategoryByCat", async (req, res) => {
-  category_name = req.query.category_name;
+  const category_name = req.query.category_name;
 
   try {
-    const product = await SubCategory.find({ category_name: category_name,isHide:false }).limit(15);
+    const product = await SubCategory.find({
+      category_name: category_name,
+      isHide: false,
+    }).limit(15);
+
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
+
+//=======================get SubCat By Category================
+router.get("/get_subcategoryByCatId", async (req, res) => {
+  const id = req.query.id;
+  try {
+    const product = await SubCategory.find({
+      category_Id: id,
+      // isHide: false,
+    });
+
+    console.log("iddddd", id);
+
+    const cat = await Product.aggregate([
+      // { $match: { category: ObjectId(id) } },
+      {
+        $sort: { sub_category: 1 },
+      },
+      { $group: { _id: "$sub_category", count: { $count: {} } } },
+      // { $where: { category: id } },
+      // { $project: { _id: 0, category: 1 }}]]
+    ]);
+
+    const countdata = await Product.find(
+      {
+        sub_category: product.map((item) => item._id),
+      },
+      { sub_category: 1 }
+    );
+    console.log(cat, "hellobabacount");
 
     res.status(200).json(product);
   } catch (error) {
@@ -687,7 +725,7 @@ router.post(
       await product.save();
       // sendEmail({
 
-      //   })  
+      //   })
       res.status(200).send(product);
     } catch (err) {
       res.status(500).send({ message: err?.message });
