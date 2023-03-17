@@ -1,32 +1,21 @@
 const express = require("express");
-
 const router = express.Router();
-
 const Category = require("../model/products/category");
-
 const path = require("path");
-// const sharp = require("sharp");
 const multer = require("multer");
-// const fs = require("fs");
 const SubCategory = require("../model/products/subcategory");
-
 const CustomerQueryByProduct = require("../model/products/CustomerQuery");
 const sendEmail = require("../lib/mailer");
 const Product = require("../model/products/product");
 const { ObjectId } = require("bson");
 
-//=====================================================
-
 const imageStorage = multer.diskStorage({
-  // Destination to store image
   destination: "public/images",
   filename: (req, file, cb) => {
     cb(
       null,
       file.fieldname + "_" + Date.now() + path.extname(file.originalname)
     );
-    // file.fieldname is name of the field (image)
-    // path.extname get the uploaded file extension
   },
 });
 
@@ -74,27 +63,16 @@ router.post(
 
 router.patch(
   "/update_category/:_id",
-  upload.fields(
-    [
-      { name: "category_image", maxCount: 1 },
-      { name: "category_image2", maxCount: 1 },
-    ]
-    // upload.fields('banner_image1',5
-  ),
+  upload.fields([
+    { name: "category_image", maxCount: 1 },
+    { name: "category_image2", maxCount: 1 },
+  ]),
   async (req, res) => {
     const { _id } = req.params;
     const { category_name } = req.body;
-
     if (!category_name) {
       res.json({ success: false, message: `Category name is required` });
     }
-    // else{
-    //   const isCategory =await Category.findOne({category_name:category_name})
-    //   if(isCategory?.length>1){
-    //     res.json({success:false,message:`${category_name} has Already created try with new `})
-
-    //   }
-    //   else{
     try {
       const user = await Category.updateOne(
         { _id },
@@ -110,8 +88,6 @@ router.patch(
           upsert: true,
         }
       );
-      //Fields
-
       res.json({
         success: true,
         message: `${category_name} has been Successfully Created `,
@@ -123,25 +99,18 @@ router.patch(
       });
     }
   }
-  // }
-
-  // }
 );
 
 //=========Hide/UnHide Category===>
 router.patch(
   "/hide-category/:_id",
-  upload.fields(
-    [
-      { name: "category_image", maxCount: 1 },
-      { name: "category_image2", maxCount: 1 },
-    ]
-    // upload.fields('banner_image1',5
-  ),
+  upload.fields([
+    { name: "category_image", maxCount: 1 },
+    { name: "category_image2", maxCount: 1 },
+  ]),
   async (req, res) => {
     const { _id } = req.params;
     const { isHide } = req.body;
-
     try {
       const user = await Category.updateOne(
         { _id },
@@ -154,8 +123,6 @@ router.patch(
           upsert: true,
         }
       );
-      //Fields
-
       res.json({
         success: true,
         message: `Category is ${isHide} Sucessfully`,
@@ -169,15 +136,10 @@ router.patch(
   }
 );
 
-///=====================
-
 router.delete("/delete_category/:_id", async (req, res) => {
   const { _id } = req.params;
-
   try {
     const category = await Category.findOneAndDelete({ _id: _id });
-
-    // category.delete()
     res.json({
       success: true,
       message: `${category?.category_name} category deleted Sucessfully`,
@@ -191,7 +153,6 @@ router.delete("/delete_category/:_id", async (req, res) => {
 router.get("/get_category", async (req, res) => {
   try {
     const product = await Category.find({ isHide: false }).lean();
-
     res.status(200).json(await product);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -213,11 +174,9 @@ router.get("/category/:_id", async (req, res) => {
   }
 });
 
-// for use of uploading Product
 router.get("/product_category", async (req, res) => {
   try {
     const product = await Category.find({}).lean();
-
     res.status(200).json(await product);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -226,7 +185,6 @@ router.get("/product_category", async (req, res) => {
 
 router.get("/get_home_cat", async (req, res) => {
   let { page = 1, limit = 10 } = req.query;
-
   page = parseInt(page);
   limit = parseInt(limit);
   try {
@@ -245,9 +203,6 @@ router.get("/get_postionCat", async (req, res) => {
     const product = await Category.find({}, { category_name: 1, position: 1 })
       .sort({ position: -1 })
       .limit(5);
-    //.sort({ position: 1 }).limit(5)
-    //{ category_name: 1,position: 1 }
-
     res.status(200).json(product);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -268,30 +223,6 @@ router.get("/get-category-by-name/:category_name", async (req, res) => {
   }
 });
 
-///  SubCategory Product==========================SubCategory Product============
-
-// router.post(
-//   "/add_subcategory",
-//   upload.single("sub_category_image"),
-//   async (req, res) => {
-//     try {
-//       const subcategory = await new SubCategory({
-//         category_Id: req.body.category_Id,
-//         category_name: req.body.category_name,
-//         sub_category_name: req.body.sub_category_name,
-//         sub_category_image:
-//           req.files.sub_category_image.filename > 0
-//             ? `${process.env.BASE_URL}/category-image/${req.files.sub_category_image.filename}`
-//             : undefined,
-//       });
-//       await subcategory.save();
-//       res.status(200).send(await subcategory);
-//     } catch (error) {
-//       res.json(error.message);
-//     }
-//   }
-// );
-
 router.post(
   "/add-subcategory",
   upload.fields([
@@ -311,7 +242,6 @@ router.post(
       const isSubCategoryName = await SubCategory.findOne({
         sub_category_name: sub_category_name,
       });
-
       if (isSubCategoryName) {
         res.json({
           success: false,
@@ -319,25 +249,13 @@ router.post(
         });
       } else {
         let category1 = await Category.find({ _id: category_Id });
-
-        //      category1[0]?.sub?.push({
-
-        //       sub_category_name: sub_category_name,
-        //       sub_category_image:
-        //         // req.files.sub_category_image.length > 0
-        //         `${process.env.BASE_URL}/category-image/${req.files.sub_category_image[0].filename}`,
-        //  })
-
         try {
           const category = await new SubCategory({
             category: category_Id,
             category_Id: category_Id,
             category_name: category_name,
             sub_category_name: sub_category_name,
-            sub_category_image:
-              // req.files.sub_category_image.length > 0
-              `${process.env.BASE_URL}/category-image/${req.files.sub_category_image[0].filename}`,
-            // : undefined,
+            sub_category_image: `${process.env.BASE_URL}/category-image/${req.files.sub_category_image[0].filename}`,
           });
           const test = await Category.findByIdAndUpdate(
             { _id: category_Id },
@@ -361,30 +279,17 @@ router.post(
     }
   }
 );
+
 // Update SubActegory
 router.patch(
   "/update_sub_category/:_id",
-  upload.fields(
-    [
-      { name: "sub_category_image", maxCount: 1 },
-      { name: "category_image2", maxCount: 1 },
-    ]
-    // upload.fields('banner_image1',5
-  ),
+  upload.fields([
+    { name: "sub_category_image", maxCount: 1 },
+    { name: "category_image2", maxCount: 1 },
+  ]),
   async (req, res) => {
     const { _id } = req.params;
-
     const { sub_category_name } = req.body;
-
-    // if(!sub_category_name){
-    //   res.json({success:false,message:"SubCategory Name is required"})
-    // }else{
-    //   const catName =await SubCategory.findOne({_id:_id,sub_category_name:sub_category_name,sub_category_image:sub_category_image})
-    //
-    //   if(catName){
-    //     res.json({success:false,message:`${sub_category_name} is Already Created in ${catName?.category_name} `})
-    //   }
-    //   else{
     try {
       const user = await SubCategory.updateOne(
         { _id },
@@ -400,8 +305,6 @@ router.patch(
           upsert: true,
         }
       );
-      //Fields
-
       res.status(201).json({
         success: true,
         message: `${sub_category_name} is  Updated Sucessfully`,
@@ -413,25 +316,18 @@ router.patch(
       });
     }
   }
-  // }
-
-  // }
 );
 
 //=========Hide/UnHide SubCategoryCategory===>
 router.patch(
   "/hide-subcategory/:_id",
-  upload.fields(
-    [
-      { name: "category_image", maxCount: 1 },
-      { name: "category_image2", maxCount: 1 },
-    ]
-    // upload.fields('banner_image1',5
-  ),
+  upload.fields([
+    { name: "category_image", maxCount: 1 },
+    { name: "category_image2", maxCount: 1 },
+  ]),
   async (req, res) => {
     const { _id } = req.params;
     const { isHide } = req.body;
-
     try {
       const user = await SubCategory.updateOne(
         { _id },
@@ -444,8 +340,6 @@ router.patch(
           upsert: true,
         }
       );
-      //Fields
-
       res.json({
         success: true,
         message: "SubCategory is Updated Sucessfully",
@@ -459,12 +353,9 @@ router.patch(
   }
 );
 
-//Fields
-
 router.get("/get_subcategory", async (req, res) => {
   try {
     const product = await SubCategory.find({}).lean();
-
     res.status(200).json(product);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -477,7 +368,6 @@ router.get("/get_subcategory/:name", async (req, res) => {
     const subcategory = await SubCategory.find({
       sub_category_name: name,
     }).lean();
-
     res.status(200).json(subcategory);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -487,7 +377,6 @@ router.get("/get_subcategory/:_id", async (req, res) => {
   const { _id } = req.params;
   try {
     const subcategory = await SubCategory.findOne({ _id: _id });
-
     res.status(200).json(subcategory);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -499,7 +388,6 @@ router.get("/get_subcatpop", async (req, res) => {
     const product = await SubCategory.find({
       category_name: req.params.category_name,
     }).populate("SubCategories");
-
     res.status(200).json(product);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -513,9 +401,7 @@ router.get("/catebycount", async (req, res) => {
         $sort: { category: 1 },
       },
       { $group: { _id: "$category", count: { $count: {} } } },
-      // { $project: { _id: 0, category: 1 }}]]
     ]);
-
     res.json({ data: cat, message: "success" });
   } catch (error) {
     console.log(error);
@@ -529,9 +415,7 @@ router.get("/catebycount1", async (req, res) => {
         $sort: { category: 1 },
       },
       { $group: { _id: "$category", count: { $count: {} } } },
-      // { $project: { _id: 0, category: 1 }}]]
     ]);
-
     const categoryData = await Category.find({}).lean();
     const arrayData = [];
     categoryData.map((item) =>
@@ -542,7 +426,6 @@ router.get("/catebycount1", async (req, res) => {
       })
     );
     const countArray = [...cat, ...arrayData];
-
     res.json({ data: countArray, message: "success" });
   } catch (error) {
     console.log(error);
@@ -556,7 +439,6 @@ router.get("/get_subcategory-sort-by-name", async (req, res) => {
       .collation({ locale: "en", strength: 2 })
       .sort({ sub_category_name: 1 })
       .limit(50);
-
     res.status(200).json(product);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -567,11 +449,8 @@ router.get("/get_subcategory-sort-by-name", async (req, res) => {
 
 router.delete("/delete_subcategory/:_id", async (req, res) => {
   const { _id } = req.params;
-
   try {
     const category = await SubCategory.findOneAndDelete({ _id: _id });
-
-    // category.delete()
     res.json({
       message: "category deleted Sucessfully",
       category,
@@ -585,7 +464,6 @@ router.delete("/delete_subcategory/:_id", async (req, res) => {
 router.get("/get_subcategory-for-upload", async (req, res) => {
   try {
     const product = await SubCategory.find({ isHide: false });
-
     res.status(200).json(product);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -660,83 +538,64 @@ router.get("/get_subcategoryByCat", async (req, res) => {
   }
 });
 
-//=======================get SubCat By Category================
+//=======================get SubCategory By Category================
 router.get("/get_subcategoryByCatId", async (req, res) => {
   const id = req.query.id;
-  const date= new Date()
-  console.log("hello",date)
+  const date = new Date();
   try {
     const data1 = await SubCategory.find({
       category_Id: id,
-       });
+    });
     const data2 = await Product.aggregate([
-      { $match: {category:ObjectId(id)} },
+      { $match: { category: ObjectId(id) } },
       {
         $sort: { sub_category: 1 },
       },
       { $group: { _id: "$sub_category", count: { $count: {} } } },
-      ]);
-
+    ]);
     const arrayData = [];
-    data1.map((item) =>{
-      data2.map((item2)=>{
-        if(item2._id==item._id){
+    data1.map((item) => {
+      data2.map((item2) => {
+        if (item2._id == item._id) {
           arrayData.push({
             _id: item._id,
-            name:item.sub_category_name,
+            name: item.sub_category_name,
             image: item.sub_category_image,
-            count: item2.count?item2.count:0,
-          })
-
+            count: item2.count ? item2.count : 0,
+          });
         }
-      } )
-    }
-    );
-   
-
-    res.status(200).json({data1,data2});
+      });
+    });
+    res.status(200).json({ data1, data2 });
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
 });
 
-//===============================Category Search ==========================
+//====================================== Category Search =======================================
 router.get("/searchCategory/:key", async (req, res) => {
   try {
     const data = await Category.find({
-      $or: [
-        { category_name: { $regex: req.params.key, $options: "$i" } },
-        // { GST_No: { $regex: req.params.key, $options: "$i" } },
-        // { Merchant_Address: { $regex: req.params.key, $options: "$i" } },
-        // { company_Name: { $regex: req.params.key, $options: "$i" } },
-      ],
+      $or: [{ category_name: { $regex: req.params.key, $options: "$i" } }],
     });
     res.json(data);
   } catch (error) {
     res.json(404);
   }
 });
-//====================
+//====================================== Category Search =======================================
 
-router.post(
-  "/connect_to_buy",
-
-  async (req, res) => {
-    try {
-      const product = await new CustomerQueryByProduct({
-        product_Id: req.body.product_Id,
-
-        customer_mob: req.body.customer_mob,
-      });
-      await product.save();
-      // sendEmail({
-
-      //   })
-      res.status(200).send(product);
-    } catch (err) {
-      res.status(500).send({ message: err?.message });
-    }
+router.post("/connect_to_buy", async (req, res) => {
+  try {
+    const product = await new CustomerQueryByProduct({
+      product_Id: req.body.product_Id,
+      customer_mob: req.body.customer_mob,
+    });
+    await product.save();
+    res.status(200).send(product);
+  } catch (err) {
+    res.status(500).send({ message: err?.message });
   }
-);
+});
 
 module.exports = router;

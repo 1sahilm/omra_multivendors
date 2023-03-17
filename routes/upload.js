@@ -112,13 +112,7 @@ router.post(
     { name: "pic2", maxCount: 1 },
   ]),
   async (req, res) => {
-    // const {user} = req.body;
-
-    // const userData = await ProductModel.findOne({_id:user.id},{GST_No:1,Merchant_Name:1})
-
     try {
-     
-
       const product = new ProductModel({
         Vendor_Id: req.body.Vendor_Id,
         vendors_name: req.body.vendors_name,
