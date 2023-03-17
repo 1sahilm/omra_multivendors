@@ -410,7 +410,7 @@ router.get("/catebycount", async (req, res) => {
 
 router.get("/catebycount1", async (req, res) => {
   try {
-    const cat = await Product.aggregate([
+    const data1 = await Product.aggregate([
       {
         $sort: { category: 1 },
       },
