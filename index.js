@@ -70,7 +70,7 @@ app.use("/api/pricing/package", verifyJwt1, package);
 app.use("/api/enquiry", enquiry);
 app.use("/api/pricing", verifyJwt1, subscribe);
 
-// api for SuperAdmin==================
+// api for SuperAdmin====================
 app.use("/api/admin", verifyJwt1, adminProduct);
 app.use("/api/admin", verifyJwt1, leads);
 app.use("/api", getProduct);
