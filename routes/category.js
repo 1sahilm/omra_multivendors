@@ -524,26 +524,28 @@ router.get("/catebycount", async (req, res) => {
 
 router.get("/catebycount1", async (req, res) => {
   try {
-    const cat = await Product.aggregate([
+    const data1 = await Product.aggregate([
       {
         $sort: { category: 1 },
       },
       { $group: { _id: "$category", count: { $count: {} } } },
       // { $project: { _id: 0, category: 1 }}]]
     ]);
+    console.log(data1,"categoryyy")
+    const data2 = await Category.find({});
 
-    const categoryData = await Category.find({}).lean();
-    const arrayData = [];
-    categoryData.map((item) =>
-      arrayData.push({
-        _id: item.category_name,
-        category_image: item.category_image,
-        count: 0,
-      })
-    );
-    const countArray = [...cat, ...arrayData];
+    // const categoryData = await Category.find({}).lean();
+    // const arrayData = [];
+    // categoryData.map((item) =>
+    //   arrayData.push({
+    //     _id: item.category_name,
+    //     category_image: item.category_image,
+    //     count: 0,
+    //   })
+    // );
+    // const countArray = [...data1, ...arrayData];
 
-    res.json({ data: countArray, message: "success" });
+    res.status(200).json({ data1, data2 });
   } catch (error) {
     console.log(error);
   }
@@ -664,7 +666,7 @@ router.get("/get_subcategoryByCat", async (req, res) => {
 router.get("/get_subcategoryByCatId", async (req, res) => {
   const id = req.query.id;
   const date= new Date()
-  console.log("hello",date)
+  
   try {
     const data1 = await SubCategory.find({
       category_Id: id,
@@ -681,6 +683,7 @@ router.get("/get_subcategoryByCatId", async (req, res) => {
     data1.map((item) =>{
       data2.map((item2)=>{
         if(item2._id==item._id){
+          console.log(item,"console")
           arrayData.push({
             _id: item._id,
             name:item.sub_category_name,
@@ -692,6 +695,9 @@ router.get("/get_subcategoryByCatId", async (req, res) => {
       } )
     }
     );
+    const test = await Product.find({category:ObjectId(id)},{sub_category:1})
+    console.log(data2,"helooooo")
+   
    
 
     res.status(200).json({data1,data2});
