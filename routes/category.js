@@ -13,6 +13,7 @@ const SubCategory = require("../model/products/subcategory");
 const CustomerQueryByProduct = require("../model/products/CustomerQuery");
 const sendEmail = require("../lib/mailer");
 const Product = require("../model/products/product");
+const { ObjectId } = require("bson");
 
 //=====================================================
 
@@ -662,33 +663,38 @@ router.get("/get_subcategoryByCat", async (req, res) => {
 //=======================get SubCat By Category================
 router.get("/get_subcategoryByCatId", async (req, res) => {
   const id = req.query.id;
+  const date= new Date()
+  console.log("hello",date)
   try {
-    const product = await SubCategory.find({
+    const data1 = await SubCategory.find({
       category_Id: id,
-      // isHide: false,
-    });
-
-    console.log("iddddd", id);
-
-    const cat = await Product.aggregate([
-      // { $match: { category: ObjectId(id) } },
+       });
+    const data2 = await Product.aggregate([
+      { $match: {category:ObjectId(id)} },
       {
         $sort: { sub_category: 1 },
       },
       { $group: { _id: "$sub_category", count: { $count: {} } } },
-      // { $where: { category: id } },
-      // { $project: { _id: 0, category: 1 }}]]
-    ]);
+      ]);
 
-    const countdata = await Product.find(
-      {
-        sub_category: product.map((item) => item._id),
-      },
-      { sub_category: 1 }
+    const arrayData = [];
+    data1.map((item) =>{
+      data2.map((item2)=>{
+        if(item2._id==item._id){
+          arrayData.push({
+            _id: item._id,
+            name:item.sub_category_name,
+            image: item.sub_category_image,
+            count: item2.count?item2.count:0,
+          })
+
+        }
+      } )
+    }
     );
-    console.log(cat, "hellobabacount");
+   
 
-    res.status(200).json(product);
+    res.status(200).json({data1,data2});
   } catch (error) {
     res.status(404).json({ message: error.message });
   }

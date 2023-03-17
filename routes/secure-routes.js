@@ -894,11 +894,7 @@ router.patch(
 
 router.get("/get_products", async (req, res) => {
      const { _id } = req.user
-   
-    // const userData = await UserModel.findOne(
-    //   { _id: user._id },
-    //   { GST_No: 1, Merchant_Name: 1 ,TypesOf_Bussiness: 1}
-    // );
+  
     try {
         const product1 = await Product.find({auther_Id:_id}).sort({ createdAt: -1 });
         const userData = await UserModel.find({}, { _id: 1, isActive: 1 });
@@ -910,22 +906,10 @@ router.get("/get_products", async (req, res) => {
     }
 });
 router.get("/getproductForApproval", async (req, res) => {
-    // const { user } = req.user;
-    // const userData = await UserModel.findOne(
-    //   { _id: user._id },
-    //   { GST_No: 1, Merchant_Name: 1 ,TypesOf_Bussiness: 1}
-    // );
-
     const populateQuery = [
-    
         {
-         
           path: "auther_Id",
           model: UserModel,
-         
-          
-          
-          
           select:{email:1,mobile_no:1,TypesOf_Bussiness:1,Merchant_Name:1,company_Name:1}
         },
         {
@@ -946,9 +930,7 @@ router.get("/getproductForApproval", async (req, res) => {
             isDeclined: false,
            
         }).populate(populateQuery).sort({ createdAt: -1 })
-        // const userData = await Product.find({isApproved:false}).populate(populateQuery)
-        // const product = { ...product1, ...userData };
-        // console.log(userData,"Hello")
+       
 
         res.status(200).json(product1);
     } catch (error) {
@@ -997,12 +979,18 @@ router.get("/notification", async (req, res) => {
 router.patch("/approved_product/:_id", async (req, res) => {
     const { _id } = req.params;
     const update_product = req.body;
+    const date = new Date()
 
     try {
         if (!mongoose.Types.ObjectId.isValid(_id))
             return res.status(404).send("No post Available");
 
-        const product = await Product.findOne({ _id });
+        const product = await Product.findOne({ _id },{
+            isApproved : req.body.isApproved,
+            approved_date:date
+
+
+        });
         product.isApproved = req.body.isApproved;
 
         await product.save();
@@ -1012,6 +1000,7 @@ router.patch("/approved_product/:_id", async (req, res) => {
         res.status(500).send({ message: err?.message });
     }
 });
+
 
 router.get("/getApprovedCount", async (req, res) => {
     try {

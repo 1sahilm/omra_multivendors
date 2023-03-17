@@ -202,6 +202,7 @@ const ProductSchema = new Schema({
         type: Boolean,
         default: false,
     },
+    approved_date:{String,required:false},
     isActive: {
         type: mongoose.Schema.Types.Boolean,
         ref: "User",
