@@ -990,10 +990,14 @@ router.patch("/approved_product/:_id", async (req, res) => {
             approved_date:date
 
 
+        },{
+           
+            new:true,
+            upsert:true
         });
-        product.isApproved = req.body.isApproved;
+        // product.isApproved = req.body.isApproved;
 
-        await product.save();
+        // await product.save();
 
         res.status(200).send(product);
     } catch (err) {
