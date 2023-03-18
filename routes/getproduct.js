@@ -510,22 +510,43 @@ router.get("/autoCompleteSearch/:key", async (req, res) => {
 
 // ===================================testing==================
 router.get("/homepageSearch/:key", async (req, res) => {
+  const populateQuery = [
+    {
+      path: "category",
+      model: Category,
+      select: { category_name: 1 },
+    },
+  ];
   try {
+    const catData = await Category.find({
+      $or: [{ category_name: { $regex: req.params.key, $options: "$i" } }],
+    }).limit(5);
+
+    //  const categoryData= await Category.find({$or:[{category_name:{$regex:req.params.key,$options:"$i"}}]}).populate(populateQuery).limit(10)
+    //  const categoryData1= await SubCategoy.find({$or:[{sub_category_name:{$regex:req.params.key,$options:"$i"}}]}).populate(populateQuery).limit(10)
+    //  console.log(categoryData1,"consoelbabab")
     const data = await Product.find({
       // $text: {
       //   $search: req.params.key.toString(),
       // },
+      //{ $regex: req.params.key, $options: "$i" } }
 
       $or: [
-        // { category: { $regex: req.params.key, $options: "$i" } },
+        // {sub_category:await SubCategoy.find({$or:[{sub_category_name:{$regex:req.params.key,$options:"$i"}}]})._id} ,
         // { sub_category: { $regex: req.params.key, $options: "$i" } },
         { brand: { $regex: req.params.key, $options: "$i" } },
         { product_name: { $regex: req.params.key, $options: "$i" } },
       ],
       isActive: true,
       isApproved: true,
-    }).limit(10);
-    res.json(data);
+    })
+      .populate(populateQuery)
+      .limit(5);
+
+    const arrayData = [...data, ...catData];
+
+    console.log(arrayData, "bycategoryyyy");
+    res.json(arrayData);
   } catch (error) {
     res.json(404);
   }
