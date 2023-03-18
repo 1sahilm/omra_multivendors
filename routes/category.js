@@ -416,17 +416,18 @@ router.get("/catebycount1", async (req, res) => {
       },
       { $group: { _id: "$category", count: { $count: {} } } },
     ]);
-    const categoryData = await Category.find({}).lean();
+    const data2 = await Category.find({});
     const arrayData = [];
-    categoryData.map((item) =>
-      arrayData.push({
-        _id: item.category_name,
-        category_image: item.category_image,
-        count: 0,
-      })
-    );
-    const countArray = [...cat, ...arrayData];
-    res.json({ data: countArray, message: "success" });
+
+    // categoryData.map((item) =>
+    //   arrayData.push({
+    //     _id: item.category_name,
+    //     category_image: item.category_image,
+    //     count: 0,
+    //   })
+    // );
+    const countArray = [...data1, ...arrayData];
+    res.json({ data1, data2 });
   } catch (error) {
     console.log(error);
   }

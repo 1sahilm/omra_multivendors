@@ -921,15 +921,21 @@ router.get("/get_products", async (req, res) => {
     {
       path: "category",
       model: Category,
-
       select: { category_name: 1 },
+    },
+    {
+      path: "sub_category",
+      model: SubCategoy,
+      select: { sub_category_name: 1 },
     },
   ];
 
   try {
     const product1 = await Product.find({ auther_Id: _id })
       .populate(populateQuery)
-      .sort({ createdAt: -1 });
+      .sort({
+        createdAt: -1,
+      });
     const userData = await UserModel.find({}, { _id: 1, isActive: 1 });
     const product = { ...product1, ...userData };
 
