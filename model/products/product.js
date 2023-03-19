@@ -19,24 +19,15 @@ const ProductSchema = new Schema(
       type: mongoose.Schema.Types.String,
       ref: "User",
     },
-    merchant: {
-      type: Object,
-      required: true,
-    },
+    // merchant: {
+    //   type: Object,
+    //   required: true,
+    // },
     company_description: {
       type: mongoose.Schema.Types.String,
       // required: false,
       // default: UserModel.description,
       ref: "User",
-    },
-    cat: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "categories",
-      required: true,
-    },
-    test: {
-      type: Object,
-      required: false,
     },
 
     // true all above
@@ -46,6 +37,12 @@ const ProductSchema = new Schema(
       type: String,
       required: false,
       //  index: true
+      trim: true,
+    },
+    slug: {
+      type: String,
+      required: false,
+      unique: true,
       trim: true,
     },
     manufacturer_name: {
@@ -187,7 +184,14 @@ const ProductSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    approved_date: { String, required: false },
+    approved_date: {
+      type: Date,
+      required: false,
+    },
+    declined_date: {
+      type: Date,
+      required: false,
+    },
     isActive: {
       type: mongoose.Schema.Types.Boolean,
       ref: "User",

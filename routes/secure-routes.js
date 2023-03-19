@@ -8,6 +8,7 @@ const ProductProfile = require("../model/products/product_profile");
 const path = require("path");
 // const sharp = require("sharp");
 const multer = require("multer");
+const slugify = require("slugify");
 const CustomerQueryByProduct = require("../model/products/CustomerQuery");
 const Category = require("../model/products/category");
 const Subscription = require("../model/pricing/subscription");
@@ -645,6 +646,7 @@ router.post(
       }
     );
     const cattest = await UserModel.findOne({ category_name: category });
+    const subCategory = await SubCategoy.findOne({ _id: sub_category });
 
     if (!product_name || !category) {
       res.json({
@@ -666,6 +668,34 @@ router.post(
           message: "This Product already created",
         });
       } else {
+        let slugString = "";
+        console.log("slugString");
+        function getRndInteger(min, max) {
+          slugNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+          slugString = slugNumber.toString();
+
+          return slugString;
+        }
+        getRndInteger(10, 10000);
+
+        const slugTitle =
+          product_name +
+          " " +
+          subCategory?.category_name +
+          " " +
+          subCategory?.sub_category_name +
+          " " +
+          brand +
+          " " +
+          slugString;
+        const slug = slugify(slugTitle, {
+          replacement: "-",
+          remove: /[*+~.()'"!:@]/g,
+          lower: true,
+          strict: false,
+          locale: "vi", // language code of the locale to use
+          trim: true, // trim leading and trailing replacement chars, defaults to `true`
+        });
         try {
           const product = await new Product({
             auther_Id: _id,
@@ -678,6 +708,7 @@ router.post(
             SubTypeOf_bussiness: userData.SubTypeOf_bussiness,
             Merchant_Address: userData.Merchant_Address,
             product_name: product_name,
+            slug: slug,
             manufacturer_name: manufacturer_name,
             manufacturer_phone_no: manufacturer_phone_no,
             manufacturer_address: manufacturer_address,
@@ -708,7 +739,7 @@ router.post(
             videos: videos,
             video_url: video_url,
             category: category,
-            cat: category,
+
             sub_category: sub_category,
             price: price,
             product_Specification: product_Specification,
@@ -1026,25 +1057,31 @@ router.patch("/approved_product/:_id", async (req, res) => {
   const { _id } = req.params;
   const update_product = req.body;
   const date = new Date();
+  const date2 = new Date(date);
+  console.log("hello1", date.toDateString);
+  console.log("hello2", date.toISOString());
+  console.log("hello3", date.toUTCString());
+  console.log("hello4", date2);
 
   try {
     if (!mongoose.Types.ObjectId.isValid(_id))
       return res.status(404).send("No post Available");
 
     const product = await Product.findOne(
-      { _id },
-      {
-        isApproved: req.body.isApproved,
-        approved_date: date,
-      },
-      {
-        new: true,
-        upsert: true,
-      }
+      { _id }
+      // {
+      //   isApproved: req.body.isApproved,
+      //   approved_date: date,
+      // },
+      // {
+      //   new: true,
+      //   upsert: true,
+      // }
     );
-    // product.isApproved = req.body.isApproved;
+    product.isApproved = req.body.isApproved;
+    product.approved_date = date.toISOString();
 
-    // await product.save();
+    await product.save();
 
     res.status(200).send(product);
   } catch (err) {
@@ -1067,6 +1104,7 @@ router.get("/getApprovedCount", async (req, res) => {
 router.patch("/declined_product/:_id", async (req, res) => {
   const { _id } = req.params;
   const update_product = req.body;
+  const date = new Date();
 
   try {
     if (!mongoose.Types.ObjectId.isValid(_id))
@@ -1074,6 +1112,7 @@ router.patch("/declined_product/:_id", async (req, res) => {
 
     const product = await Product.findOne({ _id });
     product.isDeclined = req.body.isDeclined;
+    product.declined_date = date.toISOString();
     product.status = req.body.status;
     product.message = req.body.message;
 

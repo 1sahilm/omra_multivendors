@@ -24,6 +24,7 @@ const SubCategorySchema = new schema(
       require: false,
       trim: true,
     },
+    slug: { type: String, required: false, trim: true, unique: true },
     sub_category_image: {
       type: Array,
       require: false,
