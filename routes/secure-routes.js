@@ -969,9 +969,6 @@ router.get("/get_products", async (req, res) => {
       });
     const userData = await UserModel.find({}, { _id: 1, isActive: 1 });
     const product = { ...product1, ...userData };
-
-    console.log(product1, "babatest");
-
     res.status(200).json(product1);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -1058,26 +1055,11 @@ router.patch("/approved_product/:_id", async (req, res) => {
   const update_product = req.body;
   const date = new Date();
   const date2 = new Date(date);
-  console.log("hello1", date.toDateString);
-  console.log("hello2", date.toISOString());
-  console.log("hello3", date.toUTCString());
-  console.log("hello4", date2);
-
   try {
     if (!mongoose.Types.ObjectId.isValid(_id))
       return res.status(404).send("No post Available");
 
-    const product = await Product.findOne(
-      { _id }
-      // {
-      //   isApproved: req.body.isApproved,
-      //   approved_date: date,
-      // },
-      // {
-      //   new: true,
-      //   upsert: true,
-      // }
-    );
+    const product = await Product.findOne({ _id });
     product.isApproved = req.body.isApproved;
     product.approved_date = date.toISOString();
 
@@ -1294,7 +1276,6 @@ router.get("/get_invoice", async (req, res) => {
   const { _id } = req.user;
   try {
     const service = await Subscription.find({ auther_Id: _id });
-
     res.status(200).json({ data: service, success: true });
   } catch (error) {
     res.status(404).json({ message: error.message });

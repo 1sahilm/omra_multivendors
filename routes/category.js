@@ -6,7 +6,6 @@ const multer = require("multer");
 const SubCategory = require("../model/products/subcategory");
 const CustomerQueryByProduct = require("../model/products/CustomerQuery");
 const sendEmail = require("../lib/mailer");
-const slugify = require("slugify");
 const Product = require("../model/products/product");
 const { ObjectId } = require("bson");
 
@@ -46,7 +45,6 @@ router.post(
         try {
           const category = await new Category({
             category_name: category_name,
-            slug: slugify(category_name),
             category_image: `${process.env.BASE_URL}/category-image/${req.files.category_image[0].filename}`,
           });
           await category.save();
@@ -257,7 +255,6 @@ router.post(
             category_Id: category_Id,
             category_name: category_name,
             sub_category_name: sub_category_name,
-            slug: slugify(sub_category_name),
             sub_category_image: `${process.env.BASE_URL}/category-image/${req.files.sub_category_image[0].filename}`,
           });
           const test = await Category.findByIdAndUpdate(
@@ -381,6 +378,23 @@ router.get("/get_subcategory/:_id", async (req, res) => {
   try {
     const subcategory = await SubCategory.findOne({ _id: _id });
     res.status(200).json(subcategory);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
+
+// by categoryid
+router.get("/get_subcategoryByCategory", async (req, res) => {
+  const id = req.query.id;
+  console.log(id, "bauauauau");
+
+  try {
+    const product = await SubCategory.find({
+      category_Id: id,
+      isHide: false,
+    });
+
+    res.status(200).json(product);
   } catch (error) {
     res.status(404).json({ message: error.message });
   }

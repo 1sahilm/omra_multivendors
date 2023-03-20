@@ -38,10 +38,7 @@ router.get("/get_products", async (req, res) => {
 
 router.get("/get_product/:id", async (req, res) => {
   const { id } = req.params;
-  console.log("hell getid", id);
-
   try {
-    console.log("productbaba1");
     const product = await Product.findById({ _id: id }).populate({
       path: "auther_Id",
       select: {
@@ -57,9 +54,6 @@ router.get("/get_product/:id", async (req, res) => {
         isEmail: 1,
       },
     });
-
-    console.log(product, "productbabafff");
-
     const category = await Category.findById(
       { _id: product?.category },
       { category_name: 1 }
@@ -144,7 +138,6 @@ router.get("/get_publish_product", async (req, res) => {
 });
 /// for published
 router.get("/publishproductApi", async (req, res) => {
-  // const category = req.query.category;
   const { page = 1, limit = 10, toDate, fromDate } = req.query;
   try {
     const product = await Product.find({
@@ -177,7 +170,6 @@ router.get("/publishproductApi", async (req, res) => {
 
 router.get("/get_user", async (req, res) => {
   const _id = req.query._id;
-
   try {
     const user = await UserModel.find(
       { _id: _id },
@@ -202,7 +194,6 @@ router.get("/get_user", async (req, res) => {
 
 router.get("/productByUserId/:auther_Id", async (req, res) => {
   const { auther_Id } = req.params;
-
   try {
     const userData = await Product.find({
       isActive: true,
@@ -222,7 +213,6 @@ router.get("/productByUserId/:auther_Id", async (req, res) => {
 
 router.get("/merchantNameByUserId/:auther_Id", async (req, res) => {
   const { auther_Id } = req.params;
-
   try {
     const userData = await UserModel.find(
       {
@@ -360,11 +350,6 @@ router.get("/get-by-businessType", async (req, res) => {
       isApproved: true,
       isDeclined: false,
     }).populate(populateQuery);
-
-    // console.log("new value",product.find({auther_Id[TypesOf_Bussiness] : { $in: business.split(",") },})
-
-    console.log(product, "hello");
-
     res.status(200).json(product);
   } catch (error) {
     res.status(404).json({ message: error.message });
