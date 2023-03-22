@@ -406,12 +406,11 @@ router.get("/userDetails", async (req, res) => {
     });
   }
 });
-router.get("/userDetailsPaginate?", async (req, res) => {
-  // const {page} = req.query
 
+// ==================== All Merchant Pagination API =============================
+router.get("/userDetailsPaginate?", async (req, res) => {
   const { _id, password, email } = req.user;
   let { page = 1, limit = 20, toDate, fromDate } = req.query;
-
   page = Number(page);
   limit = Number(limit);
 
@@ -438,27 +437,14 @@ router.get("/userDetailsPaginate?", async (req, res) => {
         res.json({
           success: true,
           user: newdata,
-
           totalPages: pages,
           count: totalDocuments,
           min: limit * page - limit,
           max: limit * page,
-
           currentPage: page,
           nextPage: page < pages ? page + 1 : null,
         });
       });
-
-    //Fields
-
-    // res.json({
-    //   success: true,
-    //   user: newdata,
-
-    //   totalPages: pages,
-    //   currentPage: page,
-    //   nextPage: page < pages ? page + 1 : null,
-    // });
   } catch (err) {
     res.json({
       message: err?.message,
@@ -1114,40 +1100,27 @@ router.get("/getDeclinedProductCount", async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 });
-// ===============Approved Product Search=========================
-// ===================================testing==================
-router.get("/ApprovedSearch/:key", async (req, res) => {
-  try {
-    const data = await Product.find({
-      // $text: {
-      //   $search: req.params.key.toString(),
-      // },
 
-      $or: [
-        { category: { $regex: req.params.key, $options: "$i" } },
-        { sub_category: { $regex: req.params.key, $options: "$i" } },
-        { brand: { $regex: req.params.key, $options: "$i" } },
-        { product_name: { $regex: req.params.key, $options: "$i" } },
-        { vendors_name: { $regex: req.params.key, $options: "$i" } },
-      ],
-      isActive: true,
-      isApproved: true,
-    });
-    res.json(data);
-  } catch (error) {
-    res.json(404);
-  }
-});
 //========================
 router.get("/ApprovedFilterByDate/:key", async (req, res) => {
-  // let today = new date().getTime();
-
   try {
+    const populateQuery = [
+      {
+        path: "auther_Id",
+        model: UserModel,
+        select: { Merchant_Name: 1, company_Name: 1 },
+      },
+      {
+        path: "category",
+        model: Category,
+        select: { category_name: 1 },
+      },
+    ];
     const data = await Product.find({
       isActive: true,
       isApproved: true,
       updatedAt: { $lte: new Date(), $gte: new Date(req.params.key) },
-    });
+    }).populate(populateQuery);
     res.json(data);
   } catch (error) {
     res.json(404);

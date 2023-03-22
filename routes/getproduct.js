@@ -112,11 +112,6 @@ router.get("/get_publish_product", async (req, res) => {
       model: Category,
       select: { category_name: 1 },
     },
-    // {
-    //     path: "sub_category",
-    //     model: SubCategoy,
-    //     select:{sub_category_name:1}
-    //   },
   ];
   try {
     const product = await Product.find({

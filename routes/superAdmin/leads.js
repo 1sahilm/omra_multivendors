@@ -214,6 +214,74 @@ router.get("/supplier-enquiryFilterByDateRange", async (req, res) => {
   }
 });
 
+// ==================== Email Leads Pagination API =============================
+router.get("/emailLeadsPaginate?", async (req, res) => {
+  let { page = 1, limit = 20 } = req.query;
+  page = Number(page);
+  limit = Number(limit);
+
+  try {
+    const user = await CustomerQueryByProduct.find({ type: "Email Query" })
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .sort({ createdAt: -1 });
+
+    const totalDocuments = await CustomerQueryByProduct.countDocuments({
+      type: "Email Query",
+    });
+
+    const pages = Math.ceil(totalDocuments / 20);
+    res.json({
+      success: true,
+      user: user,
+      totalPages: pages,
+      count: totalDocuments,
+      min: limit * page - limit,
+      max: limit * page,
+      currentPage: page,
+      nextPage: page < pages ? page + 1 : null,
+    });
+  } catch (err) {
+    res.json({
+      message: err?.message,
+    });
+  }
+});
+
+// ==================== Calling Leads Pagination API =============================
+router.get("/callingLeadsPaginate?", async (req, res) => {
+  let { page = 1, limit = 20 } = req.query;
+  page = Number(page);
+  limit = Number(limit);
+
+  try {
+    const user = await CustomerQueryByProduct.find({ type: "Calling Query" })
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .sort({ createdAt: -1 });
+
+    const totalDocuments = await CustomerQueryByProduct.countDocuments({
+      type: "Calling Query",
+    });
+
+    const pages = Math.ceil(totalDocuments / 20);
+    res.json({
+      success: true,
+      user: user,
+      totalPages: pages,
+      count: totalDocuments,
+      min: limit * page - limit,
+      max: limit * page,
+      currentPage: page,
+      nextPage: page < pages ? page + 1 : null,
+    });
+  } catch (err) {
+    res.json({
+      message: err?.message,
+    });
+  }
+});
+
 //================================================Email Leads=========
 router.get("/email-enquiry-by-search/:key", async (req, res) => {
   const query = req.params.key;
@@ -231,6 +299,7 @@ router.get("/email-enquiry-by-search/:key", async (req, res) => {
     res.json(404);
   }
 });
+
 router.get("/email-enquiryFilterByDate/:key", async (req, res) => {
   try {
     const data = await CustomerQueryByProduct.find({

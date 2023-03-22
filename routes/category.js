@@ -386,8 +386,6 @@ router.get("/get_subcategory/:_id", async (req, res) => {
 // by categoryid
 router.get("/get_subcategoryByCategory", async (req, res) => {
   const id = req.query.id;
-  console.log(id, "bauauauau");
-
   try {
     const product = await SubCategory.find({
       category_Id: id,

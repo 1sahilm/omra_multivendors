@@ -8,33 +8,31 @@ const CustomerQurySchema = new Schema(
       type: String,
       required: false,
     },
-    company:{ type:String,required:false},
+    company: { type: String, required: false },
     product_Id: { type: String, required: false },
-    product_name:{ type: String, required: false},
+    product_name: { type: String, required: false },
     buyer_Message: {
-      type:String,
-      required:false,
+      type: String,
+      required: false,
     },
     buyer_Email: {
       type: String,
       required: false,
     },
     buyer_Mob: { type: String, required: false },
-    isCompleted:{
-     type:Boolean,
-     default:false
+    isCompleted: {
+      type: Boolean,
+      default: false,
     },
-    isDeclined:{
-      type:Boolean,
-      default:false
-     },
+    isDeclined: {
+      type: Boolean,
+      default: false,
+    },
 
-    type:{
-      type:String,
-      required:false
-
-    }
-
+    type: {
+      type: String,
+      required: false,
+    },
   },
 
   {
