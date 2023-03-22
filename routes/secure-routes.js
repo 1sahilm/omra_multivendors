@@ -587,7 +587,6 @@ router.post(
     const { _id } = req.user;
     const {
       product_name,
-
       manufacturer_name,
       manufacturer_phone_no,
       manufacturer_address,

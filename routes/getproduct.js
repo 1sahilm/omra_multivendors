@@ -38,7 +38,10 @@ router.get("/get_products", async (req, res) => {
 
 router.get("/get_product/:id", async (req, res) => {
   const { id } = req.params;
+  console.log("hell getid", id);
+
   try {
+    console.log("productbaba1");
     const product = await Product.findById({ _id: id }).populate({
       path: "auther_Id",
       select: {
@@ -54,6 +57,9 @@ router.get("/get_product/:id", async (req, res) => {
         isEmail: 1,
       },
     });
+
+    console.log(product, "productbabafff");
+
     const category = await Category.findById(
       { _id: product?.category },
       { category_name: 1 }
@@ -112,6 +118,11 @@ router.get("/get_publish_product", async (req, res) => {
       model: Category,
       select: { category_name: 1 },
     },
+    // {
+    //     path: "sub_category",
+    //     model: SubCategoy,
+    //     select:{sub_category_name:1}
+    //   },
   ];
   try {
     const product = await Product.find({
@@ -133,6 +144,7 @@ router.get("/get_publish_product", async (req, res) => {
 });
 /// for published
 router.get("/publishproductApi", async (req, res) => {
+  // const category = req.query.category;
   const { page = 1, limit = 10, toDate, fromDate } = req.query;
   try {
     const product = await Product.find({
@@ -165,6 +177,7 @@ router.get("/publishproductApi", async (req, res) => {
 
 router.get("/get_user", async (req, res) => {
   const _id = req.query._id;
+
   try {
     const user = await UserModel.find(
       { _id: _id },
@@ -189,6 +202,7 @@ router.get("/get_user", async (req, res) => {
 
 router.get("/productByUserId/:auther_Id", async (req, res) => {
   const { auther_Id } = req.params;
+
   try {
     const userData = await Product.find({
       isActive: true,
@@ -208,6 +222,7 @@ router.get("/productByUserId/:auther_Id", async (req, res) => {
 
 router.get("/merchantNameByUserId/:auther_Id", async (req, res) => {
   const { auther_Id } = req.params;
+
   try {
     const userData = await UserModel.find(
       {
@@ -250,10 +265,16 @@ router.get("/productByCategory/:category", async (req, res) => {
 });
 
 router.get("/product-by-subcategory/:subcategory", async (req, res) => {
-  const { page = 1, limit = 20, toDate, fromDate } = req.query;
+  const { page = 1, limit = 20 } = req.query;
   const { subcategory } = req.params;
 
+  const categoryData = await SubCategoy.findOne({ _id: subcategory });
+  console.log({ subCategory: subcategory, catDatat: categoryData });
+
   try {
+    const product1 = await Product.find({
+      category: categoryData?.category_Id,
+    }).limit(20);
     const userData = await Product.find({
       isActive: true,
       isApproved: true,
@@ -262,11 +283,21 @@ router.get("/product-by-subcategory/:subcategory", async (req, res) => {
     })
       .limit(limit)
       .skip((page - 1) * limit);
-
+    userDataCount = await Product.countDocuments({
+      isActive: true,
+      isApproved: true,
+      isDeclined: false,
+      sub_category: subcategory,
+    });
+    var arrrayData = [];
     if (!userData) {
       res.status(400).json({ success: false, message: "Data not found" });
+    } else if (userDataCount < 5) {
+      product1?.map((item) => arrrayData.push(item));
+    } else {
+      userData?.map((item) => arrrayData.push(item));
     }
-    res.status(200).json({ success: true, data: await userData });
+    res.status(200).json({ success: true, data: await arrrayData });
   } catch (error) {
     res.json({ message: error.message });
   }
@@ -274,7 +305,6 @@ router.get("/product-by-subcategory/:subcategory", async (req, res) => {
 
 router.get("/getByCategory", async (req, res) => {
   let filter = {};
-
   const category = req.query.category;
   const TypesOf_Bussiness = req.query.TypesOf_Bussiness;
   // const sub_category = req.query.sub_category;
@@ -345,6 +375,11 @@ router.get("/get-by-businessType", async (req, res) => {
       isApproved: true,
       isDeclined: false,
     }).populate(populateQuery);
+
+    // console.log("new value",product.find({auther_Id[TypesOf_Bussiness] : { $in: business.split(",") },})
+
+    console.log(product, "hello");
+
     res.status(200).json(product);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -381,7 +416,6 @@ router.get("/get_products_count", async (req, res) => {
 
 router.get("/search=", async (req, res) => {
   const searchName = req.query.vendors_name;
-
   const searchName1 = req.query.product_name;
 
   try {

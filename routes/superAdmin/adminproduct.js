@@ -116,7 +116,7 @@ router.get("/approvedProductPaginate?", async (req, res) => {
   ];
   try {
     const user = await Product.find({ isApproved: true })
-      .populate(populateQuery)
+      // .populate(populateQuery)
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .sort({ createdAt: -1 });

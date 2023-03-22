@@ -19,13 +19,8 @@ const ProductSchema = new Schema(
       type: mongoose.Schema.Types.String,
       ref: "User",
     },
-    // merchant: {
-    //   type: Object,
-    //   required: true,
-    // },
     company_description: {
       type: mongoose.Schema.Types.String,
-      // required: false,
       // default: UserModel.description,
       ref: "User",
     },
