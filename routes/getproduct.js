@@ -58,8 +58,6 @@ router.get("/get_product/:id", async (req, res) => {
       },
     });
 
-    console.log(product, "productbabafff");
-
     const category = await Category.findById(
       { _id: product?.category },
       { category_name: 1 }
@@ -105,7 +103,7 @@ router.get("/getcompanyDescription", async (req, res) => {
   }
 });
 
-///
+//get_publish_product
 router.get("/get_publish_product", async (req, res) => {
   const populateQuery = [
     {
@@ -142,7 +140,8 @@ router.get("/get_publish_product", async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 });
-/// for published
+
+// for published
 router.get("/publishproductApi", async (req, res) => {
   // const category = req.query.category;
   const { page = 1, limit = 10, toDate, fromDate } = req.query;
@@ -265,7 +264,7 @@ router.get("/productByCategory/:category", async (req, res) => {
 });
 
 router.get("/product-by-subcategory/:subcategory", async (req, res) => {
-  const { page = 1, limit = 20 } = req.query;
+  const { page = 1, limit = 20, toDate, fromDate } = req.query;
   const { subcategory } = req.params;
 
   const categoryData = await SubCategoy.findOne({ _id: subcategory });
@@ -283,6 +282,7 @@ router.get("/product-by-subcategory/:subcategory", async (req, res) => {
     })
       .limit(limit)
       .skip((page - 1) * limit);
+
     userDataCount = await Product.countDocuments({
       isActive: true,
       isApproved: true,
@@ -290,6 +290,7 @@ router.get("/product-by-subcategory/:subcategory", async (req, res) => {
       sub_category: subcategory,
     });
     var arrrayData = [];
+
     if (!userData) {
       res.status(400).json({ success: false, message: "Data not found" });
     } else if (userDataCount < 5) {
@@ -297,40 +298,67 @@ router.get("/product-by-subcategory/:subcategory", async (req, res) => {
     } else {
       userData?.map((item) => arrrayData.push(item));
     }
+
     res.status(200).json({ success: true, data: await arrrayData });
   } catch (error) {
     res.json({ message: error.message });
   }
 });
 
+// router.get("/getByCategory", async (req, res) => {
+//   let filter = {};
+
+//   const category = req.query.category;
+//   const TypesOf_Bussiness = req.query.TypesOf_Bussiness;
+//   // const sub_category = req.query.sub_category;
+//   // console.log("categoryyyy", category.split(","));
+//   // if (req.query.categories) {
+//   //   filter = { category: [req.query.categories] };
+//   // }
+
+//   try {
+//     const product = await Product.find(
+//       {
+//         category: { $in: category.split(",") },
+
+//         // sub_category: { $in: sub_category },
+
+//         isActive: true,
+//         isApproved: true,
+//         isDeclined: false,
+//       }
+//       // { isActive: true, isApproved: true, isDeclined: false }
+//       // filter
+//     )
+//       .collation({ locale: "en", strength: 2 })
+//       .sort({ product_name: 1 });
+//     // .filter({ isActive: true, isApproved: true, isDeclined: false });
+//     // console.log({ category: { $in: category.split(",") } }),
+
+//     res.status(200).json(product);
+//   } catch (error) {
+//     res.status(404).json({ message: error.message });
+//   }
+// });
+
+// Randomly - get product by category....
 router.get("/getByCategory", async (req, res) => {
-  let filter = {};
   const category = req.query.category;
   const TypesOf_Bussiness = req.query.TypesOf_Bussiness;
-  // const sub_category = req.query.sub_category;
-  // console.log("categoryyyy", category.split(","));
-  // if (req.query.categories) {
-  //   filter = { category: [req.query.categories] };
-  // }
-
   try {
-    const product = await Product.find(
-      {
-        category: { $in: category.split(",") },
+    const countDocuments = await Product.countDocuments({
+      category: { $in: category.split(",") },
+      isActive: true,
+      isApproved: true,
+      isDeclined: false,
+    });
 
-        // sub_category: { $in: sub_category },
-
-        isActive: true,
-        isApproved: true,
-        isDeclined: false,
-      }
-      // { isActive: true, isApproved: true, isDeclined: false }
-      // filter
-    )
-      .collation({ locale: "en", strength: 2 })
-      .sort({ product_name: 1 });
-    // .filter({ isActive: true, isApproved: true, isDeclined: false });
-    // console.log({ category: { $in: category.split(",") } }),
+    const product = await Product.find({
+      category: { $in: category.split(",") },
+      isActive: true,
+      isApproved: true,
+      isDeclined: false,
+    }).skip(Math.random() * countDocuments);
 
     res.status(200).json(product);
   } catch (error) {
@@ -377,9 +405,6 @@ router.get("/get-by-businessType", async (req, res) => {
     }).populate(populateQuery);
 
     // console.log("new value",product.find({auther_Id[TypesOf_Bussiness] : { $in: business.split(",") },})
-
-    console.log(product, "hello");
-
     res.status(200).json(product);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -416,6 +441,7 @@ router.get("/get_products_count", async (req, res) => {
 
 router.get("/search=", async (req, res) => {
   const searchName = req.query.vendors_name;
+
   const searchName1 = req.query.product_name;
 
   try {
@@ -481,7 +507,7 @@ router.get("/search/:key", async (req, res) => {
   }
 });
 
-//// ==================== Search api for  half/full text search=============
+// ==================== Search api for  half/full text search=============
 router.get("/product-search/:key", async (req, res) => {
   var search = req.body.search;
   var category = req.body.category;
