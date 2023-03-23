@@ -38,10 +38,8 @@ router.get("/get_products", async (req, res) => {
 
 router.get("/get_product/:id", async (req, res) => {
   const { id } = req.params;
-  console.log("hell getid", id);
 
   try {
-    console.log("productbaba1");
     const product = await Product.findById({ _id: id }).populate({
       path: "auther_Id",
       select: {
@@ -240,20 +238,49 @@ router.get("/merchantNameByUserId/:auther_Id", async (req, res) => {
   }
 });
 
-router.get("/productByCategory/:category", async (req, res) => {
-  const { page = 1, limit = 20, toDate, fromDate } = req.query;
-  const { category } = req.params;
+// Related product - API
+// router.get("/productByCategory/:category", async (req, res) => {
+//   const { page = 1, limit = 20 } = req.query;
+//   const { category } = req.params;
 
+//   try {
+//     const userData = await Product.find({
+//       isActive: true,
+//       isApproved: true,
+//       isDeclined: false,
+//       category: category,
+//     })
+//       .limit(limit)
+//       .skip((page - 1) * limit);
+
+//     if (!userData) {
+//       res.status(400).json({ success: false, message: "Data not found" });
+//     }
+//     res.status(200).json({ success: true, data: await userData });
+//   } catch (error) {
+//     res.json({ message: error.message });
+//   }
+// });
+
+// Related product - API
+router.get("/productByCategory/:category", async (req, res) => {
+  const { page = 1, limit = 20 } = req.query;
+  const { category } = req.params;
   try {
-    const userData = await Product.find({
+    const countDocuments = await Product.countDocuments({
+      category: { $in: category.split(",") },
       isActive: true,
       isApproved: true,
       isDeclined: false,
-      category: category,
+    });
+    const userData = await Product.find({
+      category: { $in: category.split(",") },
+      isActive: true,
+      isApproved: true,
+      isDeclined: false,
     })
-      .limit(limit)
-      .skip((page - 1) * limit);
-
+      .skip(Math.random() * countDocuments, page - 1)
+      .limit(limit);
     if (!userData) {
       res.status(400).json({ success: false, message: "Data not found" });
     }
@@ -305,6 +332,7 @@ router.get("/product-by-subcategory/:subcategory", async (req, res) => {
   }
 });
 
+// Alphabetically - show products by category...
 // router.get("/getByCategory", async (req, res) => {
 //   let filter = {};
 
