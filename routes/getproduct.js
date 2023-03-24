@@ -266,6 +266,7 @@ router.get("/merchantNameByUserId/:auther_Id", async (req, res) => {
 router.get("/productByCategory/:category", async (req, res) => {
   const { page = 1, limit = 20 } = req.query;
   const { category } = req.params;
+  console.log("hellonnn", category);
   try {
     const countDocuments = await Product.countDocuments({
       category: { $in: category.split(",") },
@@ -281,6 +282,7 @@ router.get("/productByCategory/:category", async (req, res) => {
     })
       .skip(Math.random() * countDocuments, page - 1)
       .limit(limit);
+    console.log("hellotest", userData);
     if (!userData) {
       res.status(400).json({ success: false, message: "Data not found" });
     }
@@ -373,6 +375,7 @@ router.get("/product-by-subcategory/:subcategory", async (req, res) => {
 router.get("/getByCategory", async (req, res) => {
   const category = req.query.category;
   const TypesOf_Bussiness = req.query.TypesOf_Bussiness;
+  console.log("category", category);
   try {
     const countDocuments = await Product.countDocuments({
       category: { $in: category.split(",") },
@@ -387,7 +390,7 @@ router.get("/getByCategory", async (req, res) => {
       isApproved: true,
       isDeclined: false,
     }).skip(Math.random() * countDocuments);
-
+    console.log("product", product);
     res.status(200).json(product);
   } catch (error) {
     res.status(404).json({ message: error.message });
