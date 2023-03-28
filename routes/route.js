@@ -84,6 +84,7 @@ router.post("/login", async (req, res) => {
     }
 
     const user = await UserModel.findOne({ email });
+
     if (!user) {
       return res.json({
         success: false,
@@ -110,6 +111,7 @@ router.post("/login", async (req, res) => {
         user?.Merchant_Name && user?.SubTypeOf_bussiness ? true : false,
       isCompany: user?.company_Name ? true : false,
     };
+
     const JWTPayload1 = {
       _id: user._id,
       email: user.email,
@@ -271,39 +273,6 @@ router.patch("/forgotpassword/:_id", async (req, res) => {
   }
 });
 
-router.patch("/resetpassword/:_id", async (req, res) => {
-  try {
-    const { _id } = req.params;
-    console.log(_id, "iddddddbaba");
-    const { email, password } = req.body;
-    console.log(_id);
-
-    // Check If User Exists
-    const findUser = await UserModel.findOne({ email: _id });
-
-    if (!findUser) {
-      return res
-        .status(400)
-        .json({ success: false, message: "user not found" });
-    }
-
-    // UPDATE PASSWORD
-    const updatePassword = await UserModel.updateOne(
-      { _id },
-      { $set: { password: hashPassword(req.body.password) } }
-    );
-    console.log("updatePassword", updatePassword);
-
-    res.status(200).json({
-      success: true,
-      message: "password updated successfully",
-      updatePassword,
-    });
-  } catch (error) {
-    console.log({ error: error.message });
-  }
-});
-
 router.patch("/forgotpassword2", async (req, res) => {
   try {
     const { _id } = req.params;
@@ -423,7 +392,6 @@ router.post("/send-sms", async (req, res) => {
     end_date,
     plan,
   } = req.body;
-  console;
   const otp = otpGenerator.generate(4, {
     digits: true,
     lowerCaseAlphabets: false,
@@ -438,8 +406,6 @@ router.post("/send-sms", async (req, res) => {
   Otp(otp);
 
   const url1 = "https://marketplace.elaundry.co.in/";
-  let message = "";
-  let templateId = "";
 
   SendSMS({
     vendors_name: vendors_name,
