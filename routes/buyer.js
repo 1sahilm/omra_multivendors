@@ -10,11 +10,18 @@ router.post(
   "/connect_to_buy",
 
   async (req, res) => {
-   
+    const { merchant_Id } = req.body;
+    const merchant = await UserModel.findOne(
+      { _id: merchant_Id },
+      { Merchant_Name: 1, company_Name: 1 }
+    );
 
     try {
       const product = await CustomerQueryByProduct.create({
         merchant_Id: req.body.merchant_Id,
+        merchant: merchant_Id,
+        merchant_name: merchant?.Merchant_Name,
+        company: merchant?.company_Name,
         product_Id: req.body.product_Id,
         product_name: req.body.product_name,
         buyer_Message: req.body.buyer_Message,
@@ -33,7 +40,7 @@ router.post(
 
 router.patch("/leads_update/:_id", async (req, res) => {
   const { _id } = req.params;
-  
+
   const { isCompleted, isDeclined } = req.body;
   try {
     const updateQuery = await CustomerQueryByProduct.findByIdAndUpdate(
@@ -59,10 +66,8 @@ router.patch("/leads_update/:_id", async (req, res) => {
   }
 });
 
-
 router.patch("/declined_lead/:_id", async (req, res) => {
   const { _id } = req.params;
-
 
   try {
     // const updateQuery= await CustomerQueryByProduct.updateOne(
@@ -121,7 +126,7 @@ router.get("/getbuyerQueryCount", async (req, res) => {
 
   try {
     const merchant_Id = query?.merchant_Id;
-   
+
     const buyerQuery = await CustomerQueryByProduct.find(
       {},
       { merchant_Id: 1 }
@@ -131,7 +136,6 @@ router.get("/getbuyerQueryCount", async (req, res) => {
     res
       .status(200)
       .json({ success: true, data: buyerQuery, totalDocuments: count });
-  
   } catch (error) {
     res.status(404).json({ message: error.message });
   }

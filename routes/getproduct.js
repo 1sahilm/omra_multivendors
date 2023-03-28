@@ -266,7 +266,6 @@ router.get("/merchantNameByUserId/:auther_Id", async (req, res) => {
 router.get("/productByCategory/:category", async (req, res) => {
   const { page = 1, limit = 20 } = req.query;
   const { category } = req.params;
-  console.log("hellonnn", category);
   try {
     const countDocuments = await Product.countDocuments({
       category: { $in: category.split(",") },
@@ -282,7 +281,6 @@ router.get("/productByCategory/:category", async (req, res) => {
     })
       .skip(Math.random() * countDocuments, page - 1)
       .limit(limit);
-    console.log("hellotest", userData);
     if (!userData) {
       res.status(400).json({ success: false, message: "Data not found" });
     }

@@ -7,6 +7,9 @@ const sendEmail = require("../lib/mailer");
 const axios = require("axios");
 
 const { hashPassword, comparePassword } = require("../functions/passwordHash");
+const SendmailTransport = require("nodemailer/lib/sendmail-transport");
+const SendSMS = require("../lib/sms");
+
 require("dotenv").config();
 
 router.post("/signup", async (req, res) => {
@@ -29,21 +32,18 @@ router.post("/signup", async (req, res) => {
     } else {
       const isEmail = await UserModel.findOne({
         email: email,
-        // mobile_no: mobile_no,
       });
+
       const isMobile = await UserModel.findOne({
         mobile_no: mobile_no,
       });
 
       if (isEmail) {
-        return res.json({
-          success: false,
-          message: "This Email is already exists",
-        });
+        return res.json({ success: false, message: "Email is already exists" });
       } else if (isMobile) {
         return res.json({
           success: false,
-          message: "This Mobile is already exists",
+          message: "Mobile is already exists",
         });
       } else {
         const user = await UserModel.create(data);
@@ -141,13 +141,40 @@ router.post("/login", async (req, res) => {
   }
 });
 
+// verify Otp User
+router.post("/verifyOtp", async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    console.log("otp", otp);
+
+    if (!otp) {
+      return res.json({
+        success: false,
+        message: "Enter Otp is required",
+      });
+    }
+    console.log(userOtp === otp, "hellogvgf");
+    console.log("userfgf", userOtp, otp);
+
+    if (userOtp === otp) {
+      return res.status(200).json({
+        success: true,
+        message: "You are successfully verified",
+      });
+    }
+    res.status(200).json({
+      message: "You are Logged in Successfully",
+      success: true,
+    });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
 // Super Admin Login Using OTP
 router.post("/adminlogin", async (req, res) => {
   try {
     const { email, password, otp } = req.body;
-    console.log("print", userOtp == otp);
-    console.log("print44", otp, userOtp);
-
     if (!email || !password) {
       return res.json({
         success: false,
@@ -219,9 +246,10 @@ router.post("/logout", async (req, res) => {
 router.patch("/forgotpassword/:_id", async (req, res) => {
   try {
     const { _id } = req.params;
+    console.log(_id, "iddddddbaba");
 
     // Check If User Exists
-    const findUser = await UserModel.findOne({ _id }).lean();
+    const findUser = await UserModel.findOne({ _id });
 
     if (!findUser) {
       return res
@@ -234,10 +262,13 @@ router.patch("/forgotpassword/:_id", async (req, res) => {
       { _id },
       { $set: { password: hashPassword(req.body.password) } }
     );
+    console.log("updatePassword", updatePassword);
 
-    res
-      .status(200)
-      .json({ success: true, message: "password updated successfully" });
+    res.status(200).json({
+      success: true,
+      message: "password updated successfully",
+      updatePassword,
+    });
   } catch (error) {
     console.log({ error: error.message });
   }
@@ -246,27 +277,38 @@ router.patch("/forgotpassword/:_id", async (req, res) => {
 router.patch("/forgotpassword2", async (req, res) => {
   try {
     const { _id } = req.params;
-    const { email } = req.body;
+    const { email, type } = req.body;
+    console.log("email", email);
+    const otp = otpGenerator.generate(4, {
+      digits: true,
+      lowerCaseAlphabets: false,
+      upperCaseAlphabets: false,
+      specialChars: false,
+    });
+    console.log("otp", otp);
+    userOtp = otp;
+    function Otp(otp) {
+      userOtp = otp;
+    }
+    Otp(otp);
 
     // Check If User Exists
     const findUser = await UserModel.findOne({ _id }).lean();
     const findUser1 = await UserModel.findOne({ email: email }).lean();
+    console.log("findUser");
 
     if (!findUser1) {
       return res
         .status(400)
         .json({ success: false, message: "user not found" });
     }
+    const mobileno = findUser1?.mobile_no;
+    console.log("mobileno", mobileno);
 
-    // UPDATE PASSWORD
-    const updatePassword = await UserModel.updateOne(
-      { email },
-      { $set: { password: hashPassword(req.body.password) } }
-    );
+    await SendSMS({ type: type, mobileno: mobileno, otp: otp });
+    const userData = { email: email };
 
-    res
-      .status(200)
-      .json({ success: true, message: "password updated successfully" });
+    res.status(200).json({ message: "success", data: userData });
   } catch (error) {
     console.log({ error: error.message });
   }
@@ -284,7 +326,10 @@ router.post("/send-mail", async (req, res) => {
   } = req.body;
 
   console.log("userdata", description, phoneNumber, email, merchantId, type);
-  const merchant = await UserModel.findOne({ _id: merchantId });
+  const merchant = await UserModel.findOne(
+    { _id: merchantId },
+    { Merchant_Name: 1 }
+  );
 
   if (!merchant) {
     return res
@@ -296,6 +341,7 @@ router.post("/send-mail", async (req, res) => {
     await sendEmail({
       merchantEmail: merchant.email,
       merchantId: merchantId,
+      // merchantName:merchant?.Merchant_Name,
       email,
       merchantName: merchant?.Merchant_Name,
       price,
@@ -347,7 +393,6 @@ router.post("/send-sms", async (req, res) => {
     end_date,
     plan,
   } = req.body;
-  console.log(mobileno, vendors_name, type, "testtttttype");
   console;
   const otp = otpGenerator.generate(4, {
     digits: true,
@@ -365,89 +410,100 @@ router.post("/send-sms", async (req, res) => {
   const url1 = "https://marketplace.elaundry.co.in/";
   let message = "";
   let templateId = "";
-  switch (type) {
-    case "leads":
-      templateId = "1707166747148902896";
-      message = `Dear ${vendors_name}, You have received a new Lead from a buyer
-       for your product inquiry.Please check your registered 
-       email for more information. Regards, E-Laundry Marketplace.
-       OMRA Solutions`;
 
-      break;
-    case "payment":
-      templateId = "1707167309378301462";
-      message = `Dear ${vendors_name} , We have received your payment. Your Receipt No. ${invoice_Id} and Amount is ${price}. Thank you to choosing our services. E-Laundry Marketplace. OMRA Solutions`;
+  SendSMS({
+    vendors_name: vendors_name,
+    start_date: start_date,
+    end_date: end_date,
+    otp: otp,
+    plan: plan,
+    invoice_Id: invoice_Id,
+    type: type,
+    mobileno: mobileno,
+  });
+  // switch (type) {
+  //   case "leads":
+  //     templateId = "1707166747148902896";
+  //     message = `Dear ${vendors_name}, You have received a new Lead from a buyer
+  //      for your product inquiry.Please check your registered
+  //      email for more information. Regards, E-Laundry Marketplace.
+  //      OMRA Solutions`;
 
-      break;
+  //     break;
+  //   case "payment":
+  //     templateId = "1707167309378301462";
+  //     message = `Dear ${vendors_name} , We have received your payment. Your Receipt No. ${invoice_Id} and Amount is ${price}. Thank you to choosing our services. E-Laundry Marketplace. OMRA Solutions`;
 
-    case "subscription":
-      templateId = "1707167309358954239";
-      message = `Dear ${vendors_name}, Your Service ${plan.map(
-        (item, index) => {
-          return item.label;
-        }
-      )} has been activated from ${start_date.slice(0, 10)} to ${end_date.slice(
-        0,
-        10
-      )}. Enjoy the Service! Regards, E-Laundry Marketplace. OMRA Solutions.`;
-      break;
+  //     break;
 
-    case "registration":
-      templateId = "1707167309353498718";
-      message = `Dear ${vendors_name}, You have registered successfully on E-Laundry Marketplace. Welcome On-boarding !.Regards, E-Laundry Marketplace. OMRA Solutions`;
-      break;
+  //   case "subscription":
+  //     templateId = "1707167309358954239";
+  //     message = `Dear ${vendors_name}, Your Service ${plan.map(
+  //       (item, index) => {
+  //         return item.label;
+  //       }
+  //     )} has been activated from ${start_date.slice(0, 10)} to ${end_date.slice(
+  //       0,
+  //       10
+  //     )}. Enjoy the Service! Regards, E-Laundry Marketplace. OMRA Solutions.`;
+  //     break;
 
-    case "payment-reminder":
-      templateId = "1707167309363253224";
-      message = `Dear ${vendors_name}, Your Subscription renewal date is {#var#}. Please renew it. E-Laundry Marketplace. OMRA Solutions`;
-      break;
+  //   case "registration":
+  //     templateId = "1707167309353498718";
+  //     message = `Dear ${vendors_name}, You have registered successfully on E-Laundry Marketplace. Welcome On-boarding !.Regards, E-Laundry Marketplace. OMRA Solutions`;
+  //     break;
 
-    case "otp-login":
-      templateId = "1707161160681288183";
-      message = `Auth code ${otp} to verify your mobile number. OMRA SOLUTIONS`;
-      break;
+  //   case "payment-reminder":
+  //     templateId = "1707167309363253224";
+  //     message = `Dear ${vendors_name}, Your Subscription renewal date is {#var#}. Please renew it. E-Laundry Marketplace. OMRA Solutions`;
+  //     break;
 
-    default:
-      // templateId = "1707161160651766248"
-      // message = `Dear ${vendors_name} , Please use this link to pay your bill for Invoice No. {#var#} and Amount {#var#}, Pay now ${invoiceno}. Thanks for your visit to {#var#}. OMRA SOLUTIONS`
-      break;
-  }
+  //   case "otp-login":
+  //     templateId = "1707161160681288183";
+  //     message = `Auth code ${otp} to verify your mobile number. OMRA SOLUTIONS`;
+  //     break;
 
-  try {
-    const { data } = await axios({
-      url: "http://sms.tyrodigital.com/api/mt/SendSMS",
+  //   default:
+  //     // templateId = "1707161160651766248"
+  //     // message = `Dear ${vendors_name} , Please use this link to pay your bill for Invoice No. {#var#} and Amount {#var#}, Pay now ${invoiceno}. Thanks for your visit to {#var#}. OMRA SOLUTIONS`
+  //     break;
+  // }
 
-      params: {
-        user: process.env.SMS_USER,
-        // "Laundriz",
-        //  "omra1",
-        password: process.env.PASSWORD,
-        //  "Laundriz@1234",
-        // "omra1@1234",
-        senderid: process.env.SENDER_ID,
-        channel: process.env.CHANNEL,
-        // "Transactional",
-        DCS: 0,
-        flashsms: 0,
-        number: mobileno,
-        text: message,
-        // "DLTAPPROVEDTEMPLATE",
-        // message,
-        route: 05,
-        Peid: "1201159168754003726",
-        DLTTemplateId: templateId,
-      },
+  // try {
+  //   const { data } = await axios({
+  //     url: "http://sms.tyrodigital.com/api/mt/SendSMS",
 
-      responseType: "json",
-      method: "get",
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json",
-      },
-    });
-  } catch (error) {
-    res.json({ message: error });
-  }
+  //     params: {
+  //       user: process.env.SMS_USER,
+  //       // "Laundriz",
+  //       //  "omra1",
+  //       password: process.env.PASSWORD,
+  //       //  "Laundriz@1234",
+  //       // "omra1@1234",
+  //       senderid: process.env.SENDER_ID,
+  //       channel: process.env.CHANNEL,
+  //       // "Transactional",
+  //       DCS: 0,
+  //       flashsms: 0,
+  //       number: mobileno,
+  //       text: message,
+  //       // "DLTAPPROVEDTEMPLATE",
+  //       // message,
+  //       route: 05,
+  //       Peid: "1201159168754003726",
+  //       DLTTemplateId: templateId,
+  //     },
+
+  //     responseType: "json",
+  //     method: "get",
+  //     headers: {
+  //       "Access-Control-Allow-Origin": "*",
+  //       "Content-Type": "application/json",
+  //     },
+  //   });
+  // } catch (error) {
+  //   res.json({ message: error });
+  // }
 });
 
 router.post("/callingApi", async (req, res) => {

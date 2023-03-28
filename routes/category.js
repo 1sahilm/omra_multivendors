@@ -211,7 +211,6 @@ router.get("/get_postionCat", async (req, res) => {
 
 router.get("/get-category-by-name/:category_name", async (req, res) => {
   const { category_name } = req.params;
-  console.log(category_name, "category name");
   try {
     const category = await Category.findOne(
       { category_name: category_name },

@@ -8,6 +8,8 @@ const CustomerQurySchema = new Schema(
       type: String,
       required: false,
     },
+    merchant: { type: mongoose.Schema.Types.ObjectId, required: true },
+    merchant_name: { type: String, required: false },
     company: { type: String, required: false },
     product_Id: { type: String, required: false },
     product_name: { type: String, required: false },

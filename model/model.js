@@ -66,6 +66,7 @@ const UserSchema = new Schema(
     GST_No: {
       type: String,
       required: false,
+      // unique: true,
     },
 
     PAN_No: {
@@ -102,22 +103,22 @@ const UserSchema = new Schema(
     isUpload: {
       type: Boolean,
       required: true,
-      default:true
+      default: true,
     },
     isLead: {
       type: Boolean,
       required: true,
-      default:true
+      default: true,
     },
     isEmail: {
       type: Boolean,
       required: false,
-      default:false
+      default: false,
     },
     isCall: {
       type: Boolean,
       required: false,
-      default:false
+      default: false,
     },
   },
   { timestamps: true }

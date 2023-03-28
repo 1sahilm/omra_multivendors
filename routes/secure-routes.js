@@ -130,7 +130,6 @@ router.patch("/deactivat1111111/:_id", async (req, res) => {
 
 router.patch("/details", async (req, res) => {
   const { _id } = req.user;
-
   try {
     const user = await UserModel.findOneAndUpdate(
       { _id: _id },
@@ -152,7 +151,6 @@ router.patch("/details", async (req, res) => {
       }
     );
     //Fields
-
     res.json({
       message: "User Updated Sucessfully",
       user,
@@ -758,7 +756,6 @@ router.post(
           res.status(200).json({
             success: true,
             message: "product has been uploaded Sucessfully",
-
             product,
           });
         } catch (err) {
