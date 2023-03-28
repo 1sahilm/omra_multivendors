@@ -141,36 +141,6 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// verify Otp User
-router.post("/verifyOtp", async (req, res) => {
-  try {
-    const { email, otp } = req.body;
-    console.log("otp", otp);
-
-    if (!otp) {
-      return res.json({
-        success: false,
-        message: "Enter Otp is required",
-      });
-    }
-    console.log(userOtp === otp, "hellogvgf");
-    console.log("userfgf", userOtp, otp);
-
-    if (userOtp === otp) {
-      return res.status(200).json({
-        success: true,
-        message: "You are successfully verified",
-      });
-    }
-    res.status(200).json({
-      message: "You are Logged in Successfully",
-      success: true,
-    });
-  } catch (error) {
-    res.status(500).json(error);
-  }
-});
-
 // Super Admin Login Using OTP
 router.post("/adminlogin", async (req, res) => {
   try {
@@ -232,6 +202,33 @@ router.post("/adminlogin", async (req, res) => {
   }
 });
 
+// verify Otp User
+router.post("/verifyOtp", async (req, res) => {
+  try {
+    const { otp } = req.body;
+    if (!otp) {
+      return res.json({
+        success: false,
+        message: "Enter Otp is required",
+      });
+    }
+
+    if (userOtp == otp) {
+      return res.status(200).json({
+        message: "Verified OTP Successfully",
+        success: true,
+      });
+    } else {
+      return res.json({
+        success: false,
+        message: "You are provided wrong otp",
+      });
+    }
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
 router.post("/logout", async (req, res) => {
   try {
     res.clearCookie("access_token");
@@ -250,6 +247,39 @@ router.patch("/forgotpassword/:_id", async (req, res) => {
 
     // Check If User Exists
     const findUser = await UserModel.findOne({ _id });
+
+    if (!findUser) {
+      return res
+        .status(400)
+        .json({ success: false, message: "user not found" });
+    }
+
+    // UPDATE PASSWORD
+    const updatePassword = await UserModel.updateOne(
+      { _id },
+      { $set: { password: hashPassword(req.body.password) } }
+    );
+    console.log("updatePassword", updatePassword);
+
+    res.status(200).json({
+      success: true,
+      message: "password updated successfully",
+      updatePassword,
+    });
+  } catch (error) {
+    console.log({ error: error.message });
+  }
+});
+
+router.patch("/resetpassword/:_id", async (req, res) => {
+  try {
+    const { _id } = req.params;
+    console.log(_id, "iddddddbaba");
+    const { email, password } = req.body;
+    console.log(_id);
+
+    // Check If User Exists
+    const findUser = await UserModel.findOne({ email: _id });
 
     if (!findUser) {
       return res
@@ -306,9 +336,9 @@ router.patch("/forgotpassword2", async (req, res) => {
     console.log("mobileno", mobileno);
 
     await SendSMS({ type: type, mobileno: mobileno, otp: otp });
-    const userData = { email: email };
+    const user = { _id: findUser1?._id, email: email };
 
-    res.status(200).json({ message: "success", data: userData });
+    res.status(200).json({ message: "success", user: user });
   } catch (error) {
     console.log({ error: error.message });
   }
