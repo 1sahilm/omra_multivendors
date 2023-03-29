@@ -55,7 +55,6 @@ router.post("/signup", async (req, res) => {
         };
 
         const token = jwt.sign({ user: JWTPayload }, "TOP_SECRET");
-        console.log("This user is already exists");
 
         res.status(201).json({
           success: true,

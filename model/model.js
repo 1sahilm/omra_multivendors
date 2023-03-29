@@ -63,10 +63,14 @@ const UserSchema = new Schema(
       type: String,
       required: false,
     },
+    Service: {
+      type: String,
+      required: false,
+    },
     GST_No: {
       type: String,
       required: false,
-      // unique: true,
+      unique: true,
     },
 
     PAN_No: {
@@ -123,36 +127,6 @@ const UserSchema = new Schema(
   },
   { timestamps: true }
 );
-
-// UserSchema.pre("save", async function (next) {
-//   if (!this.isModified("password")) {
-//     return next();
-//   }
-
-//   bcrypt.hash(this.password, 10, (err, hash) => {
-//     this.password = hash;
-//     next();
-//   });
-// });
-
-// UserSchema.methods.isValidPassword = async function (password) {
-//   const user = this;
-//   const compare = await bcrypt.compare(password, user.password);
-
-//   return compare;
-// };
-
-// UserSchema.methods.validatePassword = function (password) {
-//   if (!this.password) {
-//     return false;
-//   }
-//   return bcrypt.compareSync(password, this.password);
-// };
-
-// UserSchema.methods.updatePassword = function (password) {
-//   this.password = password;
-//   this.save();
-// };
 
 const UserModel = mongoose.model("User", UserSchema);
 module.exports = UserModel;

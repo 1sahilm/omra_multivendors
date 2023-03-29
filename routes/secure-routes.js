@@ -130,35 +130,47 @@ router.patch("/deactivat1111111/:_id", async (req, res) => {
 
 router.patch("/details", async (req, res) => {
   const { _id } = req.user;
-  try {
-    const user = await UserModel.findOneAndUpdate(
-      { _id: _id },
-      {
-        Merchant_Name: req.body.Merchant_Name,
-        Merchant_Address: req.body.Merchant_Address,
-        Merchant_City: req.body.Merchant_City,
-        TypesOf_Bussiness: req.body.TypesOf_Bussiness,
-        SubTypeOf_bussiness: req.body.SubTypeOf_bussiness,
-        Merchant_Designation: req.body.Merchant_Designation,
-        Year_of_establishment: req.body.Year_of_establishment,
-        Merchant_ServiceArea_Pincodes: req.body.Merchant_ServiceArea_Pincodes,
-        GST_No: req.body.GST_No,
-        PAN_No: req.body.PAN_No,
-      },
-      {
-        new: true,
-        upsert: true,
-      }
-    );
-    //Fields
-    res.json({
-      message: "User Updated Sucessfully",
-      user,
-    });
-  } catch (err) {
-    res.json({
-      message: err.message,
-    });
+  const { GST_No, PAN_No } = req.body;
+
+  // Validations
+  const checkGST = await UserModel.findOne({ GST_No: GST_No });
+  const checkPan = await UserModel.findOne({ PAN_No: PAN_No });
+  if (checkGST) {
+    return res.json({ success: false, message: "GST is already exists" });
+  } else if (checkPan) {
+    return res.json({ success: false, message: "PAN is already exists" });
+  } else {
+    try {
+      const user = await UserModel.findOneAndUpdate(
+        { _id: _id },
+        {
+          Merchant_Name: req.body.Merchant_Name,
+          Merchant_Address: req.body.Merchant_Address,
+          Merchant_City: req.body.Merchant_City,
+          TypesOf_Bussiness: req.body.TypesOf_Bussiness,
+          SubTypeOf_bussiness: req.body.SubTypeOf_bussiness,
+          Merchant_Designation: req.body.Merchant_Designation,
+          Year_of_establishment: req.body.Year_of_establishment,
+          Service: req.body.Service,
+          Merchant_ServiceArea_Pincodes: req.body.Merchant_ServiceArea_Pincodes,
+          GST_No: req.body.GST_No,
+          PAN_No: req.body.PAN_No,
+        },
+        {
+          new: true,
+          upsert: true,
+        }
+      );
+      res.json({
+        message: "User Business Details Updated Sucessfully",
+        user,
+        success: true,
+      });
+    } catch (err) {
+      res.json({
+        message: err.message,
+      });
+    }
   }
 });
 
