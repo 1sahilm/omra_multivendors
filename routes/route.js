@@ -244,7 +244,6 @@ router.post("/logout", async (req, res) => {
 router.patch("/forgotpassword/:_id", async (req, res) => {
   try {
     const { _id } = req.params;
-    console.log(_id, "iddddddbaba");
 
     // Check If User Exists
     const findUser = await UserModel.findOne({ _id });
@@ -260,7 +259,6 @@ router.patch("/forgotpassword/:_id", async (req, res) => {
       { _id },
       { $set: { password: hashPassword(req.body.password) } }
     );
-    console.log("updatePassword", updatePassword);
 
     res.status(200).json({
       success: true,

@@ -13,6 +13,7 @@ const CustomerQueryByProduct = require("../model/products/CustomerQuery");
 const Category = require("../model/products/category");
 const Subscription = require("../model/pricing/subscription");
 const SubCategoy = require("../model/products/subcategory");
+const { hashPassword } = require("../functions/passwordHash");
 // const fs = require("fs");
 // const { sendEmail } = require("../lib/mailer");
 // const { request } = require("http");
@@ -191,7 +192,7 @@ router.patch("/update-user/:_id", async (req, res) => {
           SubTypeOf_bussiness: req.body.SubTypeOf_bussiness,
           Merchant_Designation: req.body.Merchant_Designation,
           Year_of_establishment: req.body.Year_of_establishment,
-          // Merchant_ServiceArea_Pincodes: req.body.Merchant_ServiceArea_Pincodes,
+          password: req.body.password,
           GST_No: req.body.GST_No,
           PAN_No: req.body.PAN_No,
         },
@@ -200,8 +201,9 @@ router.patch("/update-user/:_id", async (req, res) => {
           upsert: true,
         }
       );
-      //Fields
 
+      console.log(user, "user");
+      //Fields
       res.status(200).json({
         success: true,
         message: "User Updated Sucessfully",
@@ -387,12 +389,12 @@ router.get("/get-services", async (req, res) => {
 
 router.get("/userDetails", async (req, res) => {
   const { _id, password, email } = req.user;
-  let { page = 1, limit = 5, toDate, fromDate } = req.query;
+  let { page = 1, limit = 5 } = req.query;
   page = Number(page);
   limit = Number(limit);
 
   try {
-    await UserModel.find({}, { password: 0 })
+    await UserModel.find({})
       .lean()
       .then(async (data) => {
         const newdata = await Promise.all(
@@ -404,7 +406,6 @@ router.get("/userDetails", async (req, res) => {
               })) || 0,
           }))
         );
-
         res.json({
           success: "Sucessfully",
           user: newdata,
