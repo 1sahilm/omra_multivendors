@@ -281,7 +281,7 @@ router.patch("/forgotpassword2", async (req, res) => {
       upperCaseAlphabets: false,
       specialChars: false,
     });
-    console.log("otp", otp);
+
     userOtp = otp;
     function Otp(otp) {
       userOtp = otp;
@@ -291,7 +291,6 @@ router.patch("/forgotpassword2", async (req, res) => {
     // Check If User Exists
     const findUser = await UserModel.findOne({ _id }).lean();
     const findUser1 = await UserModel.findOne({ email: email }).lean();
-    console.log("findUser");
 
     if (!findUser1) {
       return res
