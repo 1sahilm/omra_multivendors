@@ -103,6 +103,39 @@ router.get("/searchRoleBasedUser/:key", async (req, res) => {
   }
 });
 
+// Superadmin Listing role based user...
+router.get("/roleBasedUserDetailsPaginate?", async (req, res) => {
+  const { _id, password, email } = req.user;
+  console;
+  let { page = 1, limit = 20, toDate, fromDate } = req.query;
+  page = Number(page);
+  limit = Number(limit);
+  const role = "Manager" || "Executive";
+  console.log("testbaba", req.user);
+
+  try {
+    const user1 = await UserModel.find({ role: "Manager" }, { password: 0 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .sort({ createdAt: -1 })
+      .lean();
+    const user2 = await UserModel.find({ role: "Executive" }, { password: 0 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .sort({ createdAt: -1 })
+      .lean();
+    const user = [...user1, ...user2];
+
+    console.log(user, "hellotestbaba");
+
+    res.json({ success: true, data: user });
+  } catch (err) {
+    res.json({
+      message: err?.message,
+    });
+  }
+});
+
 router.patch("/update-user/:_id", async (req, res) => {
   const _id = req.params;
   const isAdmin = req;

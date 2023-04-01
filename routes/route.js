@@ -67,10 +67,11 @@ router.post("/signup", async (req, res) => {
   } catch (err) {
     res.status(500).json({ success: false, data: err?.message });
   }
-});
+}); 
 
 let userOtp = 0000;
 
+// user login ...
 router.post("/login", async (req, res) => {
   try {
     const { email, password, otp } = req.body;

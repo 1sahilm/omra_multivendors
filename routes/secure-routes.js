@@ -134,44 +134,49 @@ router.patch("/details", async (req, res) => {
   const { GST_No, PAN_No } = req.body;
 
   // Validations
-  const checkGST = await UserModel.findOne({ GST_No: GST_No });
-  const checkPan = await UserModel.findOne({ PAN_No: PAN_No });
-  if (checkGST) {
-    return res.json({ success: false, message: "GST is already exists" });
-  } else if (checkPan) {
-    return res.json({ success: false, message: "PAN is already exists" });
-  } else {
-    try {
-      const user = await UserModel.findOneAndUpdate(
-        { _id: _id },
-        {
-          Merchant_Name: req.body.Merchant_Name,
-          Merchant_Address: req.body.Merchant_Address,
-          Merchant_City: req.body.Merchant_City,
-          TypesOf_Bussiness: req.body.TypesOf_Bussiness,
-          SubTypeOf_bussiness: req.body.SubTypeOf_bussiness,
-          Merchant_Designation: req.body.Merchant_Designation,
-          Year_of_establishment: req.body.Year_of_establishment,
-          Service: req.body.Service,
-          Merchant_ServiceArea_Pincodes: req.body.Merchant_ServiceArea_Pincodes,
-          GST_No: req.body.GST_No,
-          PAN_No: req.body.PAN_No,
-        },
-        {
-          new: true,
-          upsert: true,
-        }
-      );
-      res.json({
-        message: "User Business Details Updated Sucessfully",
-        user,
-        success: true,
-      });
-    } catch (err) {
-      res.json({
-        message: err.message,
-      });
+  if (GST_No) {
+    const checkGST = await UserModel.findOne({ GST_No: GST_No });
+    if (checkGST) {
+      return res.json({ success: false, message: "GST is already exists" });
     }
+  }
+  if (PAN_No) {
+    const checkPan = await UserModel.findOne({ PAN_No: PAN_No });
+    if (checkPan) {
+      return res.json({ success: false, message: "PAN is already exists" });
+    }
+  }
+
+  try {
+    const user = await UserModel.findOneAndUpdate(
+      { _id: _id },
+      {
+        Merchant_Name: req.body.Merchant_Name,
+        Merchant_Address: req.body.Merchant_Address,
+        Merchant_City: req.body.Merchant_City,
+        TypesOf_Bussiness: req.body.TypesOf_Bussiness,
+        SubTypeOf_bussiness: req.body.SubTypeOf_bussiness,
+        Merchant_Designation: req.body.Merchant_Designation,
+        Year_of_establishment: req.body.Year_of_establishment,
+        Service: req.body.Service,
+        Merchant_ServiceArea_Pincodes: req.body.Merchant_ServiceArea_Pincodes,
+        GST_No: GST_No,
+        PAN_No: PAN_No,
+      },
+      {
+        new: true,
+        upsert: true,
+      }
+    );
+    res.json({
+      message: "User Business Details Updated Sucessfully",
+      user,
+      success: true,
+    });
+  } catch (err) {
+    res.json({
+      message: err.message,
+    });
   }
 });
 
@@ -366,50 +371,6 @@ router.get("/userDetails", async (req, res) => {
         res.json({
           success: "Sucessfully",
           user: newdata,
-        });
-      });
-  } catch (err) {
-    res.json({
-      message: err?.message,
-    });
-  }
-});
-// Superadmin Listing role based user...
-router.get("/roleBasedUserDetailsPaginate?", async (req, res) => {
-  const { _id, password, email } = req.user;
-  let { page = 1, limit = 20, toDate, fromDate } = req.query;
-  page = Number(page);
-  limit = Number(limit);
-
-  try {
-    const user = await UserModel.find({}, { password: 0 })
-      .limit(limit * 1)
-      .skip((page - 1) * limit)
-      .sort({ createdAt: -1 })
-      .lean()
-      .then(async (data) => {
-        const newdata = await Promise.all(
-          data.map(async (user) => ({
-            ...user,
-            leadCount:
-              (await CustomerQueryByProduct.countDocuments({
-                merchant_Id: user._id,
-              })) || 0,
-          }))
-        );
-        const totalDocuments = await UserModel.countDocuments({});
-
-        const pages = Math.ceil(totalDocuments / 20);
-
-        res.json({
-          success: true,
-          user: newdata,
-          totalPages: pages,
-          count: totalDocuments,
-          min: limit * page - limit,
-          max: limit * page,
-          currentPage: page,
-          nextPage: page < pages ? page + 1 : null,
         });
       });
   } catch (err) {
