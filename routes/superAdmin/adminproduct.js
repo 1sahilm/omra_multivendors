@@ -17,24 +17,7 @@ router.get("/user-catalog/:_id", async (req, res) => {
 
 // Superadmin create role based user...
 router.post("/create-user", async (req, res) => {
-  const {
-    email,
-    password,
-    mobile_no,
-    Merchant_Name,
-    SubTypeOf_bussiness,
-    TypesOf_Bussiness,
-    Merchant_ServiceArea_Pincodes,
-    Merchant_Designation,
-    Merchant_City,
-    Merchant_Address,
-    Year_of_establishment,
-    GST_No,
-    PAN_No,
-    Service,
-    role,
-    company_Name,
-  } = req.body;
+  const { email, password, mobile_no, Merchant_Name, role } = req.body;
   try {
     if (!Merchant_Name || !mobile_no || !email) {
       return res.status(400).json({ message: "All fields are required" });
@@ -59,18 +42,7 @@ router.post("/create-user", async (req, res) => {
       email: email,
       password: hashPassword(password),
       mobile_no: mobile_no,
-      company_Name: company_Name,
-      TypesOf_Bussiness: TypesOf_Bussiness,
-      SubTypeOf_bussiness: SubTypeOf_bussiness,
       role: role,
-      GST_No: GST_No,
-      PAN_No: PAN_No,
-      Year_of_establishment: Year_of_establishment,
-      Service: Service,
-      Merchant_City: Merchant_City,
-      Merchant_ServiceArea_Pincodes: Merchant_ServiceArea_Pincodes,
-      Merchant_Designation: Merchant_Designation,
-      Merchant_Address: Merchant_Address,
     };
 
     const user = new UserModel(payload);
@@ -110,29 +82,405 @@ router.get("/roleBasedUserDetailsPaginate?", async (req, res) => {
   let { page = 1, limit = 20, toDate, fromDate } = req.query;
   page = Number(page);
   limit = Number(limit);
-  const role = "Manager" || "Executive";
-  console.log("testbaba", req.user);
 
   try {
-    const user1 = await UserModel.find({ role: "Manager" }, { password: 0 })
+    const user = await UserModel.find(
+      { $or: [{ role: "Manager" }, { role: "Executive" }] },
+      { password: 0 }
+    )
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .sort({ createdAt: -1 })
       .lean();
-    const user2 = await UserModel.find({ role: "Executive" }, { password: 0 })
-      .limit(limit * 1)
-      .skip((page - 1) * limit)
-      .sort({ createdAt: -1 })
-      .lean();
-    const user = [...user1, ...user2];
+    const totalDocuments = await UserModel.countDocuments(
+      { $or: [{ role: "Manager" }, { role: "Executive" }] },
+      { password: 0 }
+    );
 
-    console.log(user, "hellotestbaba");
-
-    res.json({ success: true, data: user });
+    const pages = Math.ceil(totalDocuments / 20);
+    res.json({
+      success: true,
+      data: user,
+      totalPages: pages,
+      count: totalDocuments,
+      min: limit * page - limit,
+      max: limit * page,
+      currentPage: page,
+      nextPage: page < pages ? page + 1 : null,
+    });
   } catch (err) {
     res.json({
       message: err?.message,
     });
+  }
+});
+
+// Superadmin get all user services
+router.get("/get-user-services", async (req, res) => {
+  const { _id } = req.user;
+  try {
+    const user = await UserModel.find(
+      { $or: [{ role: "Manager" }, { role: "Executive" }] },
+      { password: 0 }
+    );
+
+    res.json({ success: true, user });
+  } catch (error) {
+    res.json({
+      message: err.message,
+    });
+  }
+});
+
+router.get("/getting-user-services", async (req, res) => {
+  const { _id } = req.user;
+  const _testid = req;
+  try {
+    const user = await UserModel.findOne(
+      { _id },
+      {
+        isDashboardTab: 1,
+        isMerchantTab: 1,
+        isUersTab: 1,
+        isCategoryTab: 1,
+        isSubcategoryTab: 1,
+        isBlogsTab: 1,
+        isListingsTab: 1,
+        isPricingTab: 1,
+        isBannerTab: 1,
+        isLeadsTab: 1,
+      }
+    );
+    // const user = await UserModel.find({ role: "Admin" });
+    //Fields
+    res.json({
+      success: true,
+      data: user,
+    });
+  } catch (err) {
+    res.json({
+      message: err?.message,
+    });
+  }
+});
+
+// Superadmin DashboardTab user services
+router.patch("/dashboardTab-user-services/:_id", async (req, res) => {
+  const { _id } = req.params;
+  const _testid = req;
+
+  const user = await UserModel.findOne({ _id: _id });
+  const dashboardTab = user?.isDashboardTab;
+  if (_testid.user.role == "SuperAdmin") {
+    try {
+      const user = await UserModel.findOneAndUpdate(
+        { _id: _id },
+        {
+          isDashboardTab: !dashboardTab,
+        },
+        {
+          new: true,
+          upsert: true,
+        }
+      );
+      //Fields
+      res.json({
+        message: "User Updated Sucessfully",
+        user,
+      });
+    } catch (err) {
+      res.json({
+        message: err.message,
+      });
+    }
+  }
+});
+
+// Superadmin MerchantTab user services
+router.patch("/merchantTab-user-services/:_id", async (req, res) => {
+  const { _id } = req.params;
+  const _testid = req;
+
+  const user = await UserModel.findOne({ _id: _id });
+  const merchantTab = user?.isMerchantTab;
+  if (_testid.user.role == "SuperAdmin") {
+    try {
+      const user = await UserModel.findOneAndUpdate(
+        { _id: _id },
+        {
+          isMerchantTab: !merchantTab,
+        },
+        {
+          new: true,
+          upsert: true,
+        }
+      );
+      //Fields
+      res.json({
+        message: "User Updated Sucessfully",
+        user,
+      });
+    } catch (err) {
+      res.json({
+        message: err.message,
+      });
+    }
+  }
+});
+
+// Superadmin UserServicesTab user services
+router.patch("/userTab-services/:_id", async (req, res) => {
+  const { _id } = req.params;
+  const _testid = req;
+
+  const user = await UserModel.findOne({ _id: _id });
+  const userTab = user?.isUersTab;
+  if (_testid.user.role == "SuperAdmin") {
+    try {
+      const user = await UserModel.findOneAndUpdate(
+        { _id: _id },
+        {
+          isUersTab: !userTab,
+        },
+        {
+          new: true,
+          upsert: true,
+        }
+      );
+      //Fields
+      res.json({
+        message: "User Updated Sucessfully",
+        user,
+      });
+    } catch (err) {
+      res.json({
+        message: err.message,
+      });
+    }
+  }
+});
+
+// Superadmin CategoryTab user services
+router.patch("/categoryTab-user-services/:_id", async (req, res) => {
+  const { _id } = req.params;
+  const _testid = req;
+
+  const user = await UserModel.findOne({ _id: _id });
+  const categoryTab = user?.isCategoryTab;
+  if (_testid.user.role == "SuperAdmin") {
+    try {
+      const user = await UserModel.findOneAndUpdate(
+        { _id: _id },
+        {
+          isCategoryTab: !categoryTab,
+        },
+        {
+          new: true,
+          upsert: true,
+        }
+      );
+      //Fields
+      res.json({
+        message: "User Updated Sucessfully",
+        user,
+      });
+    } catch (err) {
+      res.json({
+        message: err.message,
+      });
+    }
+  }
+});
+
+// Superadmin SubcategoryTab user services
+router.patch("/subcategoryTab-user-services/:_id", async (req, res) => {
+  const { _id } = req.params;
+  const _testid = req;
+
+  const user = await UserModel.findOne({ _id: _id });
+  const subcategoryTab = user?.isSubcategoryTab;
+  if (_testid.user.role == "SuperAdmin") {
+    try {
+      const user = await UserModel.findOneAndUpdate(
+        { _id: _id },
+        {
+          isSubcategoryTab: !subcategoryTab,
+        },
+        {
+          new: true,
+          upsert: true,
+        }
+      );
+      //Fields
+      res.json({
+        message: "User Updated Sucessfully",
+        user,
+      });
+    } catch (err) {
+      res.json({
+        message: err.message,
+      });
+    }
+  }
+});
+
+// Superadmin BlogsTab user services
+router.patch("/blogsTab-user-services/:_id", async (req, res) => {
+  const { _id } = req.params;
+  const _testid = req;
+
+  const user = await UserModel.findOne({ _id: _id });
+  const blogsTab = user?.isBlogsTab;
+  if (_testid.user.role == "SuperAdmin") {
+    try {
+      const user = await UserModel.findOneAndUpdate(
+        { _id: _id },
+        {
+          isBlogsTab: !blogsTab,
+        },
+        {
+          new: true,
+          upsert: true,
+        }
+      );
+      //Fields
+      res.json({
+        message: "User Updated Sucessfully",
+        user,
+      });
+    } catch (err) {
+      res.json({
+        message: err.message,
+      });
+    }
+  }
+});
+
+// Superadmin ListingsTab user services
+router.patch("/listingTab-user-services/:_id", async (req, res) => {
+  const { _id } = req.params;
+  const _testid = req;
+
+  const user = await UserModel.findOne({ _id: _id });
+  const listingTab = user?.isListingsTab;
+  if (_testid.user.role == "SuperAdmin") {
+    try {
+      const user = await UserModel.findOneAndUpdate(
+        { _id: _id },
+        {
+          isListingsTab: !listingTab,
+        },
+        {
+          new: true,
+          upsert: true,
+        }
+      );
+      //Fields
+      res.json({
+        message: "User Updated Sucessfully",
+        user,
+      });
+    } catch (err) {
+      res.json({
+        message: err.message,
+      });
+    }
+  }
+});
+
+// Superadmin PricingTab user services
+router.patch("/pricingTab-user-services/:_id", async (req, res) => {
+  const { _id } = req.params;
+  const _testid = req;
+
+  const user = await UserModel.findOne({ _id: _id });
+  const pricingTab = user?.isPricingTab;
+  if (_testid.user.role == "SuperAdmin") {
+    try {
+      const user = await UserModel.findOneAndUpdate(
+        { _id: _id },
+        {
+          isPricingTab: !pricingTab,
+        },
+        {
+          new: true,
+          upsert: true,
+        }
+      );
+      //Fields
+      res.json({
+        message: "User Updated Sucessfully",
+        user,
+      });
+    } catch (err) {
+      res.json({
+        message: err.message,
+      });
+    }
+  }
+});
+
+// Superadmin BannerTab user services
+router.patch("/bannerTab-user-services/:_id", async (req, res) => {
+  const { _id } = req.params;
+  const _testid = req;
+
+  const user = await UserModel.findOne({ _id: _id });
+  const bannerTab = user?.isBannerTab;
+  if (_testid.user.role == "SuperAdmin") {
+    try {
+      const user = await UserModel.findOneAndUpdate(
+        { _id: _id },
+        {
+          isBannerTab: !bannerTab,
+        },
+        {
+          new: true,
+          upsert: true,
+        }
+      );
+      //Fields
+      res.json({
+        message: "User Updated Sucessfully",
+        user,
+      });
+    } catch (err) {
+      res.json({
+        message: err.message,
+      });
+    }
+  }
+});
+
+// Superadmin LeadsTab user services
+router.patch("/leadsTab-user-services/:_id", async (req, res) => {
+  const { _id } = req.params;
+  const _testid = req;
+
+  const user = await UserModel.findOne({ _id: _id });
+  const leadsTab = user?.isLeadsTab;
+  if (_testid.user.role == "SuperAdmin") {
+    try {
+      const user = await UserModel.findOneAndUpdate(
+        { _id: _id },
+        {
+          isLeadsTab: !leadsTab,
+        },
+        {
+          new: true,
+          upsert: true,
+        }
+      );
+      //Fields
+      res.json({
+        message: "User Updated Sucessfully",
+        user,
+      });
+    } catch (err) {
+      res.json({
+        message: err.message,
+      });
+    }
   }
 });
 

@@ -67,7 +67,7 @@ router.post("/signup", async (req, res) => {
   } catch (err) {
     res.status(500).json({ success: false, data: err?.message });
   }
-}); 
+});
 
 let userOtp = 0000;
 

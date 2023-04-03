@@ -124,6 +124,62 @@ const UserSchema = new Schema(
       required: false,
       default: false,
     },
+
+    isDashboardTab: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    isMerchantTab: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    isUersTab: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    isServiceTab: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    isCategoryTab: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    isSubcategoryTab: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    isBlogsTab: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    isListingsTab: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    isPricingTab: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    isBannerTab: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    isLeadsTab: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   { timestamps: true }
 );
