@@ -65,6 +65,7 @@ router.get("/searchRoleBasedUser/:key", async (req, res) => {
         { Merchant_Name: { $regex: req.params.key, $options: "$i" } },
         { mobile_no: { $regex: req.params.key, $options: "$i" } },
         { email: { $regex: req.params.key, $options: "$i" } },
+        // { role: { $regex: req.params.key, $options: "$i" } },
       ],
     })
       .sort({ createdAt: -1 })
@@ -165,6 +166,8 @@ router.get("/getting-user-services", async (req, res) => {
 });
 
 // Superadmin DashboardTab user services
+
+// dashboard-tab-user-services/:id
 router.patch("/dashboardTab-user-services/:_id", async (req, res) => {
   const { _id } = req.params;
   const _testid = req;

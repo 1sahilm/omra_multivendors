@@ -336,8 +336,8 @@ router.get("/get-services", async (req, res) => {
       { isUpload: 1, isCall: 1, isEmail: 1, isLead: 1 }
     );
     // const user = await UserModel.find({ role: "Admin" });
-    //Fields
 
+    //Fields
     res.json({
       success: true,
       data: user,
@@ -485,7 +485,7 @@ router.get("/userActivity", async (req, res) => {
     //Fields
 
     res.json({
-      success: "Sucessfully",
+      success: "Successfully",
       user,
     });
   } catch (err) {

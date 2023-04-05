@@ -45,7 +45,6 @@ const UserSchema = new Schema(
       type: Array,
       required: false,
     },
-
     TypesOf_Bussiness: {
       type: String,
       required: false,
@@ -58,7 +57,6 @@ const UserSchema = new Schema(
       type: String,
       required: false,
     },
-
     Year_of_establishment: {
       type: String,
       required: false,
