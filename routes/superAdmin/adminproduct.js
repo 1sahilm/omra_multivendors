@@ -133,38 +133,6 @@ router.get("/get-user-services", async (req, res) => {
   }
 });
 
-router.get("/getting-user-services", async (req, res) => {
-  const { _id } = req.user;
-  const _testid = req;
-  try {
-    const user = await UserModel.findOne(
-      { _id },
-      {
-        isDashboardTab: 1,
-        isMerchantTab: 1,
-        isUersTab: 1,
-        isCategoryTab: 1,
-        isSubcategoryTab: 1,
-        isBlogsTab: 1,
-        isListingsTab: 1,
-        isPricingTab: 1,
-        isBannerTab: 1,
-        isLeadsTab: 1,
-      }
-    );
-    // const user = await UserModel.find({ role: "Admin" });
-    //Fields
-    res.json({
-      success: true,
-      data: user,
-    });
-  } catch (err) {
-    res.json({
-      message: err?.message,
-    });
-  }
-});
-
 // Superadmin DashboardTab user services
 
 // dashboard-tab-user-services/:id
@@ -629,7 +597,7 @@ router.get("/approvedProductPaginate?", async (req, res) => {
   ];
   try {
     const user = await Product.find({ isApproved: true })
-      // .populate(populateQuery)
+      .populate(populateQuery)
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .sort({ createdAt: -1 });

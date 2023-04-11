@@ -180,6 +180,40 @@ router.patch("/details", async (req, res) => {
   }
 });
 
+router.get("/getting-user-services", async (req, res) => {
+  const { _id } = req.user;
+  const _testid = req;
+  console.log(req.user, "userRole");
+  try {
+    const user = await UserModel.findOne(
+      { $or: [{ role: "Manager" }, { role: "Executive" }] },
+      {
+        isDashboardTab: 1,
+        isMerchantTab: 1,
+        isUersTab: 1,
+        isCategoryTab: 1,
+        isSubcategoryTab: 1,
+        isBlogsTab: 1,
+        isListingsTab: 1,
+        isPricingTab: 1,
+        isBannerTab: 1,
+        isLeadsTab: 1,
+      }
+    );
+    console.log("user", user);
+    // const user = await UserModel.find({ role: "Admin" });
+    //Fields
+    res.json({
+      success: true,
+      data: user,
+    });
+  } catch (err) {
+    res.json({
+      message: err?.message,
+    });
+  }
+});
+
 router.get("/details", async (req, res) => {
   const { _id } = req.user;
 
@@ -931,6 +965,43 @@ router.get("/get_products", async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 });
+
+router.get("/get_approved_products", async (req, res) => {
+  const { _id } = req.user;
+  console.log(req.user);
+
+  const populateQuery = [
+    {
+      path: "category",
+      model: Category,
+      select: { category_name: 1 },
+    },
+    {
+      path: "sub_category",
+      model: SubCategoy,
+      select: { sub_category_name: 1 },
+    },
+  ];
+
+  try {
+    const product1 = await Product.find({
+      auther_Id: _id,
+
+      isApproved: true,
+    })
+      .populate(populateQuery)
+      .sort({
+        createdAt: -1,
+      });
+    const userData = await UserModel.find({}, { _id: 1, isActive: 1 });
+    const product = { ...product1, ...userData };
+    console.log(product1, "testdara");
+    res.status(200).json(product1);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
+
 router.get("/getproductForApproval", async (req, res) => {
   const populateQuery = [
     {
