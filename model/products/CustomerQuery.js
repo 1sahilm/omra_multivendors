@@ -35,6 +35,10 @@ const CustomerQurySchema = new Schema(
       type: String,
       required: false,
     },
+    isDoneReason: {
+      type: String,
+      required: false,
+    },
   },
 
   {

@@ -66,21 +66,16 @@ const isManagerOrExecutive = async (req, res, next) => {
   const authToken = req.headers["authorization"]?.split(" ")[1];
   const cookieToken = req?.cookies?.access_token;
   let token = "";
-
   if (cookieToken) {
     token = cookieToken;
   } else {
     token = authToken;
   }
-
   if (token) {
     try {
       const decoded = await jwt.verify(token, "TOP_SECRET");
       req.user = decoded.user;
-      console.log("hellobaba", req.user);
-
       if (req.user.role === "Manager" || req.user.role === "Executive") {
-        console.log("kahahggfgf");
         next();
       }
     } catch (err) {

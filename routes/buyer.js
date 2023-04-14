@@ -40,24 +40,26 @@ router.post(
 
 router.patch("/leads_update/:_id", async (req, res) => {
   const { _id } = req.params;
+  console.log("hellobabba", _id);
 
-  const { isCompleted, isDeclined } = req.body;
+  const { isCompleted, isDoneReason } = req.body;
   try {
-    const updateQuery = await CustomerQueryByProduct.findByIdAndUpdate(
-      _id,
+    const updateQuery = await CustomerQueryByProduct.findOneAndUpdate(
+      { _id: _id },
       {
         isCompleted: isCompleted,
-        // isDeclined:isDeclined
+        isDoneReason: isDoneReason,
       },
       {
         new: true,
         upsert: true,
       }
     );
+    console.log({ updateQuery }, "leads update");
     res.json({
       message: "updated Successfull",
       success: true,
-      data: updateQuery,
+      updateQuery,
     });
   } catch (err) {
     res.json({
@@ -68,36 +70,36 @@ router.patch("/leads_update/:_id", async (req, res) => {
 
 router.patch("/declined_lead/:_id", async (req, res) => {
   const { _id } = req.params;
+  console.log("declined lead", _id);
+  const { isDeclined, isDoneReason } = req.body;
 
   try {
-    // const updateQuery= await CustomerQueryByProduct.updateOne(
-    //   {_id},
-    //   {
+    const updateQuery = await CustomerQueryByProduct.updateOne(
+      { _id },
+      {
+        isDeclined: isDeclined,
+        isDoneReason: isDoneReason,
+      },
+      {
+        new: true,
+        upsert: true,
+      }
+    );
+    console.log({ updateQuery }, "declined update query");
+    res.json({
+      message: "Updated Successfully",
+      success: true,
+      updateQuery,
+    });
 
-    //     isDeclined:isDeclined
+    // if (!mongoose.Types.ObjectId.isValid(_id))
+    //   return res.status(404).send("No post Available");
 
-    //   },
-    //   {
-    //     new:true,
-    //     upsert:true
-    //   }
+    // const product = await CustomerQueryByProduct.findOne({ _id });
+    // product.isDeclined = req.body.isDeclined;
 
-    // )
-    // res.json({
-    //   message:"updated Successfull",
-    //   success:true,
-    //   updateQuery
-
-    // })
-
-    if (!mongoose.Types.ObjectId.isValid(_id))
-      return res.status(404).send("No post Available");
-
-    const product = await CustomerQueryByProduct.findOne({ _id });
-    product.isDeclined = req.body.isDeclined;
-
-    await product.save();
-    res.status(200).send(product);
+    // await product.save();
+    // res.status(200).send(product);
   } catch (err) {
     res.json({
       message: err?.message,
@@ -111,7 +113,7 @@ router.get("/getbuyerQuery", async (req, res) => {
       createdAt: -1,
     });
 
-    res.status(200).json(buyerQuery);
+    res.status(200).json({ buyerQuery });
   } catch (error) {
     res.status(404).json({ message: error.message });
   }

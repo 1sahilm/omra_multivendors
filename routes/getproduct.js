@@ -588,21 +588,28 @@ router.get("/homepageSearch/:key", async (req, res) => {
   ];
   try {
     const catData = await Category.find({
-      $or: [{ category_name: { $regex: req.params.key, $options: "$i" } }],
+      $or: [{ category_name: { $regex: req.params.key } }],
     }).limit(5);
+
+    // console.log({ catData }, "locatdadaacl");
 
     const data = await Product.find({
       // $text: {
       //   $search: req.params.key.toString(),
       // },
+      //{ $regex: req.params.key, $options: "$i" } }
 
       $or: [
-        { brand: { $regex: req.params.key, $options: "$i" } },
-        { product_name: { $regex: req.params.key, $options: "$i" } },
+        // { category: { $regex: req.params.key, $options: "$i" } },
+        // {sub_category:await SubCategoy.find({$or:[{sub_category_name:{$regex:req.params.key,$options:"$i"}}]})._id} ,
+        // { sub_category: { $regex: req.params.key, $options: "$i" } },
+        { brand: { $regex: req.params.key } },
+        { product_name: { $regex: req.params.key } },
       ],
       isActive: true,
       isApproved: true,
     })
+
       .populate(populateQuery)
       .limit(5);
 
@@ -611,9 +618,10 @@ router.get("/homepageSearch/:key", async (req, res) => {
     console.log(arrayData, "bycategoryyyy");
     res.json(arrayData);
   } catch (error) {
-    res.json(404);
+    res.json(error.message);
   }
 });
+
 // ====================== User Search in SuperAdmin Panel============//
 router.get("/searchUser/:key", async (req, res) => {
   try {
