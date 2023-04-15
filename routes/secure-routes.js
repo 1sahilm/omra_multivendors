@@ -995,7 +995,6 @@ router.get("/get_approved_products", async (req, res) => {
       });
     const userData = await UserModel.find({}, { _id: 1, isActive: 1 });
     const product = { ...product1, ...userData };
-    console.log(product1, "testdara");
     res.status(200).json(product1);
   } catch (error) {
     res.status(404).json({ message: error.message });

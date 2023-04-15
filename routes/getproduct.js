@@ -614,8 +614,7 @@ router.get("/homepageSearch/:key", async (req, res) => {
       .limit(5);
 
     const arrayData = [...data, ...catData];
-
-    console.log(arrayData, "bycategoryyyy");
+    // console.log(arrayData, "bycategoryyyy");
     res.json(arrayData);
   } catch (error) {
     res.json(error.message);
