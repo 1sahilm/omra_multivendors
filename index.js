@@ -97,7 +97,7 @@ app.post("/api/test-mail", (req, res) => {
       // email:"kmryvamit78@gmail.com"
     });
 
-    res.status(200).json(mail);
+    res.status(200).json({ mail });
   } catch (error) {
     res.send(error?.message);
   }

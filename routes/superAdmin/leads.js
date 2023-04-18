@@ -288,9 +288,9 @@ router.get("/email-enquiry-by-search/:key", async (req, res) => {
   try {
     const data = await CustomerQueryByProduct.find({
       $or: [
-        { buyer_Mob: { $regex: query, $options: "$i" } },
-        { buyer_Email: { $regex: query, $options: "$i" } },
-        { product_name: { $regex: query, $options: "$i" } },
+        { buyer_Mob: { $regex: query } },
+        { buyer_Email: { $regex: query } },
+        { product_name: { $regex: query } },
       ],
       type: "Email Query",
     });

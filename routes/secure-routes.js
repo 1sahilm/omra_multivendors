@@ -1,24 +1,18 @@
 const express = require("express");
-const { default: mongoose } = require("mongoose");
+const { default: mongoose, isValidObjectId } = require("mongoose");
 const router = express.Router();
 const UserModel = require("../model/model");
-
 const Product = require("../model/products/product");
 const ProductProfile = require("../model/products/product_profile");
 const path = require("path");
-// const sharp = require("sharp");
 const multer = require("multer");
 const slugify = require("slugify");
 const CustomerQueryByProduct = require("../model/products/CustomerQuery");
 const Category = require("../model/products/category");
 const Subscription = require("../model/pricing/subscription");
 const SubCategoy = require("../model/products/subcategory");
-const { hashPassword } = require("../functions/passwordHash");
-// const fs = require("fs");
-// const { sendEmail } = require("../lib/mailer");
-// const { request } = require("http");
-
-//=====================================================
+const Template = require("../model/sms-services/add-template");
+isValidObjectId;
 
 const imageStorage = multer.diskStorage({
   // Destination to store image
@@ -764,7 +758,7 @@ router.post(
           // res.status(200).send(product);
           res.status(200).json({
             success: true,
-            message: "product has been uploaded Sucessfully",
+            message: "Product has been uploaded Sucessfully",
             product,
           });
         } catch (err) {
@@ -897,7 +891,6 @@ router.patch(
             req.files.product_image5?.length > 0
               ? `${process.env.BASE_URL}/product-image/${req.files.product_image5[0].filename}`
               : undefined,
-
           // product_image2: req.files.product_image2[0].filename,
           // videos: videos,
           category: category,
@@ -914,7 +907,6 @@ router.patch(
           made_in: made_in,
           source: source,
           source_type: source_type,
-
           model_no: model_no,
           type: type,
         },
@@ -1264,7 +1256,6 @@ router.get("/getbuyerQueryfor", async (req, res) => {
 
 router.post("/company_profile", async (req, res) => {
   const { user } = req;
-
   const userData = await ProductProfile.findOne(
     { _id: user.id },
     { GST_No: 1, Merchant_Name: 1 }
@@ -1295,4 +1286,112 @@ router.get("/get_invoice", async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 });
+
+// Message - Template
+router.post("/add_template", async (req, res) => {
+  try {
+    const { template_name, template, dltTemplateId, telemarketerId } = req.body;
+    if (!template_name || !template || !dltTemplateId || !telemarketerId) {
+      res
+        .status(400)
+        .json({ success: false, message: "All fields are required" });
+    }
+
+    // Validation
+    const name = await Template.findOne({ template_name });
+    if (name) {
+      res
+        .status(400)
+        .json({ success: false, message: "Template name is already exists." });
+    }
+
+    const templateModel = new Template({
+      template_name,
+      template,
+      dltTemplateId,
+      telemarketerId,
+    });
+
+    await templateModel.save();
+    res.status(200).json({
+      success: true,
+      message: "Template Added Successfully.",
+      templateModel,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error?.message });
+  }
+});
+
+// Message - All Templates
+router.get("/template", async (req, res) => {
+  try {
+    const template = await Template.find();
+    res.status(200).json(template);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+});
+
+router.get("/template/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const template = await Template.findById(id);
+    res.status(200).json(template);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+});
+
+// Message - Delete Template
+router.delete("/template/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log("id", id);
+    if (!id || !isValidObjectId(id)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid Id provided" });
+    }
+    const data = await Template.findByIdAndDelete(id);
+    res.status(200).json({
+      success: true,
+      message: "Template Deleted Successfully.",
+      data,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+//Message - Update Template
+router.put("/template/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id || !isValidObjectId(id)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid Id provided" });
+    }
+
+    const updateTemplate = await Template.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { new: true }
+    );
+
+    res.status(200).send({
+      success: true,
+      message: "Template Updated Successfully.",
+      updateTemplate,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;

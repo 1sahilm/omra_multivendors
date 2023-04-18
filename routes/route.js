@@ -324,8 +324,9 @@ router.post("/send-mail", async (req, res) => {
   console.log("userdata", description, phoneNumber, email, merchantId, type);
   const merchant = await UserModel.findOne(
     { _id: merchantId },
-    { Merchant_Name: 1 }
+    { Merchant_Name: 1, email: 1 }
   );
+  console.log("Merchant: ", { merchant });
 
   if (!merchant) {
     return res
@@ -336,15 +337,15 @@ router.post("/send-mail", async (req, res) => {
   try {
     await sendEmail({
       merchantEmail: merchant.email,
-      merchantId: merchantId,
+      merchantId: merchant._id,
       // merchantName:merchant?.Merchant_Name,
-      email,
+      email: merchant.email,
       merchantName: merchant?.Merchant_Name,
       price,
-      invoice_Id,
-      phoneNumber,
-      description,
-      type,
+      invoice_Id: invoice_Id,
+      phoneNumber: phoneNumber,
+      description: description,
+      type: type,
     });
     res.status(200).json({ message: "email sent successfully", success: true });
   } catch (error) {
@@ -359,10 +360,16 @@ router.post("/send-mail-contact-us", async (req, res) => {
   const merchantbyEmail = await UserModel.findOne({ email: email });
   const merchantbymobile = await UserModel.findOne({ mobile_no: phoneNumber });
 
-  console.log("testdata", merchantbyEmail, email, phoneNumber);
+  console.log(
+    "testdata",
+    merchantbyEmail,
+    email,
+    phoneNumber,
+    merchantbymobile
+  );
 
   try {
-    await sendEmail({
+    const demo = await sendEmail({
       name,
       businessName,
       merchantEmail: email,
@@ -371,6 +378,7 @@ router.post("/send-mail-contact-us", async (req, res) => {
       phoneNumber,
       description,
     });
+    console.log("send email: ", { demo });
     res.status(200).json({ message: "email sent successfully", success: true });
   } catch (error) {
     res.status(500).json({ message: error?.message, success: false });
@@ -402,7 +410,7 @@ router.post("/send-sms", async (req, res) => {
   }
   Otp(otp);
 
-  const url1 = "https://marketplace.elaundry.co.in/";
+  // const url1 = "https://marketplace.elaundry.co.in/";
 
   SendSMS({
     vendors_name: vendors_name,

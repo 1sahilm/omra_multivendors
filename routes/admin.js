@@ -17,6 +17,7 @@ router.post("/connect_to_buy", async (req, res) => {
       type: req.body.type,
     });
     const CountDocuments = product.CountDocuments;
+    console.log("count documents: ", CountDocuments);
 
     res.status(200).send(product);
   } catch (err) {

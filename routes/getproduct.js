@@ -626,14 +626,15 @@ router.get("/searchUser/:key", async (req, res) => {
   try {
     const data = await UserModel.find({
       $or: [
-        { Merchant_Name: { $regex: req.params.key, $options: "$i" } },
-        { GST_No: { $regex: req.params.key, $options: "$i" } },
-        { Merchant_Address: { $regex: req.params.key, $options: "$i" } },
-        { company_Name: { $regex: req.params.key, $options: "$i" } },
+        { Merchant_Name: { $regex: req.params.key } },
+        { GST_No: { $regex: req.params.key } },
+        { Merchant_Address: { $regex: req.params.key } },
+        { company_Name: { $regex: req.params.key } },
       ],
     })
       .sort({ createdAt: -1 })
       .limit(20);
+    console.log("data: ", data);
     res.json(data);
   } catch (error) {
     res.json(404);
