@@ -62,10 +62,10 @@ router.get("/searchRoleBasedUser/:key", async (req, res) => {
   try {
     const data = await UserModel.find({
       $or: [
-        { Merchant_Name: { $regex: req.params.key, $options: "$i" } },
-        { mobile_no: { $regex: req.params.key, $options: "$i" } },
-        { email: { $regex: req.params.key, $options: "$i" } },
-        // { role: { $regex: req.params.key, $options: "$i" } },
+        { Merchant_Name: { $regex: req.params.key } },
+        { mobile_no: { $regex: req.params.key } },
+        { email: { $regex: req.params.key } },
+        // { role: { $regex: req.params.key} },
       ],
     })
       .sort({ createdAt: -1 })

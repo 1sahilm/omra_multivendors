@@ -354,6 +354,38 @@ router.patch("/activate-leads-Service/:_id", async (req, res) => {
   }
 });
 
+// SMS Center Service
+router.patch("/activate-sms-service/:_id", async (req, res) => {
+  const { _id } = req.params;
+  const _testid = req;
+
+  const user = await UserModel.findOne({ _id: _id });
+  const isSMS_serive = user?.isSMS;
+  if (_testid.user.role == "SuperAdmin") {
+    try {
+      const user = await UserModel.findOneAndUpdate(
+        { _id: _id },
+        {
+          isSMS: !isSMS_serive,
+        },
+        {
+          new: true,
+          upsert: true,
+        }
+      );
+      //Fields
+      res.json({
+        message: "User Updated Sucessfully",
+        user,
+      });
+    } catch (err) {
+      res.json({
+        message: err.message,
+      });
+    }
+  }
+});
+
 router.get("/get-services", async (req, res) => {
   const { _id } = req.user;
   const _testid = req;
@@ -361,9 +393,10 @@ router.get("/get-services", async (req, res) => {
   try {
     const user = await UserModel.findOne(
       { _id },
-      { isUpload: 1, isCall: 1, isEmail: 1, isLead: 1 }
+      { isUpload: 1, isCall: 1, isEmail: 1, isLead: 1, isSMS: 1 }
     );
     // const user = await UserModel.find({ role: "Admin" });
+    console.log("User data after update: ", { user });
 
     //Fields
     res.json({

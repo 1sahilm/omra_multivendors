@@ -120,7 +120,11 @@ const UserSchema = new Schema(
       required: false,
       default: false,
     },
-
+    isSMS: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     isDashboardTab: {
       type: Boolean,
       required: false,
