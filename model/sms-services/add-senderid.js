@@ -1,25 +1,21 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const AddTemplate = new Schema(
+const AddSenderId = new Schema(
   {
-    template_name: {
+    sender_id: {
       type: String,
       required: false,
     },
-    template: {
+    type: {
       type: String,
       required: false,
     },
-    dltTemplateId: {
+    purpose: {
       type: String,
       required: false,
     },
-    telemarketerId: {
-      type: String,
-      required: false,
-    },
-    isApproved: {
+    dlt_peid: {
       type: String,
       required: false,
     },
@@ -27,5 +23,5 @@ const AddTemplate = new Schema(
   { timestamps: true }
 );
 
-const templateModel = mongoose.model("Template", AddTemplate);
-module.exports = templateModel;
+const senderModel = mongoose.model("Sender", AddSenderId);
+module.exports = senderModel;

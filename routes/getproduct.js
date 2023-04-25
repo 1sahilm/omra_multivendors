@@ -634,7 +634,6 @@ router.get("/searchUser/:key", async (req, res) => {
     })
       .sort({ createdAt: -1 })
       .limit(20);
-    console.log("data: ", data);
     res.json(data);
   } catch (error) {
     res.json(404);

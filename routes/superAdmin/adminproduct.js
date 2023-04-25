@@ -79,7 +79,6 @@ router.get("/searchRoleBasedUser/:key", async (req, res) => {
 // Superadmin Listing role based user...
 router.get("/roleBasedUserDetailsPaginate?", async (req, res) => {
   const { _id, password, email } = req.user;
-  console;
   let { page = 1, limit = 20, toDate, fromDate } = req.query;
   page = Number(page);
   limit = Number(limit);

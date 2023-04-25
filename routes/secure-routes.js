@@ -12,6 +12,7 @@ const Category = require("../model/products/category");
 const Subscription = require("../model/pricing/subscription");
 const SubCategoy = require("../model/products/subcategory");
 const Template = require("../model/sms-services/add-template");
+const Sender = require("../model/sms-services/add-senderid");
 isValidObjectId;
 
 const imageStorage = multer.diskStorage({
@@ -177,7 +178,7 @@ router.patch("/details", async (req, res) => {
 router.get("/getting-user-services", async (req, res) => {
   const { _id } = req.user;
   const _testid = req;
-  console.log(req.user, "userRole");
+
   try {
     const user = await UserModel.findOne(
       { $or: [{ role: "Manager" }, { role: "Executive" }] },
@@ -194,7 +195,7 @@ router.get("/getting-user-services", async (req, res) => {
         isLeadsTab: 1,
       }
     );
-    console.log("user", user);
+
     // const user = await UserModel.find({ role: "Admin" });
     //Fields
     res.json({
@@ -396,8 +397,6 @@ router.get("/get-services", async (req, res) => {
       { isUpload: 1, isCall: 1, isEmail: 1, isLead: 1, isSMS: 1 }
     );
     // const user = await UserModel.find({ role: "Admin" });
-    console.log("User data after update: ", { user });
-
     //Fields
     res.json({
       success: true,
@@ -688,7 +687,7 @@ router.post(
         });
       } else {
         let slugString = "";
-        console.log("slugString");
+
         function getRndInteger(min, max) {
           slugNumber = Math.floor(Math.random() * (max - min + 1)) + min;
           slugString = slugNumber.toString();
@@ -993,7 +992,6 @@ router.get("/get_products", async (req, res) => {
 
 router.get("/get_approved_products", async (req, res) => {
   const { _id } = req.user;
-  console.log(req.user);
 
   const populateQuery = [
     {
@@ -1320,6 +1318,108 @@ router.get("/get_invoice", async (req, res) => {
   }
 });
 
+// Message - Add SenderId
+router.post("/add_senderid", async (req, res) => {
+  try {
+    const { sender_id, type, purpose, dlt_peid } = req.body;
+
+    if (!sender_id || !purpose || !dlt_peid) {
+      res
+        .status(400)
+        .json({ success: false, message: "All fields are required" });
+    }
+    // const duplicate_dlt_peid = await Sender.findOne({ dlt_peid });
+    // if (duplicate_dlt_peid) {
+    //   res
+    //     .status(400)
+    //     .json({ success: false, message: "DLT PEID is already exists." });
+    // }
+
+    const senderModel = new Sender({
+      sender_id,
+      type,
+      purpose,
+      dlt_peid,
+    });
+
+    await senderModel.save();
+    res.status(200).json({
+      success: true,
+      message: "SenderId Added Successfully.",
+      senderModel,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error?.message });
+  }
+});
+
+// Message - All Senders
+router.get("/sender", async (req, res) => {
+  try {
+    const sender = await Sender.find();
+    res.status(200).json(sender);
+  } catch (error) {
+    res.status(500).json({ message: message.error });
+  }
+});
+
+// Message - Sender by id
+router.get("/sender/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const sender = await Sender.findById(id);
+    res.status(200).json(sender);
+  } catch (error) {
+    res.status(500).json({ message: message.error });
+  }
+});
+
+router.put("/sender/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id || !isValidObjectId(id)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid Id provided" });
+    }
+
+    const updateSender = await Sender.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { new: true }
+    );
+
+    res.status(200).send({
+      success: true,
+      message: "Sender Updated Successfully.",
+      updateSender,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Message - Sender delete
+router.delete("/sender/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id || !isValidObjectId(id)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid Id provided" });
+    }
+    const data = await Sender.findByIdAndDelete(id);
+    res.status(200).json({
+      success: true,
+      message: "Sender Deleted Successfully.",
+      data,
+    });
+  } catch (error) {
+    res.status(500).json({ message: message.error });
+  }
+});
+
 // Message - Template
 router.post("/add_template", async (req, res) => {
   try {
@@ -1343,6 +1443,7 @@ router.post("/add_template", async (req, res) => {
       template,
       dltTemplateId,
       telemarketerId,
+      isApproved: "Approved",
     });
 
     await templateModel.save();
@@ -1384,7 +1485,7 @@ router.get("/template/:id", async (req, res) => {
 router.delete("/template/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    console.log("id", id);
+
     if (!id || !isValidObjectId(id)) {
       return res
         .status(400)
