@@ -188,6 +188,7 @@ router.post("/adminlogin", async (req, res) => {
     res.cookie("access_token", token, { maxAge: 1000 * 60 * 60 * 24 * 7 });
 
     if (userOtp == otp) {
+      console.log("Line no 191: ", userOtp == otp);
       return res.status(200).json({
         user: JWTPayload,
         token,
@@ -195,10 +196,9 @@ router.post("/adminlogin", async (req, res) => {
         success: true,
       });
     }
-    res.json({
-      success: false,
-      message: "You have Entered wrong OTP",
-    });
+    res
+      .status(400)
+      .json({ success: false, message: "You have entered wrong otp" });
   } catch (error) {
     res.status(500).json(error);
   }
