@@ -1528,4 +1528,9 @@ router.put("/template/:id", async (req, res) => {
   }
 });
 
+//Compose message
+router.post("/compose_message", async(req, res) => {
+res.status(200).json({success:true, message: "Compose message successfully.."})
+})
+
 module.exports = router;
