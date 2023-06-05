@@ -9,7 +9,9 @@ const axios = require("axios");
 const { hashPassword, comparePassword } = require("../functions/passwordHash");
 const SendmailTransport = require("nodemailer/lib/sendmail-transport");
 const SendSMS = require("../lib/sms");
-const { default: ComposeMessage } = require("../lib/compose-Message");
+const { default: ComposeSms } = require("../lib/compose-Message");
+
+// const { default: ComposeMessage } = require("../lib/compose-Message");
 
 require("dotenv").config();
 
@@ -412,7 +414,7 @@ router.post("/send-sms", async (req, res) => {
   Otp(otp);
 
   // const url1 = "https://marketplace.elaundry.co.in/";
-  ComposeMessage();
+  // ComposeMessage();
 
   SendSMS({
     vendors_name: vendors_name,
@@ -426,18 +428,34 @@ router.post("/send-sms", async (req, res) => {
   });
 });
 
-
-
 // way 1 for APIIntegration //
 
-router.post("/callingApi", async (req, res) => {
-  const { Agent_Mob_No, buyer_Mob } = req.body;
-  // try {
-  const callingApi = await axios.get(
-    `http://obd1.nexgplatforms.com/ClickToCallApi?ApiKey=a1fee4a676cd6366100bbaf37cccc0c3&CampaignId=62&ConnectedTo=${Agent_Mob_No}&CalledNum=${buyer_Mob}&disableAgentCheck=1`
-  );
-  console.log("callingApi", callingApi?.data);
-  res.status(200).json({ success: true, data: callingApi?.data });
+router.post("/compose_message", async (req, res) => {
+  const {
+    message_channel,
+    message_route,
+    sender_id,
+    campaign_name,
+    message_text,
+    number,
+  } = req.body;
+    
+
+
+  try{
+     await ComposeSms({
+    message_channel: message_channel,
+    message_route: message_route,
+    sender_id: sender_id,
+    campaign_name: campaign_name,
+    message_text: message_text,
+    number: number,
+  });
+  res.status(200).json({ message: "composed msg sent successfully", success: true });
+  }
+ catch(error){
+  res.status(500).json({ message: error?.message, success: false })
+ }
 });
 
 module.exports = router;

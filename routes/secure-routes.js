@@ -13,6 +13,8 @@ const Subscription = require("../model/pricing/subscription");
 const SubCategoy = require("../model/products/subcategory");
 const Template = require("../model/sms-services/add-template");
 const Sender = require("../model/sms-services/add-senderid");
+const Compose = require("../model/sms-services/compose-message");
+
 isValidObjectId;
 
 const imageStorage = multer.diskStorage({
@@ -1529,8 +1531,86 @@ router.put("/template/:id", async (req, res) => {
 });
 
 //Compose message
-router.post("/compose_message", async(req, res) => {
-res.status(200).json({success:true, message: "Compose message successfully.."})
-})
+// router.post("/compose_message", async(req, res) => {
+
+// })
+
+// router.post("/compose_message", async (req, res) => {
+
+//   try {
+//     const { message_channel, message_route, sender_id , campaign_name,message_text,number  } = req.body;
+
+//     comp
+
+//     if (!message_channel|| !message_route || !sender_id || !campaign_name || !message_text || !number   ){
+//       res
+//         .status(400)
+//         .json({ success: false, message: "All fields are required" });
+//     }
+//    console.log(message_channel,message_route,sender_id,campaign_name,message_text,number)
+
+//     const composeMsg = new Compose({
+//       message_channel,
+//       message_route,
+//       sender_id,
+//       campaign_name,
+//       message_text,
+//       number,
+//       isApproved: "Approved",
+//     });
+
+//     const data = await composeMsg.save();
+//     console.log({data})
+//     res.status(200).json({
+//       success: true,
+//       message: "Message have been send successfully.",
+//       composeMsg,
+
+//     });
+
+//   } catch (error) {
+//     res.status(500).json({ message: error?.message });
+//   }
+// });
+
+// Message - Template
+router.post("/compose_message", async (req, res) => {
+  try {
+    const {
+      message_channel,
+      message_route,
+      sender_id,
+      campaign_name,
+      message_text,
+      number,
+    } = req.body;
+    if (!message_channel || !message_route || !sender_id || !campaign_name || !message_text || !number) {
+      res
+        .status(400)
+        .json({ success: false, message: "All fields are required" });
+    }
+
+  
+    // }
+
+    const compose = new Compose({
+      message_channel,
+      message_route,
+      sender_id,
+      campaign_name,
+      message_text,
+      number,
+    });
+
+    await compose.save();
+    res.status(200).json({
+      success: true,
+      message: "Message Added Successfully.",
+      templateModel: compose,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error?.message });
+  }
+});
 
 module.exports = router;
